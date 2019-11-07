@@ -1,5 +1,5 @@
 # online-collage-platform
-
+在线学院平台前台前端项目
 ## Project setup
 ```
 npm install
