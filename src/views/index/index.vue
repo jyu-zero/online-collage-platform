@@ -11,10 +11,10 @@
                 </div>
                 <el-dropdown trigger="click"  >
                   <span class="el-dropdown-link " id='dropdown-btn'>
-                      <span >
+                      <div >
                           <div class="user-name" >{{this.studentName}}</div>
                           <div class="user-id" >{{this.studentId}}</div>
-                      </span>
+                      </div>
                       <i class="el-icon-arrow-down el-icon--right"></i>
                   </span>
                     <el-dropdown-menu slot="dropdown">
@@ -182,7 +182,7 @@
 </template>
 
 <script>
-import { Dropdown, DropdownMenu, DropdownItem, Button, Input, Message, Dialog, CheckboxGroup, Checkbox } from 'element-ui'
+import { Dropdown, DropdownMenu, DropdownItem, Button, Input, Message, Dialog } from 'element-ui'
 import { prefix, responseHandler, userApi, goodsApi } from '@/api'
 export default {
     name: 'HomePage',
