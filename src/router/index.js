@@ -65,12 +65,12 @@ const routes = [
     },
     {
         // 我的个人信息管理
-        path: '/profilemanage',
+        path: '/profile',
         component: () => import('@/views/Wrapper.vue'),
         children: [
             {
                 path: '/',
-                name: 'ProfileManage',
+                name: 'Profile',
                 component: () => import('@/views/menus/profile-manage/index.vue')
             }
         ]
