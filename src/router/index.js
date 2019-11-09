@@ -65,7 +65,7 @@ const routes = [
     },
     {
         // 我的个人信息管理
-        path: '/myinfomanage',
+        path: '/profilemanage',
         component: () => import('@/views/Wrapper.vue'),
         children: [
             {
