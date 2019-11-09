@@ -351,7 +351,7 @@ export default {
         getUserName(){
             this.$axios.get(prefix.api + userApi.getStudentName).then((response)=>{
                 if(!responseHandler(response.data, this)){
-                    // 在这里处理错误
+                    // 提示出错
                     Message.error('您还未登录')
                     return
                 }
@@ -363,6 +363,7 @@ export default {
                 this.getGoods()
             })
         },
+        // 弹出登录框
         showLoginWindow() {
             this.loginWindow = !this.loginWindow
             this.account = ''
@@ -378,7 +379,7 @@ export default {
                 .post(prefix.api + userApi.login, { account: this.account, password: this.password })
                 .then((response)=>{
                     if(!responseHandler(response.data, this)){
-                    // 在这里处理错误
+                        // 提示出错
                         Message.error(response.data.msg)
                     }
                     this.getUserName()
@@ -393,18 +394,45 @@ export default {
             // console.log('sss')
             this.$axios.post(prefix.api + userApi.logout).then((response)=>{
                 if(!responseHandler(response.data, this)){
-                    // 在这里处理错误
+                    // 提示出错
                     Message.error(response.data.msg)
                 }
                 this.isLogin = false
                 Message.success(response.data.msg)
             })
         },
+
+        // TODO : 接口没给
+        // 获取新闻列表
+        // getNews(){
+        //     this.$axios.get(prefix.api + newsApi.getNews).then((response)=>{
+        //         if(!responseHandler(response.data, this)){
+        //             // 提示出错
+        //             Message.error(response.data.msg)
+        //             return
+        //         }
+        //         this.news = response.data.data
+        //     })
+        // },
+
+        // TODO : 接口没给
+        // 获取问题列表
+        // getQuestions(){
+        //     this.$axios.get(prefix.api + questionsApi.getQusetion).then((response)=>{
+        //         if(!responseHandler(response.data, this)){
+        //             // 提示出错
+        //             Message.error(response.data.msg)
+        //             return
+        //         }
+        //         this.news = response.data.data
+        //     })
+        // },
+
         // 获取失物招领内容
         getGoods(){
             this.$axios.get(prefix.api + goodsApi.getGoods).then((response)=>{
                 if(!responseHandler(response.data, this)){
-                    // 在这里处理错误
+                    // 提示出错
                     Message.error('您还未登录')
                     return
                 }
@@ -412,10 +440,25 @@ export default {
                 console.log(response.data.data)
             })
         },
-        // 跳转至个人中心页面
+
+        // TODO : 接口没给
+        // 获取分享资料
+        // getSources(){
+        //     this.$axios.get(prefix.api + SourcesApi.getSources).then((response)=>{
+        //         if(!responseHandler(response.data, this)){
+        //             // 提示出错
+        //             Message.error(response.data.msg)
+        //             return
+        //         }
+        //         this.document = response.data.data
+        //     })
+        // },
+
+        // 跳转部分
+        // 跳转人中心页面
         goToUserCenter(){
             console.log('跳转至个人中心')
-            // this.$router.push({ name: 'UserCenter' })
+            this.$router.push({ path: '/userCenter/' })
         },
         // 跳转至新闻中心页面
         goToNewsPage(){
@@ -442,7 +485,7 @@ export default {
         // 获取一卡通号和姓名
         this.$axios.get(prefix.api + userApi.getStudentName).then((response)=>{
             if(!responseHandler(response.data, this)){
-                // 在这里处理错误
+                // 提示出错
                 Message.error('您还未登录')
                 return
             }
