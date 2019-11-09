@@ -1,12 +1,12 @@
 <template>
-  <div class="source-share">
+  <div class="file-share">
     我共享的资料
   </div>
 </template>
 
 <script>
 export default {
-    name: 'SourceShare'
+    name: 'FileShare'
 }
 </script>
 

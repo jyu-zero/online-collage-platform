@@ -16,7 +16,7 @@ const routes = [
     },
     {
         // 个人中心
-        path: '/usercenter',
+        path: '/user-center',
         component: () => import('@/views/Wrapper.vue'),
         children: [
             {
@@ -41,7 +41,7 @@ const routes = [
     },
     {
         // 我的失物招领
-        path: '/lostandfound',
+        path: '/lost-and-found',
         component: () => import('@/views/Wrapper.vue'),
         children: [
             {
@@ -53,13 +53,13 @@ const routes = [
     },
     {
         // 我共享的资料
-        path: '/sourceshare',
+        path: '/file-share',
         component: () => import('@/views/Wrapper.vue'),
         children: [
             {
                 path: '/',
                 name: 'SourceShare',
-                component: () => import('@/views/menus/source-share/index.vue')
+                component: () => import('@/views/menus/file-share/index.vue')
             }
         ]
     },

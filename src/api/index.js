@@ -1,10 +1,11 @@
 import user from './user'
+import goods from './goods'
 import apiPrefix from './apiPrefix'
 import _responseHandler from './responseHandler'
 
 export const userApi = user
 
-export const goodsApi = { getGoods: '/goods/display' }
+export const goodsApi = goods
 
 export const testApi = { test: '/test' }
 

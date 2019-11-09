@@ -458,7 +458,7 @@ export default {
         // 跳转人中心页面
         goToUserCenter(){
             console.log('跳转至个人中心')
-            this.$router.push({ path: '/usercenter/' })
+            this.$router.push({ path: '/user-center/' })
         },
         // 跳转至新闻中心页面
         goToNewsPage(){
