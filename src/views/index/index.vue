@@ -182,7 +182,7 @@
 </template>
 
 <script>
-import { Dropdown, DropdownMenu, DropdownItem, Button, Input, Message, Dialog } from 'element-ui'
+import { Dropdown, DropdownMenu, DropdownItem, Button, Input, Message, Dialog, CheckboxGroup, Checkbox } from 'element-ui'
 import { prefix, responseHandler, userApi, goodsApi } from '@/api'
 export default {
     name: 'HomePage',
@@ -458,7 +458,7 @@ export default {
         // 跳转人中心页面
         goToUserCenter(){
             console.log('跳转至个人中心')
-            this.$router.push({ path: '/userCenter/' })
+            this.$router.push({ path: '/usercenter/' })
         },
         // 跳转至新闻中心页面
         goToNewsPage(){

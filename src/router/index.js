@@ -7,7 +7,7 @@ const routes = [
     {
         path: '/',
         name: 'Index',
-        component: () => import('@/views/index/Index.vue')
+        component: () => import('@/views/index/index.vue')
     },
     {
         path: '/login',
@@ -16,13 +16,13 @@ const routes = [
     },
     {
         // 个人中心
-        path: '/userCenter',
+        path: '/usercenter',
         component: () => import('@/views/Wrapper.vue'),
         children: [
             {
                 // 通知栏
                 path: '/',
-                name: 'notification',
+                name: 'Notification',
                 component: () => import('@/views/menus/notification/index.vue')
             }
         ]
@@ -34,44 +34,44 @@ const routes = [
         children: [
             {
                 path: '/',
-                name: 'question',
+                name: 'Question',
                 component: () => import('@/views/menus/question/index.vue')
             }
         ]
     },
     {
         // 我的失物招领
-        path: '/lostAndFound',
+        path: '/lostandfound',
         component: () => import('@/views/Wrapper.vue'),
         children: [
             {
                 path: '/',
-                name: 'lostAndFound',
+                name: 'LostAndFound',
                 component: () => import('@/views/menus/lost-and-found/index.vue')
             }
         ]
     },
     {
         // 我共享的资料
-        path: '/sourceShare',
+        path: '/sourceshare',
         component: () => import('@/views/Wrapper.vue'),
         children: [
             {
                 path: '/',
-                name: 'sourceShare',
+                name: 'SourceShare',
                 component: () => import('@/views/menus/source-share/index.vue')
             }
         ]
     },
     {
         // 我的个人信息管理
-        path: '/myInfoManage',
+        path: '/myinfomanage',
         component: () => import('@/views/Wrapper.vue'),
         children: [
             {
                 path: '/',
-                name: 'myInfoManage',
-                component: () => import('@/views/menus/my-info-manage/index.vue')
+                name: 'ProfileManage',
+                component: () => import('@/views/menus/profile-manage/index.vue')
             }
         ]
     }

@@ -1,12 +1,12 @@
 <template>
-  <div class="notification">
+  <div class="lost-and-found">
     我的失物招领
   </div>
 </template>
 
 <script>
 export default {
-    name: 'lostAndFound'
+    name: 'LostAndFound'
 }
 </script>
 

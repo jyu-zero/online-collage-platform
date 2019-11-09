@@ -1,12 +1,12 @@
 <template>
-  <div class="notification">
+  <div class="profile-manage">
     个人资料管理
   </div>
 </template>
 
 <script>
 export default {
-    name: 'myInfoManage'
+    name: 'ProfileManage'
 }
 </script>
 

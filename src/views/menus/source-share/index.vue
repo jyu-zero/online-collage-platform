@@ -1,12 +1,12 @@
 <template>
-  <div class="notification">
-    我共享得资料
+  <div class="source-share">
+    我共享的资料
   </div>
 </template>
 
 <script>
 export default {
-    name: 'sourceShare'
+    name: 'SourceShare'
 }
 </script>
 

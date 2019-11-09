@@ -1,12 +1,12 @@
 <template>
-  <div class="notification">
+  <div class="question">
     我的问答
   </div>
 </template>
 
 <script>
 export default {
-    name: 'question'
+    name: 'Question'
 }
 </script>
 
