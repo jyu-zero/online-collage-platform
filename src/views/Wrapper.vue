@@ -42,23 +42,23 @@ export default {
             menus: [
                 {
                     title: '通知栏',
-                    routeName: 'notification'
+                    routeName: 'Notification'
                 },
                 {
                     title: '我的问答',
-                    routeName: 'question'
+                    routeName: 'Question'
                 },
                 {
                     title: '我的失物招领',
-                    routeName: 'lostAndFound'
+                    routeName: 'LostAndFound'
                 },
                 {
                     title: '我共享的资料',
-                    routeName: 'sourceShare'
+                    routeName: 'FileShare'
                 },
                 {
                     title: '个人资料管理',
-                    routeName: 'myInfoManage'
+                    routeName: 'Profile'
                 }
             ]
         }

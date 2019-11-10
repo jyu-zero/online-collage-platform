@@ -58,7 +58,7 @@ const routes = [
         children: [
             {
                 path: '/',
-                name: 'SourceShare',
+                name: 'FileShare',
                 component: () => import('@/views/menus/file-share/index.vue')
             }
         ]
