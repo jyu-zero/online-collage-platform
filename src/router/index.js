@@ -13,6 +13,11 @@ const routes = [
         path: '/login',
         name: 'Login',
         component: () => import('@/views/Login.vue')
+    },
+    {
+        path: '/lost-found',
+        name: 'Lost-Found',
+        component: () => import('@/views/menus/lost-found/index.vue')
     }
 ]
 
