@@ -47,7 +47,7 @@
                                         <p><span>认领</span></p>
                                     </div>
                                     <div class="goods-name">
-                                        <p><span>蓝色U盘</span></p>
+                                        <p><span>蓝色金士顿U盘</span></p>
                                     </div>
                                     <div class="goods-condition">
                                         <p><span>学院托管</span></p>

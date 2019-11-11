@@ -18,6 +18,16 @@ const routes = [
         path: '/lost-found',
         name: 'Lost-Found',
         component: () => import('@/views/menus/lost-found/index.vue')
+    },
+    {
+        path: '/lost-details',
+        name: 'Lost-Details',
+        component: () => import('@/views/menus/lost-found/LostDetails.vue')
+    },
+    {
+        path: '/found-details',
+        name: 'Found-Details',
+        component: () => import('@/views/menus/lost-found/FoundDetails.vue')
     }
 ]
 
