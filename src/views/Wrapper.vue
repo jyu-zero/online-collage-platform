@@ -119,6 +119,11 @@ export default {
         //     //     this.studentId = response.data.data.student_id
         //     })
         // }
+        // 跳转至个人中心，相当于跳转通知栏页面
+        // goToUserCenter(){
+        //     console.log('跳转至个人中心')
+        //     this.$router.push({ path: '/user-center/' })
+        // },
     },
     created() {
         // 获取学生姓名卡号
@@ -167,6 +172,7 @@ export default {
                       flex-wrap: nowrap;
                       align-items: center;
                 div{
+                      color: #fff;
                       text-align: center;
                 }
         }
