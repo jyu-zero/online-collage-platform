@@ -3,6 +3,25 @@
         <!-- 顶部导航栏 -->
         <header>
             <h1>个人中心</h1>
+          <div class="header-right"  >
+            <div class="new-msg">
+              <i class="el-icon-message"></i>
+              <span class="msg-num">996</span>
+            </div>
+            <el-dropdown trigger="click"  >
+                  <span class="el-dropdown-link " id='dropdown-btn'>
+                      <div >
+                          <div class="user-name" >{{this.studentName}}</div>
+                          <div class="user-id" >{{this.studentId}}</div>
+                      </div>
+                      <i class="el-icon-arrow-down el-icon--right"></i>
+                  </span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item icon="el-icon-user" ><span @click="goToUserCenter">个人中心</span></el-dropdown-item>
+                <el-dropdown-item icon="el-icon-close" ><span @click="logout">注销</span></el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </div>
         </header>
         <!-- 顶部导航栏 [完] -->
         <div class="wrapper-body">
@@ -25,9 +44,13 @@
 </template>
 
 <script>
-import { Menu, MenuItem } from 'element-ui'
+import { Dropdown, DropdownMenu, DropdownItem, Menu, MenuItem, Message } from 'element-ui'
+import { prefix, responseHandler, userApi } from '@/api'
 export default {
     components: {
+        [Dropdown.name]: Dropdown,
+        [DropdownMenu.name]: DropdownMenu,
+        [DropdownItem.name]: DropdownItem,
         [Menu.name]: Menu,
         [MenuItem.name]: MenuItem
     },
@@ -39,6 +62,8 @@ export default {
     },
     data() {
         return {
+            studentName: 'aaa',
+            studentId: '111111',
             menus: [
                 {
                     title: '通知栏',
@@ -64,9 +89,41 @@ export default {
         }
     },
     methods: {
+        // 跳转菜单
         goToMenu(menuItem) {
             this.$router.push({ name: menuItem.routeName })
+        },
+        // 注销
+        logout(){
+            // console.log('sss')
+            this.$axios.post(prefix.api + userApi.logout).then((response)=>{
+                if(!responseHandler(response.data, this)){
+                    // 提示出错
+                    Message.error(response.data.msg)
+                }
+                Message.success(response.data.msg)
+                this.$router.push({ name: 'HomePage' })
+            })
         }
+        // 获取学生姓名卡号
+        // getStudentName(){
+        //     // this.$axios.get(prefix.api + userApi.getStudentName).then((response)=>{
+        //     //     if(!responseHandler(response.data, this)){
+        //     //         // 提示出错
+        //     //         Message.error('您还未登录')
+        //     //         this.$router.push({ name: 'HomePage' })
+        //     //         return
+        //     //     }
+        //     //     // 更新姓名以及一卡通id
+        //     //     this.studentName = response.data.data.name
+        //     //     this.studentId = response.data.data.student_id
+        //     })
+        // }
+    },
+    created() {
+        // 获取学生姓名卡号
+
+        // this.getStudentName()
     }
 }
 </script>
@@ -90,6 +147,30 @@ export default {
             margin:0;
             font-size:20px;
         }
+
+        .header-right{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+                .new-msg{
+                      margin-right: 30px;
+                      display: flex;
+                      align-items: center;
+                      i{
+                        margin-right: 10px;
+                        font-size: 35px;
+                      }
+                }
+                #dropdown-btn{
+                      width: 100px;
+                      display: flex;
+                      flex-wrap: nowrap;
+                      align-items: center;
+                div{
+                      text-align: center;
+                }
+        }
+      }
     }
 
     .wrapper-body{
