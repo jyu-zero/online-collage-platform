@@ -6,8 +6,8 @@ Vue.use(VueRouter)
 const routes = [
     {
         path: '/',
-        name: 'Test',
-        component: () => import('@/views/Test.vue')
+        name: 'Index',
+        component: () => import('@/views/index/index.vue')
     },
     {
         path: '/login',
@@ -15,19 +15,65 @@ const routes = [
         component: () => import('@/views/Login.vue')
     },
     {
-        path: '/lost-found',
-        name: 'Lost-Found',
-        component: () => import('@/views/menus/lost-found/index.vue')
+        // 个人中心
+        path: '/user-center',
+        component: () => import('@/views/Wrapper.vue'),
+        children: [
+            {
+                // 通知栏
+                path: '/',
+                name: 'Notification',
+                component: () => import('@/views/menus/notification/index.vue')
+            }
+        ]
     },
     {
-        path: '/lost-details',
-        name: 'Lost-Details',
-        component: () => import('@/views/menus/lost-found/LostDetails.vue')
+        // 我的问答
+        path: '/question',
+        component: () => import('@/views/Wrapper.vue'),
+        children: [
+            {
+                path: '/',
+                name: 'Question',
+                component: () => import('@/views/menus/question/index.vue')
+            }
+        ]
     },
     {
-        path: '/found-details',
-        name: 'Found-Details',
-        component: () => import('@/views/menus/lost-found/FoundDetails.vue')
+        // 我的失物招领
+        path: '/lost-and-found',
+        component: () => import('@/views/Wrapper.vue'),
+        children: [
+            {
+                path: '/',
+                name: 'LostAndFound',
+                component: () => import('@/views/menus/lost-and-found/index.vue')
+            }
+        ]
+    },
+    {
+        // 我共享的资料
+        path: '/file-share',
+        component: () => import('@/views/Wrapper.vue'),
+        children: [
+            {
+                path: '/',
+                name: 'FileShare',
+                component: () => import('@/views/menus/file-share/index.vue')
+            }
+        ]
+    },
+    {
+        // 我的个人信息管理
+        path: '/profile',
+        component: () => import('@/views/Wrapper.vue'),
+        children: [
+            {
+                path: '/',
+                name: 'Profile',
+                component: () => import('@/views/menus/profile-manage/index.vue')
+            }
+        ]
     }
 ]
 
