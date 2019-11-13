@@ -21,9 +21,15 @@ const routes = [
         children: [
             {
                 // 通知栏
-                path: '/',
+                path: 'Notification',
                 name: 'Notification',
                 component: () => import('@/views/menus/notification/index.vue')
+            },
+            {
+                // 失物招领栏
+                path: 'lost-and-found',
+                name: 'LostAndFound',
+                component: () => import('@/views/menus/lost-and-found/index.vue')
             }
         ]
     },
@@ -42,12 +48,17 @@ const routes = [
     {
         // 我的失物招领
         path: '/lost-and-found',
-        component: () => import('@/views/Wrapper.vue'),
+        component: () => import('@/views/menus/lost-and-found/index.vue'),
         children: [
             {
-                path: '/',
-                name: 'LostAndFound',
-                component: () => import('@/views/menus/lost-and-found/index.vue')
+                path: 'lost-details',
+                name: 'LostDetails',
+                component: () => import('@/views/menus/lost-and-found/lost-details.vue')
+            },
+            {
+                path: 'found-details',
+                name: 'FoundDetails',
+                component: () => import('@/views/menus/lost-and-found/found-details.vue')
             }
         ]
     },

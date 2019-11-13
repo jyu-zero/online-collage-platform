@@ -1,6 +1,6 @@
 <template>
   <div class="file-share">
-    我共享的资料
+    我12312312
   </div>
 </template>
 

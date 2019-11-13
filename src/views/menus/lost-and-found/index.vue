@@ -1,6 +1,7 @@
 <template>
   <div class="lost-and-found">
     我的失物招领
+    <router-view></router-view>
   </div>
 </template>
 
