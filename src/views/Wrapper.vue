@@ -59,6 +59,10 @@ export default {
                 {
                     title: '个人资料管理',
                     routeName: 'Profile'
+                },
+                {
+                    title: '新闻中心',
+                    routeName: 'News'
                 }
             ]
         }

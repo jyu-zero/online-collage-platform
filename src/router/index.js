@@ -74,6 +74,18 @@ const routes = [
                 component: () => import('@/views/menus/profile-manage/index.vue')
             }
         ]
+    },
+    {
+        // 新闻中心
+        path: '/news',
+        component: () => import('@/views/Wrapper.vue'),
+        children: [
+            {
+                path: '/',
+                name: 'News',
+                component: () => import('@/views/news/index.vue')
+            }
+        ]
     }
 ]
 
