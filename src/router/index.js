@@ -51,14 +51,21 @@ const routes = [
         component: () => import('@/views/menus/lost-and-found/index.vue'),
         children: [
             {
-                path: 'lost-details',
+                path: 'lost-details/',
                 name: 'LostDetails',
                 component: () => import('@/views/menus/lost-and-found/lost-details.vue')
             },
             {
-                path: 'found-details',
+                path: 'found-details/',
                 name: 'FoundDetails',
-                component: () => import('@/views/menus/lost-and-found/found-details.vue')
+                component: () => import('@/views/menus/lost-and-found/found-details.vue'),
+                children: [
+                    {
+                        path: 'question-pop-up',
+                        name: 'questionPopUp',
+                        component: () => import('@/views/menus/lost-and-found/pop-up/question-pop-up.vue')
+                    }
+                ]
             }
         ]
     },
