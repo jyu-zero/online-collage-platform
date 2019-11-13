@@ -62,7 +62,7 @@ export default {
                 },
                 {
                     title: '新闻中心',
-                    routeName: 'News'
+                    routeName: 'Center'
                 }
             ]
         }

@@ -77,13 +77,25 @@ const routes = [
     },
     {
         // 新闻中心
-        path: '/news',
+        path: '/news-center',
         component: () => import('@/views/Wrapper.vue'),
         children: [
             {
                 path: '/',
-                name: 'News',
-                component: () => import('@/views/news/index.vue')
+                name: 'NewsCenter',
+                component: () => import('@/views/news/news-center/index.vue')
+            }
+        ]
+    },
+    {
+        // 新闻页面
+        path: '/news-detail',
+        component: () => import('@/views/Wrapper.vue'),
+        children: [
+            {
+                path: '/',
+                name: 'Detail',
+                component: () => import('@/views/news/news-detail/index.vue')
             }
         ]
     }
