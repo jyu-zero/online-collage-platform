@@ -2,7 +2,7 @@
     <div class="wrapper">
         <!-- 顶部导航栏 -->
         <header>
-            <h1>在线学院平台</h1>
+            <h1>个人中心</h1>
           <div class="header-right"  >
             <div class="new-msg">
               <i class="el-icon-message"></i>
@@ -25,7 +25,19 @@
         </header>
         <!-- 顶部导航栏 [完] -->
         <div class="wrapper-body">
-            <router-view></router-view>
+            <el-menu
+                :default-active="currentRouteName"
+                class="menu"
+                background-color="#22466f"
+                text-color="#779cc6"
+                active-text-color="#fff">
+                <el-menu-item @click="goToMenu(menuItem)" v-for="(menuItem,index) of menus" :index="menuItem.routeName" :key="index" :route="menuItem.route">
+                    <span slot="title">{{menuItem.title}}</span>
+                </el-menu-item>
+            </el-menu>
+            <main>
+                <router-view/>
+            </main>
         </div>
 
     </div>
@@ -51,10 +63,36 @@ export default {
     data() {
         return {
             studentName: 'aaa',
-            studentId: '111111'
+            studentId: '111111',
+            menus: [
+                {
+                    title: '通知栏',
+                    routeName: 'UserCenterNotification'
+                },
+                {
+                    title: '我的问答',
+                    routeName: 'UserCenterQuestion'
+                },
+                {
+                    title: '我的失物招领',
+                    routeName: 'UserCenterLostAndFound'
+                },
+                {
+                    title: '我共享的资料',
+                    routeName: 'UserCenterFileShare'
+                },
+                {
+                    title: '个人资料管理',
+                    routeName: 'UserCenterProfile'
+                }
+            ]
         }
     },
     methods: {
+        // 跳转菜单
+        goToMenu(menuItem) {
+            this.$router.push({ name: menuItem.routeName })
+        },
         // 注销
         logout(){
             // console.log('sss')
