@@ -50,6 +50,28 @@ export default {
     },
     data() {
         return {
+            menus: [
+                {
+                    title: '通知栏',
+                    routeName: 'Notification'
+                },
+                {
+                    title: '我的问答',
+                    routeName: 'Question'
+                },
+                {
+                    title: '我的失物招领',
+                    routeName: 'MyLostAndFound'
+                },
+                {
+                    title: '我共享的资料',
+                    routeName: 'FileShare'
+                },
+                {
+                    title: '个人资料管理',
+                    routeName: 'Profile'
+                }
+            ],
             studentName: 'aaa',
             studentId: '111111'
         }
