@@ -28,6 +28,19 @@ const routes = [
         ]
     },
     {
+        // 失物招领
+        path: '/lost-and-found',
+        component: () => import('@/views/menus/lost-and-found/LostAndFound.vue'),
+        children: [
+            {
+                // 失物招领详情
+                path: '/',
+                name: 'LostAndFound',
+                component: () => import('@/views/menus/lost-and-found/LostAndFound.vue')
+            }
+        ]
+    },
+    {
         // 我的问答
         path: '/question',
         component: () => import('@/views/Wrapper.vue'),
@@ -41,12 +54,12 @@ const routes = [
     },
     {
         // 我的失物招领
-        path: '/lost-and-found',
+        path: '/my-lost-and-found',
         component: () => import('@/views/Wrapper.vue'),
         children: [
             {
                 path: '/',
-                name: 'LostAndFound',
+                name: 'MyLostAndFound',
                 component: () => import('@/views/menus/lost-and-found/index.vue')
             }
         ]
