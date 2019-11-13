@@ -5,24 +5,27 @@
       <el-button type="primary">发送通知</el-button>
       <el-button>标记为已读</el-button>
         <el-button @click="checkAll">
-          <input type="checkbox"  id="check-all" v-model="checked" style="display:none">
+          <input type="checkbox"  id="check-all" v-model="checked"  style="display:none">
           <span  @click.stop="checkAll">全选</span>
         </el-button>
       </div>
       <div class="notification-list" >
-        <div v-for="notification of notifications" :key="notification.id" style="margin-top:20px;" class="notification-item" >
-          <label>
-            <input type="checkbox" v-model="checkModel" :value="notification.id">
-            <span class="notification-title">{{notification.title}}--</span>
-          </label>
-          <span class="check">查看</span>
+        <div v-for="notification of notifications" :key="notification.id" >
+          <div class="notification-item" >
+            <div class="checkbox-container" @click="clickCheckbox">
+            <input type="checkbox" v-model="checkModel" class="check_box tui-checkbox"  :value="notification.id">
+            </div>
+            <span class="notification-title" @click="clickPrevCheckbox">{{notification.title}}--</span>
+            <span class="check" @click="checkDetail">查看</span>
+          </div>
+          <div class="content-container hidden">
+              <p>
+                {{notification.content}}
+              </p>
+          </div>
         </div>
       </div>
     </main>
-    <div class="data_list" v-for="(item,index) in data_list" :key="index">
-      <input type="checkbox" class="check_box tui-checkbox" :id="'id'+item.id" :value="item.id" v-model="checkedNames">
-      <label :for="'id'+item.id" class="title">{{item.title}}</label >
-    </div>
   </div>
 </template>
 
@@ -41,8 +44,8 @@ export default {
     data(){
         return{
             // checkAll: false,
-            checkedCities: [],
-            cities: ['123123', '1233', '12122223'],
+            checkednotificationIdList: [],
+            notificationIdList: ['123123', '1233', '12122223'],
             cityOptions: ['123123', '123123', '12123'],
             isIndeterminate: true,
             notifications: [
@@ -54,7 +57,7 @@ export default {
                 {
                     id: 1,
                     title: '标题内容2',
-                    content: 'bablablalba'
+                    content: 'bablablalbbablablalbbablablalbbablablalbbablablalbbablablalbbablablalbbablablalbbablablalba'
                 },
                 {
                     id: 2,
@@ -102,18 +105,20 @@ export default {
         }
     },
     methods: {
-        handleCheckAllChange(val){
-            this.checkedCities = val ? this.cityOptions : []
-            this.isIndeterminate = false
+
+        // 这两个方法都是绑定了checkbox的点击事件
+        clickCheckbox(e){
+            e.currentTarget.firstElementChild.checked = !e.currentTarget.firstElementChild.checked
         },
-        handleCheckedCitiesChange(value){
-            let checkedCount = value.length
-            this.checkAll = checkedCount === this.cities.length
-            this.isIndeterminate = checkedCount > 0 && checkedCount < this.cities.length
+        clickPrevCheckbox(e){
+            e.currentTarget.previousSibling.firstElementChild.checked = !e.currentTarget.previousSibling.firstElementChild.checked
         },
-        checkout(){
-            console.log('asdasdsa')
+
+        // 这个是查看通知详情的按钮
+        checkDetail(e){
+            e.currentTarget.parentElement.nextSibling.classList['value'] = e.currentTarget.parentElement.nextSibling.classList['value'] === 'content-container display' ? 'content-container hidden' : 'content-container display'
         },
+        // 全选按钮
         checkAll(){
             if(this.checked){
                 this.checkModel = []
@@ -127,6 +132,7 @@ export default {
         }
     },
     watch: {
+        // 观察用户选择了哪个通知项，同步到checkmodel中
         checkModel(){
             console.log(this.checkModel)
             if(this.checkModel.length === this.list.length){
@@ -138,12 +144,13 @@ export default {
 
     },
     created() {
+        // 把各个通知的id放到notificationIdList中
         let arr = []
         arr = this.notifications.map(function(item, index, arr){
             return item.id
         })
         console.log(arr)
-        this.cities = arr
+        this.notificationIdList = arr
         console.log(this.cityOptions)
     }
 }
@@ -162,10 +169,12 @@ export default {
       }
     }
     .notification-list{
-        width: 70%;
+        margin-top: 10px;
+        max-width: 750px;
         display: flex;
         flex-direction: column;
-        border: 1px solid black;
+      border-radius: 15px;
+      overflow: hidden;
       .notification-item{
         /*禁止圈选*/
         -moz-user-select:none; /*火狐*/
@@ -173,38 +182,64 @@ export default {
         -ms-user-select:none; /*IE10*/
         -khtml-user-select:none; /*早期浏览器*/
         user-select:none;
-
         display: flex;
+        align-items: center;
+        height: 60px;
         position: relative;
-        padding: 20px;
+        background: #f5f5f5;
         margin: 0;
-        border: 1px solid black;
         font-size: 20px;
         &:hover{
           color: #5e91fa;
         }
-        input{
-          font-size: 25px;
-          width: 20px;
-          height: 20px;
-        }
-        label{
-          display: block;
-          width: 80%;
-          .notification-title{
-            margin-right: 15px;
-            select:none;
+        .checkbox-container{
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          input{
+            font-size: 25px;
+            width: 20px;
+            height: 20px;
           }
         }
-        .check{
-          position: absolute;
-          right: 20px;
+
+        .notification-title{
+          display: flex;
+          align-items: center;
+          flex: 0.9;
+          margin-right: 15px;
+          height: 100%;
+          line-height: 100%;
         }
+        .check{
+          height: 100%;
+          flex: 0.1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+      .content-container{
+        overflow: hidden;
+        padding: 0 20px;
+        background: #fbfbfb;
+        box-sizing: border-box;
+        word-wrap:break-word;
+        font-size: 20px;
       }
     }
   }
+  .hidden{
+    display: none;
+  }
+  .display{
+    display: block;
+  }
+  /*复选框的diy样式*/
   .tui-checkbox:checked {
-    background: #1673ff;
+    background: #427fff;
     border: solid 1px #1673ff;
   }
   .tui-checkbox {
@@ -228,7 +263,6 @@ export default {
     transition: background-color ease 0.6s;
   }
   .tui-checkbox:checked::after {
-    content: '';
     top: 0.1rem;
     left: 0.09rem;
     position: absolute;
@@ -236,11 +270,5 @@ export default {
     border: #fff solid 2px;
     border-top: none;
     border-right: none;
-    height: 0.12rem;
-    width: 0.25rem;
-    -moz-transform: rotate(-45deg);
-    -ms-transform: rotate(-45deg);
-    -webkit-transform: rotate(-45deg);
-    transform: rotate(-45deg);
   }
 </style>

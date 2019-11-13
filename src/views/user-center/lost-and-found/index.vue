@@ -228,8 +228,15 @@
 </template>
 
 <script>
+import { Row, Button, Pagination } from 'element-ui'
+
 export default {
-    name: 'FileShare'
+    name: 'UserCenterLostAndFound',
+    components: {
+        [Button.name]: Button,
+        [Pagination.name]: Pagination,
+        [Row.name]: Row
+    }
 }
 </script>
 
