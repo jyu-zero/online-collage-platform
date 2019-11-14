@@ -1,5 +1,5 @@
 <template>
-    <div id="launch-question">
+    <div id="new-question">
         <header>
             <el-breadcrumb separator-class="el-icon-arrow-right">
                 <el-breadcrumb-item :to="{ path: '/' }">主页</el-breadcrumb-item>
@@ -49,7 +49,7 @@
 import { prefix, responseHandler, questionApi } from '@/api'
 import { Button, Message, Breadcrumb, Row, Col, Input, BreadcrumbItem, Checkbox, Select, Option } from 'element-ui'
 export default {
-    name: 'launchQuestion',
+    name: 'NewQuestion',
     components: {
         [Button.name]: Button,
         [Message.name]: Message,
@@ -115,7 +115,7 @@ export default {
         box-sizing: border-box;
     }
 
-    #launch-question{
+    #new-question{
         width: 980px;
         height: 100%;
         margin: 20px auto;

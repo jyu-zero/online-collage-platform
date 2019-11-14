@@ -26,17 +26,18 @@ const routes = [
                 component: () => import('@/views/user-center/notification')
             },
             {
-                // 在线问答
                 path: 'questions',
                 name: 'UserCenterQuestion',
                 component: () => import('@/views/user-center/question')
             },
+            // 失物招领组界限 ----------
             {
                 // 失物招领
                 path: 'lost-and-found',
                 name: 'UserCenterLostAndFound',
                 component: () => import('@/views/user-center/lost-and-found')
             },
+            // 失物招领组界限 ---------- [完]
             {
                 // 资料共享
                 path: 'file-share',
@@ -62,16 +63,38 @@ const routes = [
                 name: 'Test',
                 component: () => import('@/views/Test.vue')
             },
+            // 在线问答组界限 ----------
             {
                 path: '/question',
                 name: 'Question',
                 component: () => import('@/views/question')
             },
             {
-                path: '/launch-question',
-                name: 'LaunchQuestion',
-                component: () => import('@/views/question/launchQuestion.vue')
+                path: '/question/new',
+                name: 'NewQuestion',
+                component: () => import('@/views/question/NewQuestion.vue')
+            },
+            // 在线问答组界限 ---------- [完]
+            // 失物招领组界限 ----------
+            {
+                // 失物招领详情
+                path: '/lost-and-found',
+                name: 'LostAndFound',
+                component: () => import('@/views/lost-and-found')
+            },
+            {
+                // 失物详情页
+                path: '/lost-details',
+                name: 'LostDetails',
+                component: () => import('@/views/lost-and-found/LostDetails')
+            },
+            {
+                // 招领详情页
+                path: '/found-details',
+                name: 'FoundDetails',
+                component: () => import('@/views/lost-and-found/FoundDetails')
             }
+            // 失物招领组界限 ---------- [完]
         ]
     }
 ]

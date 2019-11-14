@@ -473,7 +473,7 @@ export default {
         // 跳转至失物招领页面
         goToLostAndFound(){
             console.log('跳转至失物招领页面')
-            // this.$router.push({ name: 'LostAndFound' })
+            this.$router.push({ name: 'LostAndFound' })
         },
         // 跳转至资源共享页面
         goToSourceShare(){
