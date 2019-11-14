@@ -69,6 +69,18 @@ const routes = [
                 path: '/lost-and-found',
                 name: 'LostAndFound',
                 component: () => import('@/views/lost-and-found')
+            },
+            {
+                // 失物详情页
+                path: '/lost-details',
+                name: 'LostDetails',
+                component: () => import('@/views/lost-and-found/lostDetails')
+            },
+            {
+                // 招领详情页
+                path: '/found-details',
+                name: 'FoundDetails',
+                component: () => import('@/views/lost-and-found/foundDetails')
             }
             // 失物招领组界限 ---------- [完]
         ]
