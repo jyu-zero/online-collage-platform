@@ -70,20 +70,21 @@ const routes = [
                 path: '/lost-and-found',
                 name: 'LostAndFound',
                 component: () => import('@/views/lost-and-found')
-            }
+            },
             // 失物招领组界限 ---------- [完]
-        ]
-    },
-    {
-        // 新闻中心
-        path: '/news-center',
-        component: () => import('@/views/Wrapper.vue'),
-        children: [
+            // 新闻管理组界限 ----------
             {
-                path: '/',
+                // 新闻中心
+                path: '/news-center',
                 name: 'NewsCenter',
-                component: () => import('@/views/news/news-center/index.vue')
+                component: () => import('@/views/news/NewsCenter.vue')
+            },
+            {
+                path: '/news-detail',
+                name: 'NewsDetail',
+                component: () => import('@/views/news/NewsDetail.vue')
             }
+            // 新闻管理组界限 ---------- [完]
         ]
     },
     {
@@ -91,11 +92,7 @@ const routes = [
         path: '/news-detail',
         component: () => import('@/views/Wrapper.vue'),
         children: [
-            {
-                path: '/',
-                name: 'Detail',
-                component: () => import('@/views/news/news-detail/index.vue')
-            }
+            
         ]
     }
 ]

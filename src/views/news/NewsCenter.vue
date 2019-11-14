@@ -46,41 +46,41 @@
 </template>
 
 <script>
-    import axios from "axios";
-    import { Pagination } from 'element-ui'
-    export default {
-        name: 'News',
-        components: {
-            [Pagination.name]: Pagination
-        },
-        data(){
-            return{
-                pageCount:1,
-                news:[]
-            };
-        },
-        created() {
-            this.getNews();
-        },
-        methods: {
-            toHomePage(){
-                console.log('跳转至主页')
-                this.$router.push({ name: 'HomePage' })
-            },
-            getNews(page=1){
-                axios
-                    .get("/api" + api.getNews,{
-                        params:{
-                            page
-                        }
-                    })
-                    .then(response => {
-                        this.news = response.data.data.news;
-                        this.pageCount = response.data.data.pageCount;
-                    });
-            }
+import { Pagination } from 'element-ui'
+export default {
+    name: 'News',
+    components: {
+        [Pagination.name]: Pagination
+    },
+    data(){
+        return {
+            pageCount: 1,
+            news: []
         }
-    };
+    },
+    created() {
+        this.getNews()
+    },
+    methods: {
+        toHomePage(){
+            console.log('跳转至主页')
+            this.$router.push({ name: 'HomePage' })
+        },
+        getNews(page = 1){
+            // TODO: 这里要修改哦
+            // this.$axios
+            //     .get('/api' + api.getNews,{
+            //         params: {
+            //             page
+            //         }
+            //     })
+            //     .then(response => {
+            //         this.news = response.data.data.news
+            //         this.pageCount = response.data.data.pageCount
+            //     })
+        }
+    }
+}
 </script>
 <style lang="less">
     .index{
