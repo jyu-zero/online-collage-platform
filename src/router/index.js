@@ -63,6 +63,18 @@ const routes = [
                 name: 'Test',
                 component: () => import('@/views/Test.vue')
             },
+            // 在线问答组界限 ----------
+            {
+                path: '/question',
+                name: 'Question',
+                component: () => import('@/views/question')
+            },
+            {
+                path: '/question/new',
+                name: 'NewQuestion',
+                component: () => import('@/views/question/NewQuestion.vue')
+            },
+            // 在线问答组界限 ---------- [完]
             // 失物招领组界限 ----------
             {
                 // 失物招领详情
