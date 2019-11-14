@@ -93,8 +93,29 @@ const routes = [
                 path: '/found-details',
                 name: 'FoundDetails',
                 component: () => import('@/views/lost-and-found/FoundDetails')
-            }
+            },
             // 失物招领组界限 ---------- [完]
+            // 新闻管理组界限 ----------
+            {
+                // 新闻中心
+                path: '/news-center',
+                name: 'NewsCenter',
+                component: () => import('@/views/news/NewsCenter.vue')
+            },
+            {
+                path: '/news-detail',
+                name: 'NewsDetail',
+                component: () => import('@/views/news/NewsDetail.vue')
+            }
+            // 新闻管理组界限 ---------- [完]
+        ]
+    },
+    {
+        // 新闻页面
+        path: '/news-detail',
+        component: () => import('@/views/Wrapper.vue'),
+        children: [
+            
         ]
     }
 ]
