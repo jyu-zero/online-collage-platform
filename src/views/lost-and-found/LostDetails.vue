@@ -64,12 +64,22 @@
 </template>
 
 <script>
-import { Button, Message } from 'element-ui'
+import { Button, Message, Main, Row, Col, Divider, Collapse, CollapseItem, Card, Dialog, Image } from 'element-ui'
+
 export default {
     name: 'Lost-Details',
     components: {
         [Button.name]: Button,
-        [Message.name]: Message
+        [Message.name]: Message,
+        [Main.name]: Main,
+        [Row.name]: Row,
+        [Col.name]: Col,
+        [Divider.name]: Divider,
+        [Collapse.name]: Collapse,
+        [CollapseItem.name]: CollapseItem,
+        [Card.name]: Card,
+        [Dialog.name]: Dialog,
+        [Image.name]: Image
     },
     data() {
         return {

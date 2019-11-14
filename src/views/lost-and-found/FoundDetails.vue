@@ -69,13 +69,19 @@
 </template>
 
 <script>
-import { Button, Message } from 'element-ui'
-import { METHODS } from 'http'
+import { Button, Message, Main, Row, Col, Divider, Card, Dialog, Image } from 'element-ui'
 export default {
     name: 'Lost-Details',
     components: {
         [Button.name]: Button,
-        [Message.name]: Message
+        [Message.name]: Message,
+        [Main.name]: Main,
+        [Row.name]: Row,
+        [Col.name]: Col,
+        [Divider.name]: Divider,
+        [Card.name]: Card,
+        [Dialog.name]: Dialog,
+        [Image.name]: Image
     },
     data() {
         return {
