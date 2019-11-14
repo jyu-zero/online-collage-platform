@@ -17,7 +17,7 @@
             <div class="block"></div>
             <span>asdfghjkl</span>
             <p>附件：</p>
-            <div>XXXXXXX.doc</div>
+            <div><i class="el-icon-document-remove"></i>XXXXXXX.doc</div>
             <div class="block"></div>
             <div>上一篇：</div>
             <div>下一篇：</div>
@@ -34,7 +34,7 @@ export default {
             this.$router.push({ name: 'HomePage' })
         },
         toIndex(){
-            console.log('跳转至主页')
+            console.log('跳转至新闻中心')
             this.$router.push({ name: 'News' })
         }
     }

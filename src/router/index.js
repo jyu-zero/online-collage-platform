@@ -31,12 +31,14 @@ const routes = [
                 name: 'UserCenterQuestion',
                 component: () => import('@/views/user-center/question')
             },
+            // 失物招领组界限 ----------
             {
                 // 失物招领
                 path: 'lost-and-found',
                 name: 'UserCenterLostAndFound',
                 component: () => import('@/views/user-center/lost-and-found')
             },
+            // 失物招领组界限 ---------- [完]
             {
                 // 资料共享
                 path: 'file-share',
@@ -61,7 +63,15 @@ const routes = [
                 path: '/test',
                 name: 'Test',
                 component: () => import('@/views/Test.vue')
+            },
+            // 失物招领组界限 ----------
+            {
+                // 失物招领详情
+                path: '/lost-and-found',
+                name: 'LostAndFound',
+                component: () => import('@/views/lost-and-found')
             }
+            // 失物招领组界限 ---------- [完]
         ]
     },
     {

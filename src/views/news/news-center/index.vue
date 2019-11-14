@@ -26,11 +26,13 @@
                 <p>>></p>
                 <p>>></p>
             </div>
-            <el-pagination
-                background
-                layout="prev, pager, next"
-                :total="1000">
-            </el-pagination>
+            <div>
+                <el-pagination
+                    background
+                    layout="prev, pager, next"
+                    :total="1000">
+                </el-pagination>
+            </div>
         </div>
     </div>
 </template>

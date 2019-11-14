@@ -62,6 +62,7 @@ export default {
                 {
                     title: '我的失物招领',
                     routeName: 'LostAndFound'
+                    // routeName: 'MyLostAndFound'
                 },
                 {
                     title: '我共享的资料',
