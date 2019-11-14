@@ -15,7 +15,7 @@
             <span class="time">2019-02-12</span>
             <span>林某某</span>
             <div class="block"></div>
-            <span>asdfghjkl</span>
+            <span>asdfghjklasdfsafassasgdfz</span>
             <p>附件：</p>
             <div><i class="el-icon-document-remove"></i>XXXXXXX.doc</div>
             <div class="block"></div>
