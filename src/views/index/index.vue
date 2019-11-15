@@ -540,7 +540,6 @@ header{
       }
     }
     #dropdown-btn{
-      width: 100px;
       display: flex;
       flex-wrap: nowrap;
       align-items: center;
