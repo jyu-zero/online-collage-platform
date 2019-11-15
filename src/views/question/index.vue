@@ -1,34 +1,44 @@
 <template>
     <div id="questions-platform">
         <header>
+             <!-- 头部面包屑 -->
             <el-breadcrumb separator-class="el-icon-arrow-right">
                 <el-breadcrumb-item :to="{ path: '/' }">主页</el-breadcrumb-item>
                 <el-breadcrumb-item>在线问答</el-breadcrumb-item>
             </el-breadcrumb>
+            <!-- 头部面包屑 [完]-->
             <el-row :gutter="20">
                 <el-col :span="4">
                     <div class="grid-content bg-purple">
                         <h1>在线问答</h1>
                     </div>
                 </el-col>
+
+                <!-- 发起新问题按钮 -->
                 <el-col :span="4" :offset="6">
                     <div class="grid-content bg-purple">
-                        <el-button type="primary" @click.native="launchQuestion">发起新问题</el-button>
+                        <el-button type="primary" @click.native="newQuestion">发起新问题</el-button>
                     </div>
                 </el-col>
+                <!-- 发起新问题按钮 [完]-->
+
+                <!-- 搜索框及搜索图标 -->
                 <el-col :span="10">
                     <div class="grid-content bg-purple">
                         <el-input
-                        placeholder="搜索问题"
-                        v-model="input"
-                        clearable>
-                        <el-button slot="append" icon="el-icon-search" @click="searchQuestions"></el-button>
+                            placeholder="搜索问题"
+                            v-model="searchContent"
+                            clearable>
+                            <el-button slot="append" icon="el-icon-search" @click="searchQuestions"></el-button>
                         </el-input>
                     </div>
                 </el-col>
+                <!-- 搜索框及搜索图标 [完]-->
                 
             </el-row>
         </header>
+
+        <!-- 问题列表 -->
         <main>
             <div class="question-box" v-for="questionItem of questionList" :key="questionItem.questionId">
                 <el-row :gutter="20">
@@ -52,6 +62,9 @@
                 </el-row>
             </div>
         </main>
+        <!-- 问题列表 -->
+
+        <!-- 分页 -->
         <footer>
             <el-pagination
                 background
@@ -60,6 +73,7 @@
                 :page-count="pageCount">
             </el-pagination>
         </footer>
+        <!-- 分页 [完]-->
     </div>
 </template>
 
@@ -81,10 +95,10 @@ export default {
     },
     data(){
         return {
-            questionList: [],
-            pageCount: 1,
+            questionList: [], // 问题列表
+            pageCount: 1, // 总的页数
             radio: 1, // 获取所要查看的问题id
-            input: ''
+            searchContent: '' // 搜索的问题内容
         }
     },
     mounted(){
@@ -95,17 +109,21 @@ export default {
             this.getQuestions(val)
             this.page = val
         },
-        launchQuestion(){
-            this.$router.push({ name: 'LaunchQuestion' })
+        newQuestion(){
+            this.$router.push({ name: 'NewQuestion' })
         },
         // 搜索问题
         searchQuestions(){
             this.$axios.post(prefix.api + questionApi.searchQuestions, {
-                'content': this.input
+                'content': this.searchContent
             }).then((response)=>{
                 if(!responseHandler(response.data, this)){
-                    // 在这里处理错误
-                    Message.error('请求失败')
+                    if(response.data.code === '0001'){
+                        Message.error('搜索问题的条件不能为空')
+                    }
+                    if(response.data.code === '0002'){
+                        Message.error('搜索内容过长')
+                    }
                 }
                 Message.success('请求成功')
                 this.pageCount = response.data.data.pageCount

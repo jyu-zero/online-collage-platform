@@ -6,5 +6,5 @@ export default {
     // 获取类型名
     'getTypeName': '/get-type-name',
     // 发起问题
-    'launchQuestion': '/launch-question'
+    'newQuestion': '/new-question'
 }
