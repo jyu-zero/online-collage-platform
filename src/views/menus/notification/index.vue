@@ -12,10 +12,10 @@
       <div class="notification-list" >
         <div v-for="notification of notifications" :key="notification.id" >
           <div class="notification-item" >
-            <div class="checkbox-container" @click="clickCheckbox">
-            <input type="checkbox" v-model="checkModel" class="check_box tui-checkbox"  :value="notification.id">
+            <div class="checkbox-container" >
+                <input @click="clickCheckbox" type="checkbox" v-model="checkModel" class="check_box tui-checkbox"  :value="notification.id">
             </div>
-            <span class="notification-title" @click="clickPrevCheckbox">{{notification.title}}--</span>
+            <span class="notification-title" @click="clickTitle(notification.id)">{{notification.title}}--</span>
             <span class="check" @click="checkDetail">查看</span>
           </div>
           <div class="content-container hidden">
@@ -108,10 +108,19 @@ export default {
 
         // 这两个方法都是绑定了checkbox的点击事件
         clickCheckbox(e){
-            e.currentTarget.firstElementChild.checked = !e.currentTarget.firstElementChild.checked
+            console.log('点击了checkbox')
+            console.log(e.currentTarget.checked)
+            // console.log(e.currentTarget.firstElementChild.checked)
+            // e.currentTarget.firstElementChild.checked = !e.currentTarget.firstElementChild.checked
         },
-        clickPrevCheckbox(e){
-            e.currentTarget.previousSibling.firstElementChild.checked = !e.currentTarget.previousSibling.firstElementChild.checked
+        clickTitle(id){
+            console.log(this.checkModel.indexOf(id))
+            if (this.checkModel.indexOf(id) < 0){
+                this.checkModel.push(id)
+                return
+            }
+            this.checkModel.splice(this.checkModel.findIndex(item => item === id), 1)
+            console.log(this.checkModel)
         },
 
         // 这个是查看通知详情的按钮
@@ -141,7 +150,6 @@ export default {
                 this.checked = false
             }
         }
-
     },
     created() {
         // 把各个通知的id放到notificationIdList中
@@ -161,7 +169,6 @@ export default {
     height: 100%;
     width: 100%;
     padding: 25px;
-    border: 1px solid black;
     .btn-container{
       #check-all-btn{
         display: block;
@@ -199,16 +206,18 @@ export default {
           justify-content: center;
           width: 40px;
           input{
+            z-index: 3;
             font-size: 25px;
-            width: 20px;
-            height: 20px;
+            width: 25px;
+            height: 25px;
+            opacity: 1;
+            outline: none;
           }
         }
 
         .notification-title{
           display: flex;
           align-items: center;
-          flex: 0.9;
           margin-right: 15px;
           height: 100%;
           line-height: 100%;
@@ -216,6 +225,7 @@ export default {
         .check{
           height: 100%;
           flex: 0.1;
+          margin-left: auto;
           display: flex;
           align-items: center;
           justify-content: center;
