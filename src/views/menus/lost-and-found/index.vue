@@ -1,100 +1,56 @@
 <template>
+
     <!-- 我的失物招领[开始] -->
     <div class="my-lost-and-found">
+        <!-- 弹窗 -->
+        <!-- <LostAndFoundDialog>我丢东西了</LostAndFoundDialog> -->
         <!-- 处理按钮 -->
         <div class="my-lost-and-found-handle">
-            <el-row>
-                <el-button type="warning">我丢东西了</el-button>
-                <el-button type="warning">我捡到东西了</el-button>
-            </el-row>
+            <!-- <el-button type="text" @click="dialogVisible=true">我丢东西了</el-button> -->
+            <!-- <el-button type="warning">我捡到东西了</el-button> -->
+            <LostAndFoundDialog warning>我丢东西了</LostAndFoundDialog>
+            <LostAndFoundDialog warning>我捡到东西了</LostAndFoundDialog>
         </div>
         <!-- 正在进行 -->
         <div class="my-lost-and-found-do">
             <h2>正在进行</h2>
             <div class="lost-and-found-list">
-                <ul>
-                    <li>
+                <ul v-for="item of goods" :key="item.good_id">
+                    <!-- 进行与完成的列表最多放4列 -->
+                    <li v-if="item.status==0">
                         <div class="lost-and-found-list-left">
                             <div class="lost-and-found-type">
-                                <p><span>我丢失的</span></p>
+                                <p v-if="item.sort==0"><span>我丢失的</span></p>
+                                <p v-if="item.sort==1"><span>我捡到的</span></p>
                             </div>
-                            <div class="goods-name">
-                                <p><span>蓝色金士顿U盘</span></p>
+                            <div class="top">
+                                <div class="goods-name">
+                                    <p><span>{{item.name}}</span></p>
+                                </div>
+                                <div class="goods-condition">
+                                    <p v-if="!item.trusteeship"><span>学院托管</span></p>
+                                    <p v-if="item.trusteeship"><span>请联系我</span></p>
+                                </div>
                             </div>
-                            <div class="goods-condition">
-                                <p><span>学院托管</span></p>
-                            </div>
-                            <div class="lost-and-found-time">
-                                <p><span>于 2019-11-09 在</span></p>
-                            </div>
-                            <div class="lost-and-found-place">
-                                <p><span>锡科202 丢失</span></p>
+                            <div class="bottom">
+                                <div class="lost-and-found-time">
+                                    <p><span>于 {{item.time}} 在</span></p>
+                                </div>
+                                <div class="lost-and-found-place">
+                                    <p v-if="item.sort==0"><span>{{item.place}} 丢失</span></p>
+                                    <p v-if="item.sort==1"><span>{{item.place}} 捡到</span></p>
+                                </div>
                             </div>
                         </div>
                         <div class="to-details">
                             <el-button type="text" title="点击查看详情和图片">查看详情</el-button>
                         </div>
-                        <div class="lost-and-found-list-right">
-                            <el-row>
-                                <el-button>编辑</el-button>
-                                <el-button type="primary">未找回</el-button>
-                            </el-row>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="lost-and-found-list-left">
-                            <div class="lost-and-found-type">
-                                <p><span>我丢失的</span></p>
-                            </div>
-                            <div class="goods-name">
-                                <p><span>蓝色金士顿U盘</span></p>
-                            </div>
-                            <div class="goods-condition">
-                                <p><span>学院托管</span></p>
-                            </div>
-                            <div class="lost-and-found-time">
-                                <p><span>于 2019-11-09 在</span></p>
-                            </div>
-                            <div class="lost-and-found-place">
-                                <p><span>锡科202 丢失</span></p>
-                            </div>
-                        </div>
-                        <div class="to-details">
-                            <el-button type="text" title="点击查看详情和图片">查看详情</el-button>
-                        </div>
-                        <div class="lost-and-found-list-right">
-                            <el-row>
-                                <el-button>编辑</el-button>
-                                <el-button type="primary" disabled>已找回</el-button>
-                            </el-row>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="lost-and-found-list-left">
-                            <div class="lost-and-found-type">
-                                <p><span>我捡到的</span></p>
-                            </div>
-                            <div class="goods-name">
-                                <p><span>蓝色金士顿U盘</span></p>
-                            </div>
-                            <div class="goods-condition">
-                                <p><span>学院托管</span></p>
-                            </div>
-                            <div class="lost-and-found-time">
-                                <p><span>于 2019-11-09 在</span></p>
-                            </div>
-                            <div class="lost-and-found-place">
-                                <p><span>锡科202 丢失</span></p>
-                            </div>
-                        </div>
-                        <div class="to-details">
-                            <el-button type="text" title="点击查看详情和图片">查看详情</el-button>
-                        </div>
-                        <div class="lost-and-found-list-right">
-                            <el-row>
-                                <el-button>编辑</el-button>
-                                <el-button type="primary" disabled>已归还</el-button>
-                            </el-row>
+                        <div class="list-button">
+                            <!-- <el-button>编辑</el-button> -->
+                            <!-- <el-button type="primary">未找回失主</el-button> -->
+                            <LostAndFoundDialog>编辑</LostAndFoundDialog>
+                            <LostAndFoundDialog v-if="item.sort==0">未找回</LostAndFoundDialog>
+                            <LostAndFoundDialog v-if="item.sort==1">未归还失主</LostAndFoundDialog>
                         </div>
                     </li>
                 </ul>
@@ -119,90 +75,35 @@
         <div class="my-lost-and-found-do">
             <h2>已经完成</h2>
             <div class="lost-and-found-list">
-                <ul>
-                    <li>
+                <ul v-for="item of goods" :key="item.good_id">
+                    <li v-if="item.status==1">
                         <div class="lost-and-found-list-left">
                             <div class="lost-and-found-type">
-                                <p><span>我丢失的</span></p>
+                                <p v-if="item.sort==0"><span>我丢失的</span></p>
+                                <p v-if="item.sort==1"><span>我捡到的</span></p>
                             </div>
-                            <div class="goods-name">
-                                <p><span>蓝色金士顿U盘</span></p>
+                            <div class="top">
+                                <div class="goods-name">
+                                    <p><span>{{item.name}}</span></p>
+                                </div>
+                                <div class="goods-condition">
+                                    <p v-if="!item.trusteeship"><span>学院托管</span></p>
+                                    <p v-if="item.trusteeship"><span>请联系我</span></p>
+                                </div>
                             </div>
-                            <div class="goods-condition">
-                                <p><span>学院托管</span></p>
-                            </div>
-                            <div class="lost-and-found-time">
-                                <p><span>于 2019-11-09 在</span></p>
-                            </div>
-                            <div class="lost-and-found-place">
-                                <p><span>锡科202 丢失</span></p>
+                            <div class="bottom">
+                                <div class="lost-and-found-time">
+                                    <p><span>于 {{item.time}} 在</span></p>
+                                </div>
+                                <div class="lost-and-found-place">
+                                    <p v-if="item.sort==0"><span>{{item.place}} 丢失</span></p>
+                                    <p v-if="item.sort==1"><span>{{item.place}} 捡到</span></p>
+                                </div>
                             </div>
                         </div>
                         <div class="to-details">
                             <el-button type="text" title="点击查看详情和图片">查看详情</el-button>
                         </div>
-                        <!-- <div class="lost-and-found-list-right">
-                            <el-row>
-                                <el-button>编辑</el-button>
-                                <el-button type="primary" disabled>已找回</el-button>
-                            </el-row>
-                        </div> -->
-                    </li>
-                    <li>
-                        <div class="lost-and-found-list-left">
-                            <div class="lost-and-found-type">
-                                <p><span>我丢失的</span></p>
-                            </div>
-                            <div class="goods-name">
-                                <p><span>蓝色金士顿U盘</span></p>
-                            </div>
-                            <div class="goods-condition">
-                                <p><span>学院托管</span></p>
-                            </div>
-                            <div class="lost-and-found-time">
-                                <p><span>于 2019-11-09 在</span></p>
-                            </div>
-                            <div class="lost-and-found-place">
-                                <p><span>锡科202 丢失</span></p>
-                            </div>
-                        </div>
-                        <div class="to-details">
-                            <el-button type="text" title="点击查看详情和图片">查看详情</el-button>
-                        </div>
-                        <!-- <div class="lost-and-found-list-right">
-                            <el-row>
-                                <el-button>编辑</el-button>
-                                <el-button type="primary" disabled>已找回</el-button>
-                            </el-row>
-                        </div> -->
-                    </li>
-                    <li>
-                        <div class="lost-and-found-list-left">
-                            <div class="lost-and-found-type">
-                                <p><span>我丢失的</span></p>
-                            </div>
-                            <div class="goods-name">
-                                <p><span>蓝色金士顿U盘</span></p>
-                            </div>
-                            <div class="goods-condition">
-                                <p><span>学院托管</span></p>
-                            </div>
-                            <div class="lost-and-found-time">
-                                <p><span>于 2019-11-09 在</span></p>
-                            </div>
-                            <div class="lost-and-found-place">
-                                <p><span>锡科202 丢失</span></p>
-                            </div>
-                        </div>
-                        <div class="to-details">
-                            <el-button type="text" title="点击查看详情和图片">查看详情</el-button>
-                        </div>
-                        <!-- <div class="lost-and-found-list-right">
-                            <el-row>
-                                <el-button>编辑</el-button>
-                                <el-button type="primary" disabled>已找回</el-button>
-                            </el-row>
-                        </div> -->
                     </li>
                 </ul>
                 <!-- 分页 -->
@@ -221,15 +122,170 @@
                     </template>
                 </div>
             </div>
-
         </div>
+    <div>
+
+    </div>
     </div>
     <!-- 我的失物招领[结束] -->
 </template>
 
 <script>
+import { Button, Pagination, Dialog, Message } from 'element-ui'
+import LostAndFoundDialog from '../../../components/lost-and-found/LostAndFoundDialog'
+// responseHandler, userApi,
+import { prefix, goodsApi } from '@/api'
 export default {
-    name: 'FileShare'
+    name: 'MyLostAndFound',
+    components: {
+        [Button.name]: Button,
+        [Pagination.name]: Pagination,
+        [Dialog.name]: Dialog,
+        [Message.name]: Message,
+        LostAndFoundDialog
+    },
+    data(){
+        return{
+            dialogVisible: false,
+            currentPage3: 5,
+            studentName: '',
+            studentId: '',
+            account: '',
+            password: '',
+            // 当前是否已登录
+            isLogin: false,
+            // 登录窗口开关变量
+            loginWindow: false,
+            // 我的失物招领数据
+            goods: [
+                {
+                    id: 0,
+                    // lost: true,
+                    // 0代表进行,1代表完成
+                    status: 0,
+                    // 0丢失,1认领
+                    sort: 0,
+                    name: '蓝色小水杯',
+                    // 是否学院托管
+                    trusteeship: false,
+                    place: '中区主球场',
+                    time: '2019-02-23'
+                },
+                {
+                    id: 1,
+                    // 0代表进行,1代表完成
+                    status: 1,
+                    // 0丢失,1认领
+                    sort: 1,
+                    name: '卡西欧手表',
+                    // 是否学院托管
+                    trusteeship: true,
+                    place: '中区篮球场',
+                    time: '2019-06-04'
+                },
+                {
+                    id: 2,
+                    // 0代表进行,1代表完成
+                    status: 1,
+                    // 0丢失,1认领
+                    sort: 0,
+                    name: '小米手机',
+                    // 是否学院托管
+                    trusteeship: true,
+                    place: '南区食堂',
+                    time: '2018-12-16'
+                },
+                {
+                    id: 3,
+                    // 0代表进行,1代表完成
+                    status: 0,
+                    // 0丢失,1认领
+                    sort: 0,
+                    name: '一卡通171100220',
+                    // 是否学院托管
+                    trusteeship: false,
+                    place: '全校',
+                    time: '2019-06-11'
+                },
+                {
+                    id: 3,
+                    // 0代表进行,1代表完成
+                    status: 0,
+                    // 0丢失,1认领
+                    sort: 1,
+                    name: '一卡通171100220',
+                    // 是否学院托管
+                    trusteeship: false,
+                    place: '全校',
+                    time: '2019-06-11'
+                },
+                {
+                    id: 3,
+                    // 0代表进行,1代表完成
+                    status: 1,
+                    // 0丢失,1认领
+                    sort: 1,
+                    name: '一卡通171100220',
+                    // 是否学院托管
+                    trusteeship: false,
+                    place: '全校',
+                    time: '2019-06-11'
+                },
+                {
+                    id: 3,
+                    // 0代表进行,1代表完成
+                    status: 0,
+                    // 0丢失,1认领
+                    sort: 1,
+                    name: '一卡通171100220',
+                    // 是否学院托管
+                    trusteeship: false,
+                    place: '全校',
+                    time: '2019-06-11'
+                },
+                {
+                    id: 3,
+                    // 0代表进行,1代表完成
+                    status: 1,
+                    // 0丢失,1认领
+                    sort: 1,
+                    name: '一卡通171100220',
+                    // 是否学院托管
+                    trusteeship: false,
+                    place: '全校',
+                    time: '2019-06-11'
+                }
+            ]
+        }
+    },
+    methods: {
+        // 获取失物招领内容
+        getGoods(){
+            this.$axios.get(prefix.api + goodsApi.getGoods).then((response)=>{
+                // if(!responseHandler(response.data, this)){
+                //     // 提示出错
+                //     Message.error('您还未登录')
+                //     return
+                // }
+                this.goods = response.data.data
+                console.log(response.data.data)
+            })
+        },
+        // 关闭element对话框
+        handleClose(done) {
+            this.$confirm('确认关闭？')
+                .then(() => {
+                    done()
+                })
+                .catch(() => {})
+        },
+        handleSizeChange(val) {
+            // console.log(`每页 ${val} 条`);
+        },
+        handleCurrentChange(val) {
+            // console.log(`当前页: ${val}`);
+        }
+    }
 }
 </script>
 
@@ -244,12 +300,6 @@ export default {
         margin: 0;
         padding: 0;
     }
-    // p{
-    //     margin: 0;
-    //     padding:0;
-    //     width: 38px;
-    //     height: 18px;
-    // }
     span{
         font-size: 14px;
         color: #333;
@@ -258,22 +308,19 @@ export default {
         margin: 0;
     }
     .my-lost-and-found{
-        // background-color: pink;
         margin: 0px 50px 0px 50px;
         // 处理按钮
         .my-lost-and-found-handle{
+            display: flex;
             height: 50px;
             margin-top: 30px;
-            // border: 1px solid #333;
-            :nth-child(2){
-                margin-left: 80px;
-            }
         }
         // 正在进行与已经完成
         .my-lost-and-found-do{
             height: 320px;
             margin-top: 30px;
-            margin-bottom: 50px;
+            width: 1066px;
+            margin-bottom: 120px;
             .lost-and-found-list{
                 margin:30px 0 10px 0;
                 li{
@@ -283,7 +330,7 @@ export default {
                     border: 1px solid #000;
                     // padding:12px;
                     .lost-and-found-list-left{
-                        width: 350px;
+                        width: 650px;
                         height: 80px;
                         // margin-right: 300px;
                         p{
@@ -299,34 +346,42 @@ export default {
                                 background-color: #d7d7d7;
                             }
                         }
-                        .goods-name{
-                            float: left;
-                            margin-top: 20px;
-                            p{
-                                font-weight: 650;
-                                margin-right: 10px;
-                                span{
-                                    font-size: 18px;
+                        .top{
+                            display: flex;
+                            .goods-name{
+                                float: left;
+                                margin-top: 20px;
+                                p{
+                                    font-weight: 650;
+                                    margin-right: 10px;
+                                    span{
+                                        font-size: 18px;
+                                    }
+                                }
+                            }
+                            .goods-condition{
+                                float: left;
+                                margin: 15px 0 0 -5px;
+                                p{
+                                    background-color: #d7d7d7;
                                 }
                             }
                         }
-                        .goods-condition{
-                            float: left;
-                            margin: 15px 0 0 -5px;
-                            p{
-                                background-color: #d7d7d7;
+                        .bottom{
+                            .lost-and-found-time{
+                                float: left;
+                            }
+                            .lost-and-found-place{
+                                float: left;
+                                margin: 1px 0 0 -5px;
                             }
                         }
-                        .lost-and-found-time{
-                            float: left;
-                        }
-                        .lost-and-found-place{
-                            float: left;
-                            margin: 1px 0 0 -5px;
-                        }
+
                     }
                     .to-details{
-                        margin: 20px 300px 0 0px;
+                        width: 80px;
+                        line-height: 80px;
+                        margin-right: 40px;
                     }
                     .lost-and-found-list-right{
                         padding-top: 10px;
@@ -336,15 +391,17 @@ export default {
                             padding: 5px 25px;
                         }
                     }
+                    .list-button{
+                        display: flex;
+                        height: 80px;
+                        line-height: 80px;
+                    }
                 }
                 .list-pagination{
-                    // display: flex;
-                    margin-top: 20px;
+                    display: flex;
+                    margin-top: 10px;
                 }
             }
-        }
-        .list-pagination:nth-child(1){
-            margin-bottom: 30px;
         }
     }
 </style>
