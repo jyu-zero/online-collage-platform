@@ -2,7 +2,7 @@
     <div class="wrapper">
         <!-- 顶部导航栏 -->
         <header>
-            <h1>在线学院平台</h1>
+            <h1>个人中心</h1>
           <div class="header-right"  >
             <div class="new-msg">
               <i class="el-icon-message"></i>
@@ -25,7 +25,19 @@
         </header>
         <!-- 顶部导航栏 [完] -->
         <div class="wrapper-body">
-            <router-view></router-view>
+            <el-menu
+                :default-active="currentRouteName"
+                class="menu"
+                background-color="#22466f"
+                text-color="#779cc6"
+                active-text-color="#fff">
+                <el-menu-item @click="goToMenu(menuItem)" v-for="(menuItem,index) of menus" :index="menuItem.routeName" :key="index" :route="menuItem.route">
+                    <span slot="title">{{menuItem.title}}</span>
+                </el-menu-item>
+            </el-menu>
+            <main>
+                <router-view/>
+            </main>
         </div>
 
     </div>
@@ -50,37 +62,37 @@ export default {
     },
     data() {
         return {
+            studentName: 'aaa',
+            studentId: '111111',
             menus: [
                 {
                     title: '通知栏',
-                    routeName: 'Notification'
+                    routeName: 'UserCenterNotification'
                 },
                 {
                     title: '我的问答',
-                    routeName: 'Question'
+                    routeName: 'UserCenterQuestion'
                 },
                 {
                     title: '我的失物招领',
-                    routeName: 'MyLostAndFound'
+                    routeName: 'UserCenterLostAndFound'
                 },
                 {
                     title: '我共享的资料',
-                    routeName: 'FileShare'
+                    routeName: 'UserCenterFileShare'
                 },
                 {
                     title: '个人资料管理',
-                    routeName: 'Profile'
-                },
-                {
-                    title: '新闻中心',
-                    routeName: 'Center'
+                    routeName: 'UserCenterProfile'
                 }
-            ],
-            studentName: 'aaa',
-            studentId: '111111'
+            ]
         }
     },
     methods: {
+        // 跳转菜单
+        goToMenu(menuItem) {
+            this.$router.push({ name: menuItem.routeName })
+        },
         // 注销
         logout(){
             // console.log('sss')
@@ -94,19 +106,19 @@ export default {
             })
         },
         // 获取学生姓名卡号
-        getStudentName(){
-            this.$axios.get(prefix.api + userApi.getStudentName).then((response)=>{
-                if(!responseHandler(response.data, this)){
-                    // 提示出错
-                    Message.error('您还未登录')
-                    this.$router.push({ name: 'HomePage' })
-                    return
-                }
-                // 更新姓名以及一卡通id
-                this.studentName = response.data.data.name
-                this.studentId = response.data.data.student_id
-            })
-        },
+        // getStudentName(){
+        //     // this.$axios.get(prefix.api + userApi.getStudentName).then((response)=>{
+        //     //     if(!responseHandler(response.data, this)){
+        //     //         // 提示出错
+        //     //         Message.error('您还未登录')
+        //     //         this.$router.push({ name: 'HomePage' })
+        //     //         return
+        //     //     }
+        //     //     // 更新姓名以及一卡通id
+        //     //     this.studentName = response.data.data.name
+        //     //     this.studentId = response.data.data.student_id
+        //     })
+        // }
         // 跳转至个人中心，相当于跳转通知栏页面
         goToUserCenter(){
             console.log('跳转至个人中心')
@@ -116,7 +128,7 @@ export default {
     created() {
         // 获取学生姓名卡号
 
-        this.getStudentName()
+        // this.getStudentName()
     }
 }
 </script>

@@ -63,7 +63,7 @@
                         <span v-if="!item.solve">待解决</span>
                       </div>
                       <div class="question-info">
-                        <h3>{{item.content}}                   <span v-if="item.setTop">置顶</span></h3>
+                        <h3>{{item.content}}<span v-if="item.setTop">置顶</span></h3>
                         <div>
                           <div>
                             由
@@ -473,7 +473,7 @@ export default {
         // 跳转至失物招领页面
         goToLostAndFound(){
             console.log('跳转至失物招领页面')
-            // this.$router.push({ name: 'LostAndFound' })
+            this.$router.push({ name: 'LostAndFound' })
         },
         // 跳转至资源共享页面
         goToSourceShare(){
