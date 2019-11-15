@@ -63,7 +63,7 @@
                         <span v-if="!item.solve">待解决</span>
                       </div>
                       <div class="question-info">
-                        <h3>{{item.content}}                   <span v-if="item.setTop">置顶</span></h3>
+                        <h3>{{item.content}}<span v-if="item.setTop">置顶</span></h3>
                         <div>
                           <div>
                             由

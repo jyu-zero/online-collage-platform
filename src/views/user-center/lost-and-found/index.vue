@@ -131,13 +131,14 @@
 </template>
 
 <script>
-import { Button, Pagination, Dialog, Message } from 'element-ui'
+import { Row, Button, Pagination, Dialog, Message } from 'element-ui'
 import LostAndFoundDialog from '../../../components/lost-and-found/LostAndFoundDialog'
 // responseHandler, userApi,
 import { prefix, goodsApi } from '@/api'
 export default {
-    name: 'MyLostAndFound',
+    name: 'UserCenterLostAndFound',
     components: {
+        [Row.name]: Row,
         [Button.name]: Button,
         [Pagination.name]: Pagination,
         [Dialog.name]: Dialog,
@@ -285,8 +286,6 @@ export default {
         handleCurrentChange(val) {
             // console.log(`当前页: ${val}`);
         }
-    }
-}
 </script>
 
 <style lang="less" scoped>

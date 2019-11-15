@@ -1,12 +1,12 @@
 <template>
     <!-- 失物招领列表页面[开始] -->
-    <div class="found-details-page">
+    <div class="lost-details-page">
         <!-- 头部部分[开始] -->
         <header>
             <h1>线上学院平台</h1>
 
             <!-- 用户登录[开始] -->
-            <div class="found-details-login">
+            <div class="lost-details-login">
                 <i class="login">
                     <!-- <div class="icon"><img src="/src/assets/login.png" alt=""></div> -->
                     <span>shenhongzhen</span>
@@ -29,23 +29,70 @@
         <!-- 头部部分[结束] -->
 
         <!-- 中间部分[开始] -->
-        <main>
-            <div class="found-details-main">
-                <div class="found-details-head-list">
-                    <h3>在锡科202门口捡到一个蓝色金士顿U盘</h3>
-                </div>
-                <div class="found-details-list">
-                    <ul>
-
-                    </ul>
-                </div>
+        <el-main>
+            <div class="lost-details-main">
+                <el-row type="flex" justify="center" class="lost-title"><h1>求救大家，有没有谁看见我丢的东西</h1></el-row>
+                <el-row type="flex" >
+                    <!-- 展示物品图 -->
+                    <el-col>
+                        <div class="container">
+                            <el-image style="width: 450px; height: 500px" :src="lostImageUrl"></el-image>
+                        </div>
+                    </el-col>
+                    <!-- 展示物品信息 -->
+                    <el-col>
+                        <!-- 物品的基本信息 -->
+                
+                        <el-row>
+                            <el-card class="box-card">
+                                <div slot="header">
+                                    <span>物品信息</span>
+                                </div>
+                                <el-row type="flex">
+                                    <el-col>
+                                        物品名：
+                                    </el-col>
+                                    <el-col>
+                                        金士顿u盘
+                                    </el-col>
+                                </el-row>
+                                <el-divider></el-divider>
+                                <el-row type="flex">
+                                    <el-col>
+                                        丢失地点：
+                                    </el-col>
+                                    <el-col>
+                                        田师201
+                                    </el-col>
+                                </el-row>
+                                <el-divider></el-divider>
+                                <el-row type="flex">
+                                    <el-col>
+                                        丢失时间：
+                                    </el-col>
+                                    <el-col>
+                                        2010.12.03c
+                                    </el-col>
+                                </el-row>
+                                <el-row class="contact-information">
+                                    <el-collapse v-model=" activeNames" @change="handleChange">
+                                        <el-collapse-item title="点击查看联系人信息" name="1">
+                                            小明 1335465464
+                                        </el-collapse-item>
+                                    </el-collapse>
+                                </el-row>
+                                
+                            </el-card>
+                        </el-row>
+                    </el-col>
+                </el-row>
             </div>
-        </main>
+        </el-main>
         <!-- 中间部分[结束] -->
 
         <!-- 底部部分[开始] -->
         <footer>
-            <div class="found-details-footer">
+            <div class="lost-details-footer">
                 <p>
                     <span class="white">
                         版权所有©ZERO软件开发中心<br>
@@ -63,14 +110,14 @@
 <script>
 import { Button, Message } from 'element-ui'
 export default {
-    name: 'Found-Details',
+    name: 'Lost-Details',
     components: {
         [Button.name]: Button,
         [Message.name]: Message
     },
     data() {
         return {
-            // input: ''
+            lostImageUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
         }
     }
 }
@@ -107,7 +154,7 @@ p{
     color: #fff;
 }
 // 头部部分[开始]
-.found-details-page{
+.lost-details-page{
     height:100%;
     display: flex;
     flex-direction: column;
@@ -119,7 +166,7 @@ p{
             // width: 200px;
             margin: 20px 0 20px 100px;
         }
-        .found-details-login{
+        .lost-details-login{
             
             // display: flex;
             float: right;
@@ -170,13 +217,13 @@ p{
 // 头部部分[结束]
 
 // 中间部分[开始]
-.found-details-main{
+.lost-details-main{
     // display: flex;
     width: 1166px;
     // border:1px solid #000;
     margin: auto;
 
-    .found-details-head-list{
+    .lost-details-head-list{
         width: 1166px;
         height: 60px;
         line-height: 60px;
@@ -195,18 +242,27 @@ p{
         }
     }
 
-    .found-details-list{
+    .lost-details-list{
         width: 1026px;
         height: 750px;
         margin: auto;
         background-color: pink;
         padding: 50px 0  0 20px;
     }
+
+    .lost-title{
+        font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+    }
+    
+    .contact-information{
+        padding-top:24px;
+
+    }
 }
 // 中间部分[结束]
 
 // 底部部分[开始]
-.found-details-footer{
+.lost-details-footer{
     width: 100%;
     height: 70px;
     text-align:center;
