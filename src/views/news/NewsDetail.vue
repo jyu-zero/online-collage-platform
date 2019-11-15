@@ -9,25 +9,28 @@
         </div>
 
         <div class="news">
-
-            <div class="title">新闻标题</div>
-            <!-- <span class="title">{{item.title}}</span> -->
-            <span class="time">2019-02-12</span>
-            <span>林某某</span>
+            <span class="title">{{news.news_title}}</span>
+            <span class="created_at">{{news.created_at}}</span>
+            <span>{{news.author}}</span>
             <div class="block"></div>
-            <span>asdfghjklasdfsafassasgdfz</span>
+            <span>{{news.news_content}}</span>
             <p>附件：</p>
-            <div><i class="el-icon-document-remove"></i>XXXXXXX.doc</div>
+            <div><i class="el-icon-document-remove"></i>{{storage_path}}</div>
             <div class="block"></div>
-            <div>上一篇：</div>
-            <div>下一篇：</div>
+            <div>{{pre}}</div>
+            <div>{{next}}</div>
         </div>
     </div>
 </template>
 
 <script>
+import { prefix, responseHandler, newsApi } from '@/api'
+import { Message } from 'element-ui'
 export default {
     name: 'Detail',
+    components: {
+        [Message.name]: Message
+    },
     methods: {
         toHomePage(){
             console.log('跳转至主页')
@@ -36,6 +39,15 @@ export default {
         toIndex(){
             console.log('跳转至新闻中心')
             this.$router.push({ name: 'News' })
+        },
+        getNewDetail(){
+            this.$axios.get(prefix.api + newsApi.getNewDetail).then(response => {
+                if(!responseHandler(response.data, this)){
+                    // 在这里处理错误
+                    Message.error('请求失败')
+                }
+                Message.success('请求成功')
+            })
         }
     }
 }
@@ -62,7 +74,7 @@ export default {
         width: 1300px;
         height: 100%;
     }
-    .title{
+    .headline{
         width: 1300px;
         height: 45px;
         margin-top: 20px;

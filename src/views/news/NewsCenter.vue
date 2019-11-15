@@ -11,34 +11,22 @@
         <div class="news">
             <div class="title">
                  <div class="question-item" v-for="news of newsList" :key="news.id">
-                    <span class="content">{{news.headline}}</span>
-                    <span class="time">{{news.time}}</span>
+                    <span class="content">{{news.title}}</span>
+                    <span class="time">{{news.created_at}}</span>
                 </div>
-                <!-- <p>[置顶]新闻一(时间)</p>
-                <p>[置顶]新闻二(时间)</p>
-                <p>[置顶]新闻三(时间)</p>
-                <p>新闻四*****(时间)</p>
-                <p>新闻二*******(时间)</p>
-                <p>新闻四*****(时间)</p> -->
             </div>
 
             <div class="amount">
-                <div class="question-item" v-for="news of newsList" :key="news.id">
+                <div class="news-item" v-for="news of newsList" :key="news.id">
                     <span class="amount">{{news.amount}}</span>
                 </div>
-                <!-- <p>>></p>
-                <p>>></p>
-                <p>>></p>
-                <p>>></p>
-                <p>>></p>
-                <p>>></p> -->
             </div>
         </div>
         <div>
             <el-pagination
                 background
                 layout="prev, pager, next"
-                @current-change="getQuestionList"
+                @current-change="getNews"
                 :page-count="pageCount">
             </el-pagination>
         </div>
@@ -46,39 +34,22 @@
 </template>
 
 <script>
-import { Pagination } from 'element-ui'
+import { prefix, responseHandler, newsApi } from '@/api'
+import { Pagination, Message } from 'element-ui'
 export default {
     name: 'News',
     components: {
-        [Pagination.name]: Pagination
+        [Pagination.name]: Pagination,
+        [Message.name]: Message
     },
-    data(){
-        return {
-            pageCount: 1,
-            news: []
-        }
-    },
-    created() {
-        this.getNews()
-    },
-    methods: {
-        toHomePage(){
-            console.log('跳转至主页')
-            this.$router.push({ name: 'HomePage' })
-        },
-        getNews(page = 1){
-            // TODO: 这里要修改哦
-            // this.$axios
-            //     .get('/api' + api.getNews,{
-            //         params: {
-            //             page
-            //         }
-            //     })
-            //     .then(response => {
-            //         this.news = response.data.data.news
-            //         this.pageCount = response.data.data.pageCount
-            //     })
-        }
+    getNewList(page = 1){
+        this.$axios.get(prefix.api + newsApi.getNewList).then((response)=>{
+            if(!responseHandler(response.data, this)){
+                // 在这里处理错误
+                Message.error('请求失败')
+            }
+            Message.success('请求成功')
+        })
     }
 }
 </script>
