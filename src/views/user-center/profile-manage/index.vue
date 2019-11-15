@@ -1,68 +1,82 @@
 <template>
 <!-- 个人资料管理页面 -->
-  <div class="profile-manage">
+    <div class="profile-manage">
     <!-- 修改密码按钮 -->
-    <el-button class="p1-button" type="primary">修改密码</el-button>
+    <div class="p1-button">
+        <el-button type="primary">修改密码</el-button>
+    </div>
     <!-- 学生个人信息 -->
-    <div id="p1-test" class="test">
-      <p>姓名</p>
+    <div class="p1-test">
+        <p>姓名</p>
     </div>
     <div class="test">
-      <p>{{name}}</p>
+        <p>{{name}}</p>
     </div>
-    <div id="p1-test" class="test">
-      <p>学号</p>
-    </div>
-    <div class="test">
-      <p>{{account}}</p>
-    </div>
-    <div id="p1-test" class="test">
-      <p>联系方式</p>
+    <div class="p1-test">
+        <p>学号</p>
     </div>
     <div class="test">
-      <p>{{contact}}</p>
+        <p>{{account}}</p>
     </div>
-    <div id="p1-test" class="test">
-      <p>宿舍</p>
-    </div>
-    <div class="test">
-      <p>{{dormitory}}</p>
-    </div>
-    <div id="p1-test" class="test">
-      <p>性别</p>
+    <div class="p1-test">
+        <p>联系方式</p>
     </div>
     <div class="test">
-      <p>{{sex}}</p>
+        <p>{{contact}}</p>
+    </div>
+    <div class="p1-test">
+        <p>宿舍</p>
+    </div>
+    <div class="test">
+        <p>{{dormitory}}</p>
+    </div>
+    <div class="p1-test">
+        <p>性别</p>
+    </div>
+    <div class="test">
+        <p>{{sex}}</p>
     </div>
     <!-- 学生个人信息【完】 -->
-  </div>
+    </div>
 </template>
 
 <script>
-import { userApi } from '@/api'
-import { Button, Message  } from 'element-ui'
+import { userApi, prefix } from '@/api'
+import { Button, Message } from 'element-ui'
 export default {
     name: 'ProfileManage',
     components: {
-		[Button.name]: Button,
-		[Message.name]: Message
-	},
-	created () {
-        this.$axios.post(prefix.api + userApi.profileManage).then((response)=>{
-            // if(!responseHandler(response.data, this)){
-            //     // 在这里处理错误
-            //     Message.error('请求失败')
-            // }
-            // Message.success('请求成功')
-        })
+        [Button.name]: Button,
+        [Message.name]: Message
+    },
+    data(){
+        return {
+            name: '赖',
+            account: '123',
+            contact: '123654',
+            dormitory: '203',
+            sex: '1'
+        }
     }
 }
 </script>
 
 <style lang="less" scoped>
-  .overview{
-    height:100%;
+.overview{
+    // height:100%;
     display: flex;
     flex-direction: column;
-  }
+}
+.profile-manage{
+    padding: 40px;
+}
+.p1-button{
+    font-size: 13px;
+    width: 140px;
+    height: 40px;
+}
+.p1-test{
+    font-size: 18px;
+    font-weight: bold;
+}
 </style>
