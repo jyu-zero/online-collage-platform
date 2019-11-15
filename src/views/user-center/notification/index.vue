@@ -168,7 +168,7 @@ export default {
   #notification{
     height: 100%;
     width: 100%;
-    padding: 25px;
+    padding: 30px 60px;
     .btn-container{
       #check-all-btn{
         display: block;

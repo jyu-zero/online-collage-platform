@@ -115,7 +115,6 @@ export default {
     },
     created() {
         // 获取学生姓名卡号
-
         this.getStudentName()
     }
 }
