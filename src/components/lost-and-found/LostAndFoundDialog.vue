@@ -1,11 +1,11 @@
 <template>
     <!-- 失物招领弹窗组件 -->
     <div :class="['dialog']">
-        <el-button :type="[{ warning, primary }]" @click="dialogVisible=true">
+        <el-button :class="[{ head,list }]" :type="typeStyle" @click="dialogVisible=true" :disabled="disabled">
             <slot></slot>
         </el-button>
         <el-dialog
-            title="提示"
+            :title="prompt"
             :visible.sync="dialogVisible"
             width="30%"
             :before-close="handleClose">
@@ -28,15 +28,26 @@ export default {
     },
     data() {
         return {
-            dialogVisible: false
+            dialogVisible: false,
+            prompt: '我丢东西了'
+            // warning: '',
+            // primary: ''
         }
     },
     props: {
-        warning: {
+        typeStyle: {
             type: Boolean,
             default: false
         },
-        primary: {
+        head: {
+            type: Boolean,
+            default: false
+        },
+        list: {
+            type: Boolean,
+            default: false
+        },
+        disabled: {
             type: Boolean,
             default: false
         }
@@ -59,10 +70,15 @@ export default {
 
 <style scoped lang="less">
 .dialog {
-    .el-button{
+    .list{
         width: 120px;
         height: 50px;
         margin-right: 20px;
+    }
+    .head{
+        width: 160px;
+        height: 50px;
+        margin: 5px 20px 0 0;
     }
 }
 </style>

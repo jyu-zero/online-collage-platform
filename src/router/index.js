@@ -36,6 +36,20 @@ const routes = [
                 path: 'lost-and-found',
                 name: 'UserCenterLostAndFound',
                 component: () => import('@/views/user-center/lost-and-found')
+                // children: [
+                //     {
+                //         // 跳转至失物详情页
+                //         path: 'lost-details',
+                //         name: 'LostDetails',
+                //         component: () => import('@/views/lost-and-found/LostDetails.vue')
+                //     },
+                //     {
+                //         // 跳转至招领详情页
+                //         path: 'found-details',
+                //         name: 'FoundDetails',
+                //         component: () => import('@/views/lost-and-found/FoundDetails.vue')
+                //     }
+                // ]
             },
             // 失物招领组界限 ---------- [完]
             {

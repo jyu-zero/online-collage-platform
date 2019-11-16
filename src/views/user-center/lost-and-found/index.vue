@@ -2,14 +2,9 @@
 
     <!-- 我的失物招领[开始] -->
     <div class="my-lost-and-found">
-        <!-- 弹窗 -->
-        <!-- <LostAndFoundDialog>我丢东西了</LostAndFoundDialog> -->
-        <!-- 处理按钮 -->
         <div class="my-lost-and-found-handle">
-            <!-- <el-button type="text" @click="dialogVisible=true">我丢东西了</el-button> -->
-            <!-- <el-button type="warning">我捡到东西了</el-button> -->
-            <LostAndFoundDialog warning>我丢东西了</LostAndFoundDialog>
-            <LostAndFoundDialog warning>我捡到东西了</LostAndFoundDialog>
+            <LostAndFoundDialog :typeStyle="'warning'" list>我丢东西了</LostAndFoundDialog>
+            <LostAndFoundDialog :typeStyle="'warning'" list>我捡到东西了</LostAndFoundDialog>
         </div>
         <!-- 正在进行 -->
         <div class="my-lost-and-found-do">
@@ -24,12 +19,12 @@
                                 <p v-if="item.sort==1"><span>我捡到的</span></p>
                             </div>
                             <div class="top">
-                                <div class="goods-name">
-                                    <p><span>{{item.name}}</span></p>
+                                <div class="goods-title">
+                                    <p><span>{{item.title}}</span></p>
                                 </div>
                                 <div class="goods-condition">
-                                    <p v-if="!item.trusteeship"><span>学院托管</span></p>
-                                    <p v-if="item.trusteeship"><span>请联系我</span></p>
+                                    <p v-if="!item.hoster"><span>学院托管</span></p>
+                                    <p v-if="item.hoster"><span>请联系我</span></p>
                                 </div>
                             </div>
                             <div class="bottom">
@@ -43,14 +38,13 @@
                             </div>
                         </div>
                         <div class="to-details">
-                            <el-button type="text" title="点击查看详情和图片">查看详情</el-button>
+                            <el-button type="text" title="点击查看详情和图片" v-if="item.sort==0" @click="goToLostDetails">查看详情</el-button>
+                            <el-button type="text" title="点击查看详情和图片" v-if="item.sort==1" @click="goToFoundDetails">查看详情</el-button>
                         </div>
                         <div class="list-button">
-                            <!-- <el-button>编辑</el-button> -->
-                            <!-- <el-button type="primary">未找回失主</el-button> -->
-                            <LostAndFoundDialog>编辑</LostAndFoundDialog>
-                            <LostAndFoundDialog v-if="item.sort==0">未找回</LostAndFoundDialog>
-                            <LostAndFoundDialog v-if="item.sort==1">未归还失主</LostAndFoundDialog>
+                            <LostAndFoundDialog list>编辑</LostAndFoundDialog>
+                            <LostAndFoundDialog v-if="item.sort==0" :typeStyle="'primary'" list>未找回</LostAndFoundDialog>
+                            <LostAndFoundDialog v-if="item.sort==1" :typeStyle="'primary'" list>未归还失主</LostAndFoundDialog>
                         </div>
                     </li>
                 </ul>
@@ -83,12 +77,12 @@
                                 <p v-if="item.sort==1"><span>我捡到的</span></p>
                             </div>
                             <div class="top">
-                                <div class="goods-name">
-                                    <p><span>{{item.name}}</span></p>
+                                <div class="goods-title">
+                                    <p><span>{{item.title}}</span></p>
                                 </div>
                                 <div class="goods-condition">
-                                    <p v-if="!item.trusteeship"><span>学院托管</span></p>
-                                    <p v-if="item.trusteeship"><span>请联系我</span></p>
+                                    <p v-if="!item.hoster"><span>学院托管</span></p>
+                                    <p v-if="item.hoster"><span>请联系我</span></p>
                                 </div>
                             </div>
                             <div class="bottom">
@@ -102,7 +96,8 @@
                             </div>
                         </div>
                         <div class="to-details">
-                            <el-button type="text" title="点击查看详情和图片">查看详情</el-button>
+                            <el-button type="text" title="点击查看详情和图片" v-if="item.sort==0" @click="goToLostDetails">查看详情</el-button>
+                            <el-button type="text" title="点击查看详情和图片" v-if="item.sort==1" @click="goToFoundDetails">查看详情</el-button>
                         </div>
                     </li>
                 </ul>
@@ -133,8 +128,9 @@
 <script>
 import { Row, Button, Pagination, Dialog, Message } from 'element-ui'
 import LostAndFoundDialog from '../../../components/lost-and-found/LostAndFoundDialog'
+import $axios from 'axios'
 // responseHandler, userApi,
-import { prefix, goodsApi } from '@/api'
+import { prefix, responseHandler, goodsApi } from '@/api'
 export default {
     name: 'UserCenterLostAndFound',
     components: {
@@ -147,6 +143,7 @@ export default {
     },
     data(){
         return{
+            typeStyle: '',
             dialogVisible: false,
             currentPage3: 5,
             studentName: '',
@@ -166,9 +163,9 @@ export default {
                     status: 0,
                     // 0丢失,1认领
                     sort: 0,
-                    name: '蓝色小水杯',
+                    title: '蓝色小水杯',
                     // 是否学院托管
-                    trusteeship: false,
+                    hoster: false,
                     place: '中区主球场',
                     time: '2019-02-23'
                 },
@@ -178,9 +175,9 @@ export default {
                     status: 1,
                     // 0丢失,1认领
                     sort: 1,
-                    name: '卡西欧手表',
+                    title: '卡西欧手表',
                     // 是否学院托管
-                    trusteeship: true,
+                    hoster: true,
                     place: '中区篮球场',
                     time: '2019-06-04'
                 },
@@ -190,9 +187,9 @@ export default {
                     status: 1,
                     // 0丢失,1认领
                     sort: 0,
-                    name: '小米手机',
+                    title: '小米手机',
                     // 是否学院托管
-                    trusteeship: true,
+                    hoster: true,
                     place: '南区食堂',
                     time: '2018-12-16'
                 },
@@ -202,9 +199,9 @@ export default {
                     status: 0,
                     // 0丢失,1认领
                     sort: 0,
-                    name: '一卡通171100220',
+                    title: '一卡通171100220',
                     // 是否学院托管
-                    trusteeship: false,
+                    hoster: false,
                     place: '全校',
                     time: '2019-06-11'
                 },
@@ -214,9 +211,9 @@ export default {
                     status: 0,
                     // 0丢失,1认领
                     sort: 1,
-                    name: '一卡通171100220',
+                    title: '一卡通171100220',
                     // 是否学院托管
-                    trusteeship: false,
+                    hoster: false,
                     place: '全校',
                     time: '2019-06-11'
                 },
@@ -226,9 +223,9 @@ export default {
                     status: 1,
                     // 0丢失,1认领
                     sort: 1,
-                    name: '一卡通171100220',
+                    title: '一卡通171100220',
                     // 是否学院托管
-                    trusteeship: false,
+                    hoster: false,
                     place: '全校',
                     time: '2019-06-11'
                 },
@@ -238,9 +235,9 @@ export default {
                     status: 0,
                     // 0丢失,1认领
                     sort: 1,
-                    name: '一卡通171100220',
+                    title: '一卡通171100220',
                     // 是否学院托管
-                    trusteeship: false,
+                    hoster: false,
                     place: '全校',
                     time: '2019-06-11'
                 },
@@ -250,9 +247,9 @@ export default {
                     status: 1,
                     // 0丢失,1认领
                     sort: 1,
-                    name: '一卡通171100220',
+                    title: '一卡通171100220',
                     // 是否学院托管
-                    trusteeship: false,
+                    hoster: false,
                     place: '全校',
                     time: '2019-06-11'
                 }
@@ -268,9 +265,26 @@ export default {
                 //     Message.error('您还未登录')
                 //     return
                 // }
-                this.goods = response.data.data
-                console.log(response.data.data)
+
+                // this.goods = response.data.data
+                this.status = response.data.data.status
+                this.sort = response.data.data.sort
+                this.title = response.data.data.title
+                this.hoster = response.data.data.hoster
+                this.place = response.data.data.place
+                this.time = response.data.data.time
+                // console.log(response.data.data)
             })
+        },
+        // 跳转至失物详情页
+        goToLostDetails(){
+            console.log('跳转至失物详情页')
+            this.$router.push({ name: 'LostDetails' })
+        },
+        // 跳转至招领详情页
+        goToFoundDetails(){
+            console.log('跳转至招领详情页')
+            this.$router.push({ name: 'FoundDetails' })
         },
         // 关闭element对话框
         handleClose(done) {
@@ -286,6 +300,8 @@ export default {
         handleCurrentChange(val) {
             // console.log(`当前页: ${val}`);
         }
+    }
+}
 </script>
 
 <style lang="less" scoped>
@@ -347,7 +363,7 @@ export default {
                         }
                         .top{
                             display: flex;
-                            .goods-name{
+                            .goods-title{
                                 float: left;
                                 margin-top: 20px;
                                 p{
