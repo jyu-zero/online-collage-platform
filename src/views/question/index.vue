@@ -98,7 +98,8 @@ export default {
             questionList: [], // 问题列表
             pageCount: 1, // 总的页数
             radio: 1, // 获取所要查看的问题id
-            searchContent: '' // 搜索的问题内容
+            searchContent: '', // 搜索的问题内容
+            page: 1
         }
     },
     mounted(){

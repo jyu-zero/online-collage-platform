@@ -27,8 +27,25 @@ const routes = [
             },
             {
                 path: 'questions',
-                name: 'UserCenterQuestion',
-                component: () => import('@/views/user-center/question')
+                // name: 'UserCenterQuestion',
+                component: () => import('@/views/user-center/question'),
+                children: [
+                    {
+                        path: '/',
+                        name: 'MyQuestion',
+                        component: () => import('@/views/user-center/question/question')
+                    },
+                    {
+                        path: 'my-question',
+                        name: 'MyQuestion',
+                        component: () => import('@/views/user-center/question/question')
+                    },
+                    {
+                        path: 'my-answer',
+                        name: 'MyAnswer',
+                        component: () => import('@/views/user-center/question/answer')
+                    }
+                ]
             },
             // 失物招领组界限 ----------
             {

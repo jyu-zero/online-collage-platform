@@ -4,7 +4,7 @@ export default {
     // 获取问题
     'getQuestions': '/get-questions',
     // 获取类型名
-    'getTypeName': '/get-type-name',
+    'getQuestionTypes': '/get-question-types',
     // 发起问题
     'newQuestion': '/new-question'
 }

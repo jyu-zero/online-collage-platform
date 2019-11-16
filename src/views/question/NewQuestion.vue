@@ -81,19 +81,18 @@ export default {
         }
     },
     created(){
-        this.getTypeName()
+        this.getQuestionTypes()
     },
     methods: {
         onlineQuestionAndAnswer(){
             this.$router.push({ name: 'Question' })
         },
         // 获取类型名
-        getTypeName(){
-            this.$axios.get(prefix.api + questionApi.getTypeName).then((response)=>{
+        getQuestionTypes(){
+            this.$axios.get(prefix.api + questionApi.getQuestionTypes).then((response)=>{
                 if(!responseHandler(response.data, this)){
                     Message.error('服务器太过繁忙，请刷新重试')
                 }
-                Message.success('请求成功')
                 this.typeName = response.data.data
             })
         },
