@@ -106,7 +106,14 @@ const routes = [
                 // 招领详情页
                 path: '/found-details',
                 name: 'FoundDetails',
-                component: () => import('@/views/lost-and-found/FoundDetails')
+                component: () => import('@/views/lost-and-found/FoundDetails'),
+                children: [
+                    {
+                        path: '/question-pop-up',
+                        name: 'questionPopUp',
+                        component: () => import('@/views/lost-and-found/pop-up/QuestionPopUp')
+                    }
+                ]
             },
             // 失物招领组界限 ---------- [完]
             // 新闻管理组界限 ----------
