@@ -74,13 +74,20 @@ const routes = [
                 // 失物详情页
                 path: '/lost-details',
                 name: 'LostDetails',
-                component: () => import('@/views/lost-and-found/lostDetails')
+                component: () => import('@/views/lost-and-found/LostDetails')
             },
             {
                 // 招领详情页
                 path: '/found-details',
                 name: 'FoundDetails',
-                component: () => import('@/views/lost-and-found/foundDetails')
+                component: () => import('@/views/lost-and-found/FoundDetails'),
+                children: [
+                    {
+                        path: '/question-pop-up',
+                        name: 'questionPopUp',
+                        component: () => import('@/views/lost-and-found/pop-up/QuestionPopUp')
+                    }
+                ]
             }
             // 失物招领组界限 ---------- [完]
         ]
