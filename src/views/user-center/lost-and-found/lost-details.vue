@@ -1,33 +1,7 @@
 <template>
     <!-- 失物招领列表页面[开始] -->
     <div class="lost-details-page">
-        <!-- 头部部分[开始] -->
-        <header>
-            <h1>线上学院平台</h1>
-
-            <!-- 用户登录[开始] -->
-            <div class="lost-details-login">
-                <i class="login">
-                    <!-- <div class="icon"><img src="/src/assets/login.png" alt=""></div> -->
-                    <span>shenhongzhen</span>
-                    <!-- <div class="icon"><img src="/src/assets/list.png" alt=""></div> -->
-                </i>
-                <i class="list"></i>
-            </div>
-            <!-- 用户登录[结束] -->
-
-            <!-- 头部列表[开始] -->
-            <div class="breadcrumb">
-                <a href="#" title="首页"><span class="white">首页</span></a>
-                <span class="white">＞</span>
-                <a href="#" title="失物招领"><span class="white">失物招领</span></a>
-                <span class="white">＞</span>
-                <span class="white">招领</span>
-            </div>
-            <!-- 头部列表[结束] -->
-        </header>
-        <!-- 头部部分[结束] -->
-
+       
         <!-- 中间部分[开始] -->
         <el-main>
             <div class="lost-details-main">
