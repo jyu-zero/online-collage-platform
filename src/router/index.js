@@ -63,6 +63,18 @@ const routes = [
                 name: 'Test',
                 component: () => import('@/views/Test.vue')
             },
+            // 在线问答组界限 ----------
+            {
+                path: '/question',
+                name: 'Question',
+                component: () => import('@/views/question')
+            },
+            {
+                path: '/question/new',
+                name: 'NewQuestion',
+                component: () => import('@/views/question/NewQuestion.vue')
+            },
+            // 在线问答组界限 ---------- [完]
             // 失物招领组界限 ----------
             {
                 // 失物招领详情
@@ -88,8 +100,29 @@ const routes = [
                         component: () => import('@/views/lost-and-found/pop-up/QuestionPopUp')
                     }
                 ]
-            }
+            },
             // 失物招领组界限 ---------- [完]
+            // 新闻管理组界限 ----------
+            {
+                // 新闻中心
+                path: '/news-center',
+                name: 'NewsCenter',
+                component: () => import('@/views/news/NewsCenter.vue')
+            },
+            {
+                path: '/news-detail',
+                name: 'NewsDetail',
+                component: () => import('@/views/news/NewsDetail.vue')
+            }
+            // 新闻管理组界限 ---------- [完]
+        ]
+    },
+    {
+        // 新闻页面
+        path: '/news-detail',
+        component: () => import('@/views/Wrapper.vue'),
+        children: [
+            
         ]
     }
 ]
