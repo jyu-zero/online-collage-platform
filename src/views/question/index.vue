@@ -42,10 +42,10 @@
         <main>
             <div class="question-box" v-for="questionItem of questionList" :key="questionItem.questionId">
                 <el-row :gutter="20">
-                    <el-col :span="12">
+                    <el-col :span="14">
                         <div class="grid-content bg-purple left-align">
-                            <el-radio v-model="radio" :label="questionItem.questionId">{{questionItem.title}}
-                                <el-button type="text" disabled>{{questionItem.status}}</el-button>
+                            <el-radio v-model="radio" :label="questionItem.questionId">
+                                <span>{{questionItem.title}}</span>
                             </el-radio>
                             <p class="description">提问人{{questionItem.name}} {{questionItem.time}}
                                 <i class="el-icon-s-promotion">{{questionItem.typeName}}</i>
@@ -54,8 +54,9 @@
                             </p>
                         </div>
                     </el-col>
-                    <el-col :span="4" :offset="8">
+                    <el-col :span="4" :offset="6">
                         <div class="grid-content bg-purple right-align">
+                            <el-button type="text" disabled>{{questionItem.status}}</el-button>
                             <el-button>查看</el-button>
                         </div>
                     </el-col>
@@ -145,15 +146,17 @@ export default {
                     page
                 }
             }).then((response)=>{
-                if(response.data.code === '0000'){
-                    this.pageCount = response.data.data.pageCount
-                    this.questionList = response.data.data.information
-                    for(var i = 0; i < this.questionList.length; i++){
-                        if(this.questionList[i].status === 0){
-                            this.questionList[i].status = '待解决'
-                        } else{
-                            this.questionList[i].status = '已解决'
-                        }
+                if(!responseHandler(response.data, this)){
+                    // TODO:
+                    Message.error('获取失败')
+                }
+                this.pageCount = response.data.data.pageCount
+                this.questionList = response.data.data.information
+                for(var i = 0; i < this.questionList.length; i++){
+                    if(this.questionList[i].status === 0){
+                        this.questionList[i].status = '待解决'
+                    } else{
+                        this.questionList[i].status = '已解决'
                     }
                 }
             })
@@ -207,13 +210,14 @@ export default {
 
                         .el-radio{
                             font-size: 18px;
+                            width: 100%;
+                            margin-right: 0;
+                            overflow: hidden;
+                            text-overflow:ellipsis;
+                            white-space: nowrap;
 
                             .el-radio__label{
                                 font-size: 18px;
-                            }
-
-                            .is-disabled{
-                                padding: 5px 0;
                             }
                         }
                         

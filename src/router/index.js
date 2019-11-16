@@ -27,12 +27,11 @@ const routes = [
             },
             {
                 path: 'questions',
-                // name: 'UserCenterQuestion',
                 component: () => import('@/views/user-center/question'),
                 children: [
                     {
-                        path: '/',
-                        name: 'MyQuestion',
+                        path: '',
+                        name: 'UserCenterQuestion',
                         component: () => import('@/views/user-center/question/question')
                     },
                     {

@@ -3,7 +3,7 @@
         <h1 class="questioin-status">待解决</h1>
             <!-- 待解决问题列表 -->
             <div class="wait-for-solve-container">
-                <div class="question-box" v-for="questionItem of questionList" :key="questionItem.questionId">
+                <div class="question-box" v-for="questionItem of waitToSolveQuestionList" :key="questionItem.questionId">
                     <el-row :gutter="20">
                         <el-col :span="6">
                             <div class="grid-content bg-purple left-align">
@@ -35,7 +35,7 @@
             <h1 class="questioin-status">已解决</h1>
             <!-- 已解决问题列表 -->
             <div class="solved-container">
-                <div class="question-box" v-for="questionItem of questionList" :key="questionItem.questionId">
+                <div class="question-box" v-for="questionItem of solvedQuestionList" :key="questionItem.questionId">
                     <el-row :gutter="20">
                         <el-col :span="6">
                             <div class="grid-content bg-purple left-align">
@@ -67,6 +67,7 @@
 </template>
 
 <script>
+import { prefix, responseHandler, questionApi } from '@/api'
 import { Button, Message, Row, Col, Checkbox, Pagination } from 'element-ui'
 export default {
     name: 'Question',
@@ -80,46 +81,26 @@ export default {
     },
     data(){
         return {
-            // 获取的所有问题
-            questionList: [
-                // 这是测试用的数据
-                {
-                    'questionId': 6,
-                    'title': '这是问题的标题',
-                    'description': '描述',
-                    'time': '2019-11-15  12:02:33',
-                    'typeName': '类型名',
-                    'views': 20,
-                    'solutionsNum': 11
-                },
-                {
-                    'questionId': 22,
-                    'title': '这是问题的标题',
-                    'description': '描述',
-                    'time': '2019-11-15  12:02:33',
-                    'typeName': '类型名',
-                    'views': 20,
-                    'solutionsNum': 11
-                },
-                {
-                    'questionId': 30,
-                    'title': '这是问题的标题',
-                    'description': '描述',
-                    'time': '2019-11-15  12:02:33',
-                    'typeName': '类型名',
-                    'views': 20,
-                    'solutionsNum': 11
-                }
-            ],
+            // 获取待解决的所有问题
+            waitToSolveQuestionList: [],
+            // 获取已解决的所有问题
+            solvedQuestionList: [],
             // 获取用户选择要进行查看的问题的id,只能是一条
             checkQuestionId: [],
             // 待解决问题列表的页数
             waitToSolvePageCount: 5,
             // 已解决问题列表的页数
             solvedPageCount: 5,
+            // 记录当前待解决问题所在页数
             waitToSolvePage: 1,
+            // 记录当前已解决问题所在页数
             solvedPage: 1
         }
+    },
+    created(){
+        // 获取当前页面的待解决和已解决问题
+        this.getWaitToSolveQuestion()
+        this.getSolvedQuestion()
     },
     methods: {
         // 将选择的问题id传给 checkQuestionId
@@ -131,14 +112,60 @@ export default {
             }
             this.checkQuestionId.push(id)
         },
-        // 处理待解决问题的分页
+        // 获取用户的待解决问题
+        getWaitToSolveQuestion(page = 1){
+            this.$axios.get(prefix.api + questionApi.getAnswerWaitToSolveQuestion, {
+                params: {
+                    page
+                }
+            }).then((response)=>{
+                if(!responseHandler(response.data, this)){
+                    // TODO
+                    Message.error('请求失败')
+                }
+                this.waitToSolvePageCount = response.data.data.pageCount
+                this.waitToSolveQuestionList = response.data.data.information
+                for(var i = 0; i < this.waitToSolveQuestionList.length; i++){
+                    if(this.waitToSolveQuestionList[i].status === 0){
+                        this.waitToSolveQuestionList[i].status = '待解决'
+                    } else{
+                        this.waitToSolveQuestionList[i].status = '已解决'
+                    }
+                }
+            })
+        },
+        // 获取用户的已解决的问题
+        getSolvedQuestion(page = 1){
+            this.$axios.get(prefix.api + questionApi.getAnswerSolvedQuestion, {
+                params: {
+                    page
+                }
+            }).then((response)=>{
+                if(!responseHandler(response.data, this)){
+                    // TODO
+                    Message.error('请求失败')
+                }
+                this.solvedPageCount = response.data.data.pageCount
+                this.solvedQuestionList = response.data.data.information
+                for(var i = 0; i < this.solvedQuestionList.length; i++){
+                    if(this.solvedQuestionList[i].status === 0){
+                        this.solvedQuestionList[i].status = '待解决'
+                    } else{
+                        this.solvedQuestionList[i].status = '已解决'
+                    }
+                }
+            })
+        },
+        // 待解决问题分页
         handleWaitToSolveQuestionChange(val){
-            console.log(this.checkQuestionId)
+            this.getWaitToSolveQuestion(val)
+            this.getSolvedQuestion(this.solvedPageCount)
             this.waitToSolvePage = val
         },
-        // 处理已解决问题的分页
+        // 已解决问题分页
         handleSolvedQuestionChange(val){
-            // this.getQuestions(val)
+            this.getSolvedQuestion(val)
+            this.getWaitToSolveQuestion(this.waitTosolvePageCount)
             this.solvedPage = val
         }
     }
