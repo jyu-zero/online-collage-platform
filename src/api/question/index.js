@@ -14,5 +14,17 @@ export default {
     // 获取登录用户的待解决问题
     'getAnswerWaitToSolveQuestion': '/answer/get-wait-to-solve-question',
     // 获取用户的回答中的已解决的问题
-    'getAnswerSolvedQuestion': '/answer/get-solved-question'
+    'getAnswerSolvedQuestion': '/answer/get-solved-question',
+    // 删除问题
+    'deleteQuestion': '/admin/delete-question',
+    // 获取查看的问题信息
+    'getCheckQuestions': '/admin/get-check-questions',
+    // 采纳为最佳
+    'adoptAsBest': '/admin/adopt-as-best',
+    // 获取回答问题的列表
+    'getSolutions': '/admin/get-solutions',
+    // 给回答点赞
+    'likes': '/admin/likes',
+    // 给回答点踩
+    'dislikes': '/admin/dislikes'
 }

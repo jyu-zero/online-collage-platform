@@ -90,6 +90,12 @@ const routes = [
                 name: 'NewQuestion',
                 component: () => import('@/views/question/NewQuestion.vue')
             },
+            {
+                path: '/question/questions-specific/:id',
+                name: 'QuestionSpecific',
+                props: true,
+                component: () => import('@/views/question/specificQuestion.vue')
+            },
             // 在线问答组界限 ---------- [完]
             // 失物招领组界限 ----------
             {
