@@ -38,10 +38,11 @@
     </div>
     <!-- 学生个人信息【完】 -->
     </div>
+    
 </template>
 
 <script>
-import { userApi, prefix } from '@/api'
+import { userApi, prefix, responseHandler } from '@/api'
 import { Button, Message } from 'element-ui'
 export default {
     name: 'ProfileManage',
@@ -57,7 +58,28 @@ export default {
             dormitory: '203',
             sex: '1'
         }
+    },
+    methods: {
+        // 获取个人资料管理中的内容
+        getProfileManage(){
+            this.$axios.get(prefix.api + userApi.profileManage).then((response)=>{
+                if(!responseHandler(response.data, this)){
+                    Message.error('请求失败')
+                }
+                Message.success('请求成功')
+                this.name = response.data.data.name
+                this.account = response.data.data.account
+                this.contact = response.data.data.contact
+                this.dormitory = response.data.data.dormitory
+                this.sex = response.data.data.sex
+            })
+        }
+        // 修改密码
+    },
+    created(){
+        this.getProfileManage()
     }
+
 }
 </script>
 
