@@ -10,17 +10,19 @@
         <el-card class="box-card">
             <div class="news">
                 <div class="title">
-                    <div class="new" v-for="news of newsList" :key="news.id">
+                    <div class="new" @click="goToDetailPage(news.news_id)" v-for="news of newsList" :key="news.id">
                         <!-- <span class="">{{news.is_pinned}}</span> -->
                         <span class="" v-if="news.is_pinned===1">[置顶] </span>
-                        <span @click="goToDetailPage" class="content">{{news.news_title}}</span>
+                        <span class="content">{{news.news_title}}</span>
                         <span class="time">{{news.created_at}}</span>
+                        <el-divider></el-divider>
                     </div>
                 </div>
 
                 <div class="views">
                     <div class="new" v-for="news of newsList" :key="news.id">
                         <span class="views"><font-awesome-icon icon="eye" /> {{news.views}}</span>
+                        <el-divider></el-divider>
                     </div>
                 </div>
             </div>
@@ -104,9 +106,13 @@ export default {
             console.log('跳转至主页')
             this.$router.push({ name: 'HomePage' })
         },
-        goToDetailPage(){
+        goToDetailPage(id){
             console.log('跳转至新闻具体页面')
-            this.$router.push({ path: '/news-detail' })
+            console.log(id)
+            this.$router.push({ path: '/news-detail',
+                query: {
+                    newsId: id
+                } })
         },
         handleSizeChange(val) {
             console.log(`每页 ${val} 条`)
@@ -120,7 +126,7 @@ export default {
 <style lang="less">
     .index{
         width: 1300px;
-        height: 1000px;
+        height: 600px;
         // border: 1px solid rgb(0, 0, 0);
         margin-left: 175px;
         margin-top: 30px;
@@ -139,13 +145,14 @@ export default {
         // border: 1px solid rgb(0, 0, 0);
     }
     .news{
-        width: 1300px;
+        width: 1260px;
         // border: 1px solid rgb(0, 0, 0);
         display: flex;
     }
     .new{
         margin-bottom: 10px;
         margin-top: 10px;
+        font-size: 15px;
     }
     .title{
         width: 1200px;
@@ -157,19 +164,11 @@ export default {
         width: 100px;
         height: 100%;
         // border: 1px solid rgb(0, 0, 0);
-        font-size: 20px;
+        // font-size: 20px;
         // margin-bottom: 10px;
     }
     .pagination{
         margin-top: 20px;
-    }
-
-    .text {
-    font-size: 14px;
-    }
-
-    .item {
-        padding: 18px 0;
     }
 
     .box-card {
