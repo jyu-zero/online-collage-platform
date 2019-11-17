@@ -28,8 +28,8 @@
             </el-table-column>
             <el-table-column label="操作"  width="200">
                 <template slot-scope="scope">
-                  <el-button type="text" @click="handleEdit(scope.$index, scope.row)">删除</el-button>
-                  <el-button size="mini" @click="handleDelete(scope.$index, scope.row)">下载</el-button>
+                  <el-button type="text" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                  <el-button size="mini" @click="handleDownload(scope.$index, scope.row)">下载</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -52,7 +52,7 @@
             <div>
                 <p>可见范围</p>
                 <el-select v-model="range" multiple>
-                    <el-option  v-for="item in set_view_ranges" :key="item.value" :label="item.label" :value="item.value"> </el-option>
+                    <el-option  v-for="item in setViewRanges" :key="item.value" :label="item.label" :value="item.value"> </el-option>
                 </el-select>
             </div>
             <div>
@@ -71,8 +71,10 @@
 </template>
 
 <script>
-import { Select, Option, Button, Table, TableColumn, Tag, Icon, Upload, Container, Main } from'element-ui'
+import { Select, Option, Button, Table, TableColumn, Tag, Icon, Upload, Container, Main, Message, Pagination } from'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
+import { prefix, responseHandler, fileApi } from '@/api'
+import axios from 'axios'
 export default {
     name: 'FileShare',
     components: {
@@ -85,7 +87,9 @@ export default {
         [Icon.name]: Icon,
         [Upload.name]: Upload,
         [Container.name]: Container,
-        [Main.name]: Main
+        [Main.name]: Main,
+        [Message.name]: Message,
+        [Pagination.name]: Pagination
     },
     data (){
         return {
@@ -113,7 +117,7 @@ export default {
             }],
             type: '',
             range: [],
-            set_view_ranges: [{
+            setViewRanges: [{
                 value: '选项1',
                 label: '全学院'
             }, {
@@ -125,24 +129,28 @@ export default {
             }],
             showModal: false,
             document: [{
+                id: 1,
                 fileName: '啊速度就会幸福大家',
                 time: '2016-05-02',
                 view_range: ' 1518 弄',
                 type: '家',
                 downloadTimes: 5
             }, {
+                id: 2,
                 fileName: '啊速度就会幸福大家',
                 time: '2016-05-04',
                 view_range: ' 1517 弄',
                 type: '公司',
                 downloadTimes: 5
             }, {
+                id: 3,
                 fileName: '啊速度就会幸福大家',
                 time: '2016-05-01',
                 view_range: ' 1519 弄',
                 type: '家',
                 downloadTimes: 5
             }, {
+                id: 4,
                 fileName: '啊速度就会幸福大家',
                 time: '2016-05-03',
                 view_range: ' 1516 弄',
@@ -151,12 +159,41 @@ export default {
             }]
         }
     },
+    created(){
+        this.$axios.post(prefix.api + fileApi.getAllFile).then(response => {
+            if(!responseHandler(response.data, this)){
+                Message.error(response.data.msg)
+            }
+            this.document = response.data.data
+        })
+    },
     methods: {
-        handleEdit(index, row) {
+        handleDownload(index, row) {
             console.log(index, row)
         },
         handleDelete(index, row) {
-            console.log(index, row)
+            // console.log(this.document[index].id)
+            this.$axios.post(prefix.api + fileApi.deleteFile, {
+                fileId: this.document[index].id
+            }).then(response => {
+                if(!responseHandler(response.data, this)){
+                    Message.error(response.data.msg)
+                }
+                this.$axios.post(prefix.api + fileApi.getAllFile)
+            })
+        },
+        uploadFile(){
+            this.$axios.post(prefix.api + fileApi.upload, {
+                type: this.type,
+                range: this.range
+            }).then(response => {
+                if(!responseHandler(response.data, this)){
+                    Message.error(response.data.msg)
+                }
+                // this.$axios.post(prefix.api + fileApi.getAllFile)
+                this.type = ''
+                this.range = []
+            })
         }
     }
 }

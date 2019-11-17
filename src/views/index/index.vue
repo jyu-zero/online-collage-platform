@@ -478,7 +478,7 @@ export default {
         // 跳转至资源共享页面
         goToSourceShare(){
             console.log('跳转至资源共享页面')
-            // this.$router.push({ name: 'SourceShare' })
+            this.$router.push({ name: 'SourceShare' })
         }
     },
     created () {

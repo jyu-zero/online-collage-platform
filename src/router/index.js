@@ -106,8 +106,17 @@ const routes = [
                 path: '/news-detail',
                 name: 'NewsDetail',
                 component: () => import('@/views/news/NewsDetail.vue')
-            }
+            },
             // 新闻管理组界限 ---------- [完]
+            // 文件共享组界限 ----------
+            {
+                // 文件共享
+                path: '/source-share',
+                name: 'SourceShare',
+                component: () => import('@/views/file-share')
+            }
+            // 文件共享组界限 ---------- [完]
+
         ]
     },
     {
@@ -115,7 +124,7 @@ const routes = [
         path: '/news-detail',
         component: () => import('@/views/Wrapper.vue'),
         children: [
-            
+
         ]
     }
 ]
