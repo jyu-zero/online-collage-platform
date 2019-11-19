@@ -1,41 +1,51 @@
 <template>
     <div id="questions-platform">
         <header>
+             <!-- 头部面包屑 -->
             <el-breadcrumb separator-class="el-icon-arrow-right">
                 <el-breadcrumb-item :to="{ path: '/' }">主页</el-breadcrumb-item>
                 <el-breadcrumb-item>在线问答</el-breadcrumb-item>
             </el-breadcrumb>
+            <!-- 头部面包屑 [完]-->
             <el-row :gutter="20">
                 <el-col :span="4">
                     <div class="grid-content bg-purple">
                         <h1>在线问答</h1>
                     </div>
                 </el-col>
+
+                <!-- 发起新问题按钮 -->
                 <el-col :span="4" :offset="6">
                     <div class="grid-content bg-purple">
-                        <el-button type="primary" @click.native="launchQuestion">发起新问题</el-button>
+                        <el-button type="primary" @click.native="newQuestion">发起新问题</el-button>
                     </div>
                 </el-col>
+                <!-- 发起新问题按钮 [完]-->
+
+                <!-- 搜索框及搜索图标 -->
                 <el-col :span="10">
                     <div class="grid-content bg-purple">
                         <el-input
-                        placeholder="搜索问题"
-                        v-model="input"
-                        clearable>
-                        <el-button slot="append" icon="el-icon-search" @click="searchQuestions"></el-button>
+                            placeholder="搜索问题"
+                            v-model="searchContent"
+                            clearable>
+                            <el-button slot="append" icon="el-icon-search" @click="searchQuestions"></el-button>
                         </el-input>
                     </div>
                 </el-col>
+                <!-- 搜索框及搜索图标 [完]-->
                 
             </el-row>
         </header>
+
+        <!-- 问题列表 -->
         <main>
             <div class="question-box" v-for="questionItem of questionList" :key="questionItem.questionId">
                 <el-row :gutter="20">
-                    <el-col :span="12">
+                    <el-col :span="14">
                         <div class="grid-content bg-purple left-align">
-                            <el-radio v-model="radio" :label="questionItem.questionId">{{questionItem.title}}
-                                <el-button type="text" disabled>{{questionItem.status}}</el-button>
+                            <el-radio v-model="radio" :label="questionItem.questionId">
+                                <span>{{questionItem.title}}</span>
                             </el-radio>
                             <p class="description">提问人{{questionItem.name}} {{questionItem.time}}
                                 <i class="el-icon-s-promotion">{{questionItem.typeName}}</i>
@@ -44,14 +54,18 @@
                             </p>
                         </div>
                     </el-col>
-                    <el-col :span="4" :offset="8">
+                    <el-col :span="4" :offset="6">
                         <div class="grid-content bg-purple right-align">
+                            <el-button type="text" disabled>{{questionItem.status}}</el-button>
                             <el-button>查看</el-button>
                         </div>
                     </el-col>
                 </el-row>
             </div>
         </main>
+        <!-- 问题列表 -->
+
+        <!-- 分页 -->
         <footer>
             <el-pagination
                 background
@@ -60,6 +74,7 @@
                 :page-count="pageCount">
             </el-pagination>
         </footer>
+        <!-- 分页 [完]-->
     </div>
 </template>
 
@@ -81,10 +96,11 @@ export default {
     },
     data(){
         return {
-            questionList: [],
-            pageCount: 1,
+            questionList: [], // 问题列表
+            pageCount: 1, // 总的页数
             radio: 1, // 获取所要查看的问题id
-            input: ''
+            searchContent: '', // 搜索的问题内容
+            page: 1
         }
     },
     mounted(){
@@ -95,17 +111,21 @@ export default {
             this.getQuestions(val)
             this.page = val
         },
-        launchQuestion(){
-            this.$router.push({ name: 'LaunchQuestion' })
+        newQuestion(){
+            this.$router.push({ name: 'NewQuestion' })
         },
         // 搜索问题
         searchQuestions(){
             this.$axios.post(prefix.api + questionApi.searchQuestions, {
-                'content': this.input
+                'content': this.searchContent
             }).then((response)=>{
                 if(!responseHandler(response.data, this)){
-                    // 在这里处理错误
-                    Message.error('请求失败')
+                    if(response.data.code === '0001'){
+                        Message.error('搜索问题的条件不能为空')
+                    }
+                    if(response.data.code === '0002'){
+                        Message.error('搜索内容过长')
+                    }
                 }
                 Message.success('请求成功')
                 this.pageCount = response.data.data.pageCount
@@ -126,15 +146,17 @@ export default {
                     page
                 }
             }).then((response)=>{
-                if(response.data.code === '0000'){
-                    this.pageCount = response.data.data.pageCount
-                    this.questionList = response.data.data.information
-                    for(var i = 0; i < this.questionList.length; i++){
-                        if(this.questionList[i].status === 0){
-                            this.questionList[i].status = '待解决'
-                        } else{
-                            this.questionList[i].status = '已解决'
-                        }
+                if(!responseHandler(response.data, this)){
+                    // TODO:
+                    Message.error('获取失败')
+                }
+                this.pageCount = response.data.data.pageCount
+                this.questionList = response.data.data.information
+                for(var i = 0; i < this.questionList.length; i++){
+                    if(this.questionList[i].status === 0){
+                        this.questionList[i].status = '待解决'
+                    } else{
+                        this.questionList[i].status = '已解决'
                     }
                 }
             })
@@ -188,13 +210,14 @@ export default {
 
                         .el-radio{
                             font-size: 18px;
+                            width: 100%;
+                            margin-right: 0;
+                            overflow: hidden;
+                            text-overflow:ellipsis;
+                            white-space: nowrap;
 
                             .el-radio__label{
                                 font-size: 18px;
-                            }
-
-                            .is-disabled{
-                                padding: 5px 0;
                             }
                         }
                         
