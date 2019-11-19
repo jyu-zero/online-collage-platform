@@ -300,24 +300,22 @@
             </div>
             <!-- 提交或取消 -->
             <span slot="footer" class="dialog-footer">
-                <!-- 这里都要改成多一层弹窗,目前还没有解决this.$confirm is not a function的bug -->
                 <el-button @click="dialogVisible=false">取 消</el-button>
-                <el-button type="primary" @click="dialogVisible=false" v-if="prompt==='我丢东西了'">发 布</el-button>
-                <el-button type="primary" @click="dialogVisible=false" v-if="prompt==='我捡到东西了'">发 布</el-button>
-                <el-button type="primary" @click="dialogVisible=false" v-if="sort=='0'">修 改</el-button>
-                <el-button type="primary" @click="dialogVisible=false" v-if="sort=='1'">修 改</el-button>
-                <el-button type="primary" @click="dialogVisible=false" v-if="prompt==='设置失物状态'">已找回</el-button>
-                <!-- <el-button type="primary" @click="open" v-if="prompt==='设置失物状态'">已找回</el-button> -->
-                <el-button type="primary" @click="dialogVisible=false" v-if="prompt==='设置失物状态'">放 弃</el-button>
-                <el-button type="primary" @click="dialogVisible=false" v-if="prompt==='设置失物状态'">删 除</el-button>
-                <el-button type="primary" @click="dialogVisible=false" v-if="prompt==='确认认领'">确 定</el-button>
+                <el-button type="primary" @click="lostSubmit" v-if="prompt==='我丢东西了'">发 布</el-button>
+                <el-button type="primary" @click="foundSubmit" v-if="prompt==='我捡到东西了'">发 布</el-button>
+                <el-button type="primary" @click="lostSubmitChange" v-if="sort=='0'">修 改</el-button>
+                <el-button type="primary" @click="foundSubmitChange" v-if="sort=='1'">修 改</el-button>
+                <el-button type="primary" @click="setRecovered" v-if="prompt==='设置失物状态'">已找回</el-button>
+                <el-button type="primary" @click="setAbandon" v-if="prompt==='设置失物状态'">放 弃</el-button>
+                <el-button type="primary" @click="setDelete" v-if="prompt==='设置失物状态'">删 除</el-button>
+                <el-button type="primary" @click="setClaim" v-if="prompt==='确认认领'">确 定</el-button>
             </span>
         </el-dialog>
     </div>
 </template>
 
 <script>
-import { Button, Dialog, Input, Upload, MessageBox, Radio } from 'element-ui'
+import { Button, Dialog, Input, Upload, MessageBox, Radio, Message } from 'element-ui'
 export default {
     components: {
         name: 'LostAndFoundDialog',
@@ -326,7 +324,8 @@ export default {
         [Input.name]: Input,
         [Upload.name]: Upload,
         [MessageBox.name]: MessageBox,
-        [Radio.name]: Radio
+        [Radio.name]: Radio,
+        [Message.name]: Message
     },
     data() {
         return {
@@ -404,11 +403,7 @@ export default {
         },
         // 关闭element对话框
         handleClose(done) {
-            this.$confirm('确认关闭?', '', {
-                // confirmButtonText: '确定',
-                // cancelButtonText: '取消',
-                // type: 'warning'
-            })
+            MessageBox.confirm('确认关闭?')
                 .then(_ => {
                     done()
                 })
@@ -428,22 +423,157 @@ export default {
         },
         // 确认删除图片
         beforeRemove(file, fileList) {
-            return this.$confirm(`确定移除 ${file.name}？`)
+            return MessageBox.confirm(`确定移除 ${file.name}？`)
         },
-        open() {
-            this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        // 确定失物发布
+        lostSubmit() {
+            MessageBox.confirm('', '确定发布吗?', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                this.$message({
+                Message({
                     type: 'success',
-                    message: '删除成功!'
+                    message: '发布成功!'
                 })
+                this.dialogVisible = false
             }).catch(() => {
-                this.$message({
+                Message({
                     type: 'info',
-                    message: '已取消删除'
+                    message: '已取消发布'
+                })
+            })
+        },
+        // 确定招领发布
+        foundSubmit() {
+            MessageBox.confirm('', '确定发布吗?', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                Message({
+                    type: 'success',
+                    message: '发布成功!'
+                })
+                this.dialogVisible = false
+            }).catch(() => {
+                Message({
+                    type: 'info',
+                    message: '已取消发布'
+                })
+            })
+        },
+        // 失物信息修改
+        lostSubmitChange() {
+            MessageBox.confirm('', '确定修改吗?', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                Message({
+                    type: 'success',
+                    message: '修改成功!'
+                })
+                this.dialogVisible = false
+            }).catch(() => {
+                Message({
+                    type: 'info',
+                    message: '已取消修改'
+                })
+            })
+        },
+        // 招领信息修改
+        foundSubmitChange() {
+            MessageBox.confirm('', '确定修改吗?', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                Message({
+                    type: 'success',
+                    message: '修改成功!'
+                })
+                this.dialogVisible = false
+            }).catch(() => {
+                Message({
+                    type: 'info',
+                    message: '已取消修改'
+                })
+            })
+        },
+        // 确定设置成已找回
+        setRecovered() {
+            MessageBox.confirm('此操作将永久设置该物品状态为已找回, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                Message({
+                    type: 'success',
+                    message: '设置成功!'
+                })
+                this.dialogVisible = false
+            }).catch(() => {
+                Message({
+                    type: 'info',
+                    message: '已取消设置'
+                })
+            })
+        },
+        // 确定设置成放弃
+        setAbandon() {
+            MessageBox.confirm('此操作将永久设置该物品状态为放弃, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                Message({
+                    type: 'success',
+                    message: '设置成功!'
+                })
+                this.dialogVisible = false
+            }).catch(() => {
+                Message({
+                    type: 'info',
+                    message: '已取消设置'
+                })
+            })
+        },
+        // 确定设置成删除
+        setDelete() {
+            MessageBox.confirm('此操作将永久设置该物品状态为删除, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                Message({
+                    type: 'success',
+                    message: '设置成功!'
+                })
+                this.dialogVisible = false
+            }).catch(() => {
+                Message({
+                    type: 'info',
+                    message: '已取消设置'
+                })
+            })
+        },
+        // 确定认领
+        setClaim() {
+            MessageBox.confirm('此操作将永久设置该物品状态为确定认领, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                Message({
+                    type: 'success',
+                    message: '设置成功!'
+                })
+                this.dialogVisible = false
+            }).catch(() => {
+                Message({
+                    type: 'info',
+                    message: '已取消设置'
                 })
             })
         }
