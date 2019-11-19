@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import { Button, Select, Divider, Image, Container, Card, Row, Col, Main, Dialog } from 'element-ui'
+import { Button, Select, Divider, Image, Container, Card, Row, Col, Main, Dialog, MessageBox } from 'element-ui'
 import axios from 'axios'
 import { prefix, goodsApi } from '@/api'
 export default {
@@ -80,7 +80,8 @@ export default {
         [Row.name]: Row,
         [Col.name]: Col,
         [Main.name]: Main,
-        [Dialog.name]: Dialog
+        [Dialog.name]: Dialog,
+        [MessageBox.name]: MessageBox
     },
     data() {
         return {
@@ -121,6 +122,14 @@ export default {
         questionPopUp() {
             this.dialogVisible = true
             this.$router.push({ name: 'questionPopUp' })
+        },
+        // 关闭弹窗
+        handleClose(done) {
+            MessageBox.confirm('确认关闭？')
+                .then(_ => {
+                    done()
+                })
+                .catch(_ => {})
         }
     }
 }

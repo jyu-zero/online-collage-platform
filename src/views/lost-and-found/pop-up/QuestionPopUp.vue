@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { Row, Radio, Divider, Button } from 'element-ui'
+import { Row, Radio, Divider, Button, Col } from 'element-ui'
 import { prefix, goodsApi } from '@/api'
 import axios from 'axios'
 export default {
@@ -28,7 +28,8 @@ export default {
         [Row.name]: Row,
         [Radio.name]: Radio,
         [Divider.name]: Divider,
-        [Button.name]: Button
+        [Button.name]: Button,
+        [Col.name]: Col
     },
     data () {
         return {
