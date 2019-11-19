@@ -1,30 +1,79 @@
 <template>
     <div class="question-pop-up">
-        <el-row>
-            <el-row class="question">你丢失的U盘是什么颜色的</el-row>
-            <el-row class="select"><el-radio v-model="radio" label="1">A. {{A}}</el-radio></el-row>
-            <el-row class="select"><el-radio v-model="radio" label="2">B. {{B}}</el-radio></el-row>
-            <el-row class="select"><el-radio v-model="radio" label="3">c. {{C}}</el-radio></el-row>
-            <el-row class="select"><el-radio v-model="radio" label="4">d. {{D}}</el-radio></el-row>
+        <el-row class="question-contain" v-for="(questionsItem,index) of questions " :key="index" >
+            <el-row class="question">1. {{questionsItem.question}}</el-row>
+            <el-row class="select"><el-radio v-model="answer[index]" label="A">A. {{questionsItem.a}}</el-radio></el-row>
+            <el-row class="select"><el-radio v-model="answer[index]" label="B">B. {{questionsItem.b}}</el-radio></el-row>
+            <el-row class="select"><el-radio v-model="answer[index]" label="C">C. {{questionsItem.c}}</el-radio></el-row>
+            <el-row class="select"><el-radio v-model="answer[index]" label="D">D. {{questionsItem.d}}</el-radio></el-row>
+        </el-row>
+        <el-divider></el-divider>
+
+        <el-row type="flex" justify="space-between">
+            <el-row>
+                <el-col>{{name}}</el-col>
+                <el-col>{{num}}</el-col>
+            </el-row>
+            <el-row><el-button type="success" @click="getInfomation">提交</el-button></el-row>
         </el-row>
     </div>
 </template>
 
 <script>
-import { Row, Radio } from 'element-ui'
-
+import { Row, Radio, Divider, Button } from 'element-ui'
+import { prefix, goodsApi } from '@/api'
+import axios from 'axios'
 export default {
     components: {
         [Row.name]: Row,
-        [Radio.name]: Radio
+        [Radio.name]: Radio,
+        [Divider.name]: Divider,
+        [Button.name]: Button
     },
     data () {
         return {
-            radio: '1',
-            A: '红色',
-            B: '绿色',
-            C: '红色和蓝色',
-            D: '蓝色'
+            answer: ['', '', ''],
+            questions: [],
+            questionOneA: '',
+            questionOneB: '',
+            questionOneC: '',
+            questionOneD: '',
+            questionTwo: '',
+            questionThree: '',
+            answerOne: '',
+            answerTwo: '',
+            answerThree: '',
+            name: '',
+            num: ''
+        }
+    },
+    created () {
+        this.getRouterData()
+        axios
+            .post(prefix.api + goodsApi.getLostQuestion, {
+                good_id: 1
+            })
+            .then(response => {
+                this.questions = response.data.data.rs
+            })
+    },
+    methods: {
+        getRouterData() {
+            this.good_id = this.$route.params.good_id
+            this.good_id = this.$route.params.sort
+        },
+        getInfomation() {
+            axios
+                .post(prefix.api + goodsApi.giveLostQuestion, {
+                    good_id: 1,
+                    anwserOne: this.answer[0],
+                    anwserTwo: this.answer[1],
+                    anwserThree: this.answer[2]
+                })
+                .then(response => {
+                    this.name = response.data.data.rs[0].found_name
+                    this.num = response.data.data.rs[0].found_num
+                })
         }
     }
 }
@@ -35,6 +84,10 @@ export default {
 
     .question{
         padding-bottom: 15px
+    }
+
+    .question-contain{
+        margin-left: 30px;
     }
 
     .select{
