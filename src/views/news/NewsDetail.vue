@@ -93,7 +93,7 @@ export default {
             })
         },
         getRouterData(){
-            this.id = this.$route.query.id
+            this.id = this.$route.params.id
         },
         downLoad(storagePath){
             // console.log(storagePath)

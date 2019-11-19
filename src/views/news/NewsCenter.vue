@@ -106,6 +106,7 @@ export default {
             console.log('跳转至主页')
             this.$router.push({ path: '/' })
         },
+        // query方式传参
         goToDetailPage(id){
             console.log('跳转至新闻具体页面')
             console.log(id)
