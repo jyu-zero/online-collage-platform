@@ -27,8 +27,24 @@ const routes = [
             },
             {
                 path: 'questions',
-                name: 'UserCenterQuestion',
-                component: () => import('@/views/user-center/question')
+                component: () => import('@/views/user-center/question'),
+                children: [
+                    {
+                        path: '',
+                        name: 'UserCenterQuestion',
+                        component: () => import('@/views/user-center/question/question')
+                    },
+                    {
+                        path: 'my-question',
+                        name: 'MyQuestion',
+                        component: () => import('@/views/user-center/question/question')
+                    },
+                    {
+                        path: 'my-answer',
+                        name: 'MyAnswer',
+                        component: () => import('@/views/user-center/question/answer')
+                    }
+                ]
             },
             // 失物招领组界限 ----------
             {
@@ -87,6 +103,12 @@ const routes = [
                 path: '/question/new',
                 name: 'NewQuestion',
                 component: () => import('@/views/question/NewQuestion.vue')
+            },
+            {
+                path: '/question/questions-specific/:id',
+                name: 'QuestionSpecific',
+                props: true,
+                component: () => import('@/views/question/specificQuestion.vue')
             },
             // 在线问答组界限 ---------- [完]
             // 失物招领组界限 ----------
