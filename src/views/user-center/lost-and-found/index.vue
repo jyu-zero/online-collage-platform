@@ -291,7 +291,13 @@ export default {
         // 跳转至失物详情页
         goToLostDetails(){
             console.log('跳转至失物详情页')
-            this.$router.push({ name: 'LostDetails' })
+            this.$router.push({
+                name: 'LostDetails',
+                params: {
+                    good_id: 1,
+                    sort: 0
+                }
+            })
         },
         // 跳转至招领详情页
         goToFoundDetails(){
