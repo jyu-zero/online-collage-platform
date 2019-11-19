@@ -38,12 +38,12 @@
             </el-pagination>
         </div>
     </div>
+    
 </template>
 
 <script>
 import { prefix, responseHandler, newsApi } from '@/api'
 import { Pagination, Message, Table, Card } from 'element-ui'
-import 'font-awesome/css/font-awesome.css'
 export default {
     name: 'News',
     data() {
@@ -104,7 +104,7 @@ export default {
         },
         toHomePage(){
             console.log('跳转至主页')
-            this.$router.push({ name: 'HomePage' })
+            this.$router.push({ path: '/' })
         },
         goToDetailPage(id){
             console.log('跳转至新闻具体页面')
@@ -122,6 +122,7 @@ export default {
         }
     }
 }
+
 </script>
 <style lang="less">
     .index{
