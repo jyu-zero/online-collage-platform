@@ -57,7 +57,7 @@
                     <el-col :span="4" :offset="6">
                         <div class="grid-content bg-purple right-align">
                             <el-button type="text" disabled>{{questionItem.status}}</el-button>
-                            <el-button>查看</el-button>
+                            <el-button @click="goToSpecificQuestion(questionItem.questionId)">查看</el-button>
                         </div>
                     </el-col>
                 </el-row>
@@ -160,6 +160,9 @@ export default {
                     }
                 }
             })
+        },
+        goToSpecificQuestion(questionId){
+            this.$router.push({ path: `/question/questions-specific/${questionId}` })
         }
     }
 }

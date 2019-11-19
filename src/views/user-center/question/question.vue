@@ -21,7 +21,7 @@
                             <i class="el-icon-s-promotion">{{questionItem.typeName}}</i>
                             <i class="el-icon-view">{{questionItem.views}}</i>
                             <i class="el-icon-chat-dot-round">{{questionItem.solutionsNum}}</i>
-                            <el-button @click.native="goToDetailedQuestion(questionItem.questionId)">查看</el-button>
+                            <el-button @click.native="goToSpecificQuestion(questionItem.questionId)">查看</el-button>
                         </div>
                     </el-col>
                 </el-row>
@@ -53,7 +53,7 @@
                             <i class="el-icon-s-promotion">{{questionItem.typeName}}</i>
                             <i class="el-icon-view">{{questionItem.views}}</i>
                             <i class="el-icon-chat-dot-round">{{questionItem.solutionsNum}}</i>
-                            <el-button @click.native="goToDetailedQuestion(questionItem.questionId)">查看</el-button>
+                            <el-button @click.native="goToSpecificQuestion(questionItem.questionId)">查看</el-button>
                         </div>
                     </el-col>
                 </el-row>
@@ -141,6 +141,10 @@ export default {
                     }
                 }
             })
+        },
+        // 前往问题详情页面
+        goToSpecificQuestion(questionId){
+            this.$router.push({ path: `/question/questions-specific/${questionId}` })
         },
         // 获取用户的已解决的问题
         getSolvedQuestion(page = 1){
