@@ -27,8 +27,24 @@ const routes = [
             },
             {
                 path: 'questions',
-                name: 'UserCenterQuestion',
-                component: () => import('@/views/user-center/question')
+                component: () => import('@/views/user-center/question'),
+                children: [
+                    {
+                        path: '',
+                        name: 'UserCenterQuestion',
+                        component: () => import('@/views/user-center/question/question')
+                    },
+                    {
+                        path: 'my-question',
+                        name: 'MyQuestion',
+                        component: () => import('@/views/user-center/question/question')
+                    },
+                    {
+                        path: 'my-answer',
+                        name: 'MyAnswer',
+                        component: () => import('@/views/user-center/question/answer')
+                    }
+                ]
             },
             // 失物招领组界限 ----------
             {
@@ -88,6 +104,12 @@ const routes = [
                 name: 'NewQuestion',
                 component: () => import('@/views/question/NewQuestion.vue')
             },
+            {
+                path: '/question/questions-specific/:id',
+                name: 'QuestionSpecific',
+                props: true,
+                component: () => import('@/views/question/specificQuestion.vue')
+            },
             // 在线问答组界限 ---------- [完]
             // 失物招领组界限 ----------
             {
@@ -127,8 +149,17 @@ const routes = [
                 path: '/news-detail',
                 name: 'NewsDetail',
                 component: () => import('@/views/news/NewsDetail.vue')
-            }
+            },
             // 新闻管理组界限 ---------- [完]
+            // 文件共享组界限 ----------
+            {
+                // 文件共享
+                path: '/source-share',
+                name: 'SourceShare',
+                component: () => import('@/views/file-share')
+            }
+            // 文件共享组界限 ---------- [完]
+
         ]
     },
     {
@@ -136,7 +167,7 @@ const routes = [
         path: '/news-detail',
         component: () => import('@/views/Wrapper.vue'),
         children: [
-            
+
         ]
     }
 ]

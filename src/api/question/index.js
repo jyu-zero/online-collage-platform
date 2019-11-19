@@ -4,7 +4,27 @@ export default {
     // 获取问题
     'getQuestions': '/get-questions',
     // 获取类型名
-    'getTypeName': '/get-type-name',
+    'getQuestionTypes': '/get-question-types',
     // 发起问题
-    'launchQuestion': '/launch-question'
+    'newQuestion': '/new-question',
+    // 获取用户自己的提问中的待解决的问题
+    'getWaitToSolveQuestion': '/get-wait-to-solve-question',
+    // 获取用户自己的提问中的已解决的问题
+    'getSolvedQuestion': '/get-solved-question',
+    // 获取登录用户的待解决问题
+    'getAnswerWaitToSolveQuestion': '/answer/get-wait-to-solve-question',
+    // 获取用户的回答中的已解决的问题
+    'getAnswerSolvedQuestion': '/answer/get-solved-question',
+    // 删除问题
+    'deleteQuestion': '/admin/delete-question',
+    // 获取查看的问题信息
+    'getCheckQuestions': '/admin/get-check-questions',
+    // 采纳为最佳
+    'adoptAsBest': '/admin/adopt-as-best',
+    // 获取回答问题的列表
+    'getSolutions': '/admin/get-solutions',
+    // 给回答点赞
+    'likes': '/admin/likes',
+    // 给回答点踩
+    'dislikes': '/admin/dislikes'
 }
