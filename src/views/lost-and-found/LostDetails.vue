@@ -7,7 +7,7 @@
                     <!-- 展示物品图 -->
                     <el-col>
                         <div class="container">
-                            <el-image style="width: 450px; height: 500px" :src="lostImageUrl"></el-image>
+                            <el-image style="width: 500px; height: 374px" :src="lostImageUrl"></el-image>
                         </div>
                     </el-col>
                     <!-- 展示物品信息 -->
@@ -26,7 +26,7 @@
                                         物品名：
                                     </el-col>
                                     <el-col>
-                                        金士顿u盘
+                                        {{goodName}}
                                     </el-col>
                                 </el-row>
                                 <el-divider></el-divider>
@@ -35,7 +35,7 @@
                                         丢失地点：
                                     </el-col>
                                     <el-col>
-                                        田师201
+                                        {{lostPlace}}
                                     </el-col>
                                 </el-row>
                                 <el-divider></el-divider>
@@ -44,17 +44,16 @@
                                         丢失时间：
                                     </el-col>
                                     <el-col>
-                                        2010.12.03c
+                                        {{lostTime}}
                                     </el-col>
                                 </el-row>
                                 <el-row class="contact-information">
-                                    <el-collapse v-model=" activeNames" @change="handleChange">
+                                    <el-collapse v-model="activeNames" @change="handleChange">
                                         <el-collapse-item title="点击查看联系人信息" name="1">
-                                            小明 1335465464
+                                            <el-row class="contact-information-contain">{{contact}}</el-row>
                                         </el-collapse-item>
                                     </el-collapse>
                                 </el-row>
-                                
                             </el-card>
                         </el-row>
                     </el-col>
@@ -64,32 +63,53 @@
 </template>
 
 <script>
-import { Button, Message, Main, Row, Col, Divider, Collapse, CollapseItem, Card, Dialog, Image } from 'element-ui'
-
+import { Button, Select, Divider, Image, Container, Card, Row, Col, Main, Collapse, CollapseItem } from 'element-ui'
+import axios from 'axios'
+import { prefix, goodsApi } from '@/api'
 export default {
     name: 'Lost-Details',
+    
     components: {
         [Button.name]: Button,
-        [Message.name]: Message,
-        [Main.name]: Main,
+        [Select.name]: Select,
+        [Divider.name]: Divider,
+        [Image.name]: Image,
+        [Container.name]: Container,
+        [Card.name]: Card,
         [Row.name]: Row,
         [Col.name]: Col,
-        [Divider.name]: Divider,
+        [Main.name]: Main,
         [Collapse.name]: Collapse,
-        [CollapseItem.name]: CollapseItem,
-        [Card.name]: Card,
-        [Dialog.name]: Dialog,
-        [Image.name]: Image
+        [CollapseItem.name]: CollapseItem
     },
     data() {
         return {
-            lostImageUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
+            lostImageUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
+            title: '',
+            goodName: '金士顿U盘',
+            lostPlace: '嘉应学院',
+            lostTime: '2019.11.11',
+            contact: '小胖欣 1312311646'
         }
+    },
+    created () {
+        axios
+            .post(prefix.api + goodsApi.getLostDetails, {
+                good_id: 1
+            })
+            .then(response => {
+                this.goodName = response.data.data.name
+                this.lostPlace = response.data.data.place
+                this.lostTime = response.data.data.time
+            })
     }
 }
 </script>
 
 <style lang="less" scoped>
+.el-main{
+    background-color: #fafafa;
+}
 .lost-details-main{
     width: 1166px;
     margin: auto;
@@ -98,6 +118,10 @@ export default {
     }
     .lost-title{
         font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+        padding-bottom: 20px;
     }
+}
+.contact-information-contain{
+    padding-top: 20px;
 }
 </style>
