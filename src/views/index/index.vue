@@ -328,7 +328,6 @@ export default {
                     Message.error(response.data.msg)
                     return
                 }
-                // console.log(response.data.data)
                 this.questions = response.data.data.information
             })
         },
@@ -342,7 +341,6 @@ export default {
                     return
                 }
                 this.goods = response.data.data.rs
-                console.log(response.data)
             })
         },
 
@@ -362,7 +360,6 @@ export default {
         // 跳转部分
         // 个人中心跳转
         goToUserCenter(){
-            console.log('跳转至个人中心')
             this.$router.push({ path: '/user-center/' })
         },
         // 新闻中心跳转
@@ -396,7 +393,6 @@ export default {
 
         // 失物招领跳转
         goToLostAndFound(goodsId, sort){
-            console.log(sort)
             // 判断sort的值
             // 1则跳转至认领页面
             // 2则跳转至失物招领主页
@@ -426,7 +422,6 @@ export default {
 
         // 资源共享跳转
         goToSourceShare(fileId){
-            console.log('跳转至资源共享页面')
             // 1.空则跳转至丢失页面
             if (!fileId){
                 this.$router.push({ name: 'SourceShare' })
