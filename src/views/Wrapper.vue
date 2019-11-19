@@ -94,19 +94,19 @@ export default {
             })
         },
         // 获取学生姓名卡号
-        // getStudentName(){
-        //     // this.$axios.get(prefix.api + userApi.getStudentName).then((response)=>{
-        //     //     if(!responseHandler(response.data, this)){
-        //     //         // 提示出错
-        //     //         Message.error('您还未登录')
-        //     //         this.$router.push({ name: 'HomePage' })
-        //     //         return
-        //     //     }
-        //     //     // 更新姓名以及一卡通id
-        //     //     this.studentName = response.data.data.name
-        //     //     this.studentId = response.data.data.student_id
-        //     })
-        // }
+        getStudentName(){
+            this.$axios.get(prefix.api + userApi.getStudentName).then((response)=>{
+                if(!responseHandler(response.data, this)){
+                    // 提示出错
+                    Message.error('您还未登录')
+                    this.$router.push({ name: 'HomePage' })
+                    return
+                }
+                // 更新姓名以及一卡通id
+                this.studentName = response.data.data.name
+                this.studentId = response.data.data.student_id
+            })
+        },
         // 跳转至个人中心，相当于跳转通知栏页面
         goToUserCenter(){
             console.log('跳转至个人中心')
@@ -115,8 +115,7 @@ export default {
     },
     created() {
         // 获取学生姓名卡号
-
-        // this.getStudentName()
+        this.getStudentName()
     }
 }
 </script>

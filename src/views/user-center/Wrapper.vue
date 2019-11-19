@@ -3,7 +3,8 @@
         <!-- 顶部导航栏 -->
         <header>
             <h1>个人中心</h1>
-          <div class="header-right"  >
+          <div class="header-right">
+            <div id="home-page-btn" @click="goToHomePage">主页</div>
             <div class="new-msg">
               <i class="el-icon-message"></i>
               <span class="msg-num">996</span>
@@ -93,6 +94,9 @@ export default {
         goToMenu(menuItem) {
             this.$router.push({ name: menuItem.routeName })
         },
+        goToHomePage(){
+            this.$router.push({ name: 'Index' })
+        },
         // 注销
         logout(){
             // console.log('sss')
@@ -157,17 +161,25 @@ export default {
             display: flex;
             justify-content: center;
             align-items: center;
+                #home-page-btn{
+                  margin-right: 20px;
+                  cursor: pointer;
+
+                }
                 .new-msg{
                       margin-right: 30px;
                       display: flex;
                       align-items: center;
+                      &:hover{
+                        cursor: pointer;
+                      }
                       i{
                         margin-right: 10px;
-                        font-size: 35px;
+                        font-size: 30px;
                       }
                 }
                 #dropdown-btn{
-                      width: 100px;
+                      select:disabled;
                       display: flex;
                       flex-wrap: nowrap;
                       align-items: center;
