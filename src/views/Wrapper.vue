@@ -131,7 +131,7 @@ export default {
         justify-content: space-between;
         align-items: center;
         height:60px;
-        padding: 0 20px;
+        padding: 30px 20px;
         background:#5e91fa;
         color:#fff;
 
@@ -169,7 +169,7 @@ export default {
     .wrapper-body{
         flex: 1;
         display: flex;
-        overflow: hidden;
+        // overflow: hidden;
 
         .menu{
             width:200px;

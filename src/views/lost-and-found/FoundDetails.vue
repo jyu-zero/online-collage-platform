@@ -6,7 +6,7 @@
                     <!-- 展示物品图 -->
                     <el-col>
                         <div class="container">
-                            <el-image style="width: 450px; height: 500px" :src="lostImageUrl"></el-image>
+                            <el-image style="width: 500px; height: 374px" :src="lostImageUrl"></el-image>
                         </div>
                     </el-col>
                     <!-- 展示物品信息 -->
@@ -24,7 +24,7 @@
                                         物品名：
                                     </el-col>
                                     <el-col>
-                                        金士顿u盘
+                                        {{goodName}}
                                     </el-col>
                                 </el-row>
                                 <el-divider></el-divider>
@@ -33,7 +33,7 @@
                                         丢失地点：
                                     </el-col>
                                     <el-col>
-                                        田师201
+                                        {{foundPlace}}
                                     </el-col>
                                 </el-row>
                                 <el-divider></el-divider>
@@ -42,13 +42,14 @@
                                         丢失时间：
                                     </el-col>
                                     <el-col>
-                                        2010.12.03c
+                                        {{foundTime}}
                                     </el-col>
                                 </el-row>
-                                <el-row class="contact-information" >
+                                <!-- 问题弹窗 -->
+                                <el-row class="contact-information" type="flex" justify="end">
                                     <el-button type="success" @click="questionPopUp">获取拾取者联系信息</el-button>
                                         <el-dialog
-                                            title="回答问题才能获取联系信息"
+                                            title="失物信息确认"
                                             :visible.sync="dialogVisible"
                                             width="50%"
                                             :before-close="handleClose">
@@ -58,7 +59,6 @@
                                             <el-button type="primary" @click="dialogVisible = false">下一题</el-button>
                                             </span>
                                         </el-dialog>
-
                                 </el-row>
                             </el-card>
                         </el-row>
@@ -69,25 +69,44 @@
 </template>
 
 <script>
-import { Button, Message, Main, Row, Col, Divider, Card, Dialog, Image } from 'element-ui'
+import { Button, Select, Divider, Image, Container, Card, Row, Col, Main, Dialog } from 'element-ui'
+import axios from 'axios'
+import { prefix, goodsApi } from '@/api'
 export default {
     name: 'Lost-Details',
     components: {
         [Button.name]: Button,
-        [Message.name]: Message,
-        [Main.name]: Main,
+        [Select.name]: Select,
+        [Divider.name]: Divider,
+        [Image.name]: Image,
+        [Container.name]: Container,
+        [Card.name]: Card,
         [Row.name]: Row,
         [Col.name]: Col,
-        [Divider.name]: Divider,
-        [Card.name]: Card,
-        [Dialog.name]: Dialog,
-        [Image.name]: Image
+        [Main.name]: Main,
+        [Dialog.name]: Dialog
     },
     data() {
         return {
             dialogVisible: false,
-            lostImageUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
+            lostImageUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
+            title: '',
+            goodName: '金士顿u盘',
+            foundPlace: '田师',
+            foundTime: '2019.12.16',
+            contact: ''
         }
+    },
+    created () {
+        axios
+            .post(prefix.api + goodsApi.getLostDetails, {
+                good_id: 1
+            })
+            .then(response => {
+                this.goodName = response.data.data.name
+                this.lostPlace = response.data.data.place
+                this.lostTime = response.data.data.time
+            })
     },
     methods: {
         // 招领详情页弹出问题窗口
@@ -100,11 +119,15 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.el-main{
+    background-color: #fafafa;
+}
 .lost-details-main{
     width: 1166px;
     margin: auto;
     .lost-title{
         font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+        padding-bottom: 20px;
     }
     .contact-information{
         padding-top:24px;
