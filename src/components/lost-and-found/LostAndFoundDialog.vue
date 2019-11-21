@@ -148,12 +148,13 @@
                 <div class="question-list">
                     <h3>设置三个物品校验问题</h3>
                     <span>仅有回答全部正确的人才能取得您的联系方式</span>
-                    <ul class="check-questions">
+                    <!-- question.goods_id这个东西怎么获取 -->
+                    <ul class="check-questions" v-for="(question,index) of questionAndAnswers" :key="question.goods_id">
                         <li>
-                            <span>问题一
+                            <span>问题{{index+1}}
                                 <el-input
                                 placeholder="请输入内容"
-                                v-model="question1"
+                                v-model="question.questionContent"
                                 clearable>
                                 </el-input>
                             </span>
@@ -162,7 +163,7 @@
                                     <div class="option"><span>A</span></div>
                                     <el-input
                                     placeholder="请输入内容"
-                                    v-model="question1A"
+                                    v-model="question.questionAnswer[0].answerOne"
                                     clearable>
                                     </el-input>
                                 </dt>
@@ -170,7 +171,7 @@
                                     <div class="option"><span>B</span></div>
                                     <el-input
                                     placeholder="请输入内容"
-                                    v-model="question1B"
+                                    v-model="question.questionAnswer[1].answerTwo"
                                     clearable>
                                     </el-input>
                                 </dt>
@@ -178,7 +179,7 @@
                                     <div class="option"><span>C</span></div>
                                     <el-input
                                     placeholder="请输入内容"
-                                    v-model="question1C"
+                                    v-model="question.questionAnswer[2].answerThree"
                                     clearable>
                                     </el-input>
                                 </dt>
@@ -186,93 +187,21 @@
                                     <div class="option"><span>D</span></div>
                                     <el-input
                                     placeholder="请输入内容"
-                                    v-model="question1D"
+                                    v-model="question.questionAnswer[3].answerFour"
                                     clearable>
                                     </el-input>
                                 </dt>
-                            </dl>
-                        </li>
-                        <li>
-                            <span>问题二</span>
-                            <el-input
-                            placeholder="请输入内容"
-                            v-model="question2"
-                            clearable>
-                            </el-input>
-                            <dl>
+                                <!-- 正确答案 -->
                                 <dt>
-                                    <div class="option"><span>A</span></div>
-                                    <el-input
-                                    placeholder="请输入内容"
-                                    v-model="question1A"
-                                    clearable>
-                                    </el-input>
-                                </dt>
-                                <dt>
-                                    <div class="option"><span>B</span></div>
-                                    <el-input
-                                    placeholder="请输入内容"
-                                    v-model="question1B"
-                                    clearable>
-                                    </el-input>
-                                </dt>
-                                <dt>
-                                    <div class="option"><span>C</span></div>
-                                    <el-input
-                                    placeholder="请输入内容"
-                                    v-model="question1C"
-                                    clearable>
-                                    </el-input>
-                                </dt>
-                                <dt>
-                                    <div class="option"><span>D</span></div>
-                                    <el-input
-                                    placeholder="请输入内容"
-                                    v-model="question1D"
-                                    clearable>
-                                    </el-input>
-                                </dt>
-                            </dl>
-                        </li>
-                        <li>
-                            <span>问题三</span>
-                            <el-input
-                            placeholder="请输入内容"
-                            v-model="question3"
-                            clearable>
-                            </el-input>
-                            <dl>
-                                <dt>
-                                    <div class="option"><span>A</span></div>
-                                    <el-input
-                                    placeholder="请输入内容"
-                                    v-model="question1A"
-                                    clearable>
-                                    </el-input>
-                                </dt>
-                                <dt>
-                                    <div class="option"><span>B</span></div>
-                                    <el-input
-                                    placeholder="请输入内容"
-                                    v-model="question1B"
-                                    clearable>
-                                    </el-input>
-                                </dt>
-                                <dt>
-                                    <div class="option"><span>C</span></div>
-                                    <el-input
-                                    placeholder="请输入内容"
-                                    v-model="question1C"
-                                    clearable>
-                                    </el-input>
-                                </dt>
-                                <dt>
-                                    <div class="option"><span>D</span></div>
-                                    <el-input
-                                    placeholder="请输入内容"
-                                    v-model="question1D"
-                                    clearable>
-                                    </el-input>
+                                    <el-select v-model="value" placeholder="请设置正确选项">
+                                        <el-option
+                                        v-for="item in question.questionAndAnswers"
+                                        :key="item.answerOne"
+                                        :label="item.answerOne"
+                                        :value="item.answerOne"
+                                        >
+                                        </el-option>
+                                    </el-select>
                                 </dt>
                             </dl>
                         </li>
@@ -315,7 +244,7 @@
 </template>
 
 <script>
-import { Button, Dialog, Input, Upload, MessageBox, Radio, Message } from 'element-ui'
+import { Button, Dialog, Input, Upload, MessageBox, Radio, Message, Select } from 'element-ui'
 export default {
     components: {
         name: 'LostAndFoundDialog',
@@ -325,7 +254,8 @@ export default {
         [Upload.name]: Upload,
         [MessageBox.name]: MessageBox,
         [Radio.name]: Radio,
-        [Message.name]: Message
+        [Message.name]: Message,
+        [Select.name]: Select
     },
     data() {
         return {
@@ -343,14 +273,41 @@ export default {
             inputUserName: '',
             // 发布者联系方式
             inputTelephone: '',
+            // 正确答案
+            value: '',
             // 问题及其答案
-            question1: '',
-            question1A: '',
-            question1B: '',
-            question1C: '',
-            question1D: '',
-            question2: '',
-            question3: '',
+            questionAndAnswers: [
+                // {
+                //     questionContent:[]
+                // },
+                {
+                    questionContent: '1',
+                    questionAnswer: [
+                        { answerOne: '11' },
+                        { answerTwo: '12' },
+                        { answerThree: '13' },
+                        { answerFour: '14' }
+                    ]
+                },
+                {
+                    questionContent: '2',
+                    questionAnswer: [
+                        { answerOne: '21' },
+                        { answerTwo: '22' },
+                        { answerThree: '23' },
+                        { answerFour: '24' }
+                    ]
+                },
+                {
+                    questionContent: '3',
+                    questionAnswer: [
+                        { answerOne: '31' },
+                        { answerTwo: '32' },
+                        { answerThree: '33' },
+                        { answerFour: '34' }
+                    ]
+                }
+            ],
             // 图片的名字和url
             fileList: [
                 // { name: '', url: '' }
@@ -394,7 +351,7 @@ export default {
         },
         sort: {
             type: Number,
-            default: 2
+            default: 3
         }
     },
     methods: {
@@ -625,9 +582,21 @@ ul,li {
                     .el-input__inner{
                         width: 350px;
                         height: 35px;
-                        .el-input__suffix{
-                            background-color: pink;
-                        }
+                    }
+                    .el-input__suffix{
+                        margin-right: 10px;
+                    }
+                }
+                :nth-child(5){
+                    .el-input{
+                        // height: 500px;
+                        // width: 500px;
+                        
+                    }
+                    i{
+                        line-height: 16px;
+                        // background-color: pink;
+                        transform-origin: center;
                     }
                 }
                 

@@ -55,8 +55,8 @@
                         <div class="block">
                             <el-pagination
                             @size-change="handleSizeChange"
-                            @current-change="handleCurrentChange"
-                            :current-page.sync="currentPage3"
+                            @current-change="getMyLostAndFoundList"
+                            :current-page.sync="page"
                             :page-size="100"
                             layout="prev, pager, next, jumper"
                             :total="500">
@@ -108,8 +108,8 @@
                         <div class="block">
                             <el-pagination
                             @size-change="handleSizeChange"
-                            @current-change="handleCurrentChange"
-                            :current-page.sync="currentPage3"
+                            @current-change="getMyLostAndFoundList"
+                            :current-page.sync="page"
                             :page-size="100"
                             layout="prev, pager, next, jumper"
                             :total="500">
@@ -153,7 +153,8 @@ export default {
             dialogVisible: false,
             // 动态改变按钮的提示,多此一步是为了解决弹窗中出现title冒泡的问题
             buttonTitle: '',
-            currentPage3: 5,
+            page: 1,
+            // currentPage3: 5,
             studentName: '',
             studentId: '',
             account: '',
@@ -166,7 +167,6 @@ export default {
             goods: [
                 {
                     id: 0,
-                    // lost: true,
                     // 0代表进行,1代表完成
                     status: 0,
                     // 0丢失,1认领
@@ -175,11 +175,7 @@ export default {
                     // 是否学院托管
                     hoster: false,
                     place: '中区主球场',
-                    time: '2019-02-23',
-                    question1: '',
-                    question2: '',
-                    question3: '',
-                    question1A: ''
+                    time: '2019-02-23'
                 },
                 {
                     id: 1,
@@ -315,9 +311,22 @@ export default {
         handleSizeChange(val) {
             // console.log(`每页 ${val} 条`);
         },
-        handleCurrentChange(val) {
-            // console.log(`当前页: ${val}`);
+        // handleCurrentChange(val) {
+        //     // console.log(`当前页: ${val}`);
+        // }
+        getMyLostAndFoundList(page = 1){
+            this.$axios.get(prefix.api + goodsApi.getGoods, {
+                params: {
+                    page
+                }
+            })
+                .then(response => {
+                    if(!responseHandler.handle(response.data, this)) { return }
+                    this.questionList = response.data.data.questions
+                    this.pageCount = response.data.data.pageCount
+                })
         }
+        
     }
 }
 </script>
