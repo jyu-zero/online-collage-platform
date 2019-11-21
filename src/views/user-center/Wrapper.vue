@@ -109,7 +109,7 @@ export default {
                 this.$router.push({ name: 'HomePage' })
             })
         },
-        // 获取学生姓名卡号
+        // 获取学生姓名卡号·
         // getStudentName(){
         //     // this.$axios.get(prefix.api + userApi.getStudentName).then((response)=>{
         //     //     if(!responseHandler(response.data, this)){
