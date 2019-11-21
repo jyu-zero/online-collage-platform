@@ -1,7 +1,7 @@
 <template>
         <el-main>
             <div class="lost-details-main">
-                <el-row type="flex" justify="center" class="lost-title"><h1>哪个倒霉孩子丢东西啦</h1></el-row>
+                <el-row type="flex" justify="center" class="lost-title"><h1>{{goodTitle}}</h1></el-row>
                 <el-row type="flex" >
                     <!-- 展示物品图 -->
                     <el-col>
@@ -54,10 +54,6 @@
                                             width="50%"
                                             :before-close="handleClose">
                                             <router-view></router-view>
-                                            <span slot="footer" class="dialog-footer">
-                                            <el-button @click="dialogVisible = false">取 消</el-button>
-                                            <el-button type="primary" @click="dialogVisible = false">下一题</el-button>
-                                            </span>
                                         </el-dialog>
                                 </el-row>
                             </el-card>
@@ -69,7 +65,7 @@
 </template>
 
 <script>
-import { Button, Select, Divider, Image, Container, Card, Row, Col, Main, Dialog } from 'element-ui'
+import { Button, Select, Divider, Image, Container, Card, Row, Col, Main, Dialog, MessageBox } from 'element-ui'
 import axios from 'axios'
 import { prefix, goodsApi } from '@/api'
 export default {
@@ -84,35 +80,56 @@ export default {
         [Row.name]: Row,
         [Col.name]: Col,
         [Main.name]: Main,
-        [Dialog.name]: Dialog
+        [Dialog.name]: Dialog,
+        [MessageBox.name]: MessageBox
     },
     data() {
         return {
+            goodTitle: '',
             dialogVisible: false,
             lostImageUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
             title: '',
-            goodName: '金士顿u盘',
-            foundPlace: '田师',
+            goodName: '',
+            foundPlace: '',
             foundTime: '2019.12.16',
             contact: ''
         }
     },
     created () {
+        this.getRouterData()
         axios
-            .post(prefix.api + goodsApi.getLostDetails, {
-                good_id: 1
+            .post(prefix.api + goodsApi.getFoundDetails, {
+                good_id: this.id,
+                sort: this.sort
             })
             .then(response => {
-                this.goodName = response.data.data.name
-                this.lostPlace = response.data.data.place
-                this.lostTime = response.data.data.time
+                this.goodTitle = response.data.data.rs[0].title
+                this.goodName = response.data.data.rs[0].name
+                this.foundPlace = response.data.data.rs[0].place
+                this.foundTime = response.data.data.rs[0].time
+                this.contactName = response.data.data.rs[0].contact_name
+                this.contactPhone = response.data.data.rs[0].contact_num
+                this.lostImageUrl = response.data.data.rs[0].contact_image
             })
     },
     methods: {
+        // 获取物品的id和类别
+        getRouterData() {
+            this.good_id = this.$route.params.good_id
+            this.good_id = this.$route.params.sort
+        },
         // 招领详情页弹出问题窗口
         questionPopUp() {
             this.dialogVisible = true
             this.$router.push({ name: 'questionPopUp' })
+        },
+        // 关闭弹窗
+        handleClose(done) {
+            MessageBox.confirm('确认关闭？')
+                .then(_ => {
+                    done()
+                })
+                .catch(_ => {})
         }
     }
 }
