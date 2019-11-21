@@ -164,7 +164,6 @@ export default {
                 #home-page-btn{
                   margin-right: 20px;
                   cursor: pointer;
-
                 }
                 .new-msg{
                       margin-right: 30px;
@@ -179,7 +178,10 @@ export default {
                       }
                 }
                 #dropdown-btn{
-                      select:disabled;
+                      -webkit-user-select:none;
+                      -moz-user-select:none;
+                      -ms-user-select:none;
+                      user-select:none;
                       display: flex;
                       flex-wrap: nowrap;
                       align-items: center;
