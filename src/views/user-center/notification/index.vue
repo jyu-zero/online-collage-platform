@@ -2,7 +2,7 @@
   <div id="notification">
     <main>
       <div id="btn-container">
-      <el-button type="primary">发送通知</el-button>
+      <el-button type="primary" @click="toggle">发送通知</el-button>
       <el-button>标记为已读</el-button>
         <el-button @click="checkAll">
           <input type="checkbox"  id="check-all" v-model="checked"  style="display:none">
@@ -18,7 +18,7 @@
             <span class="notification-title" v-if="notification.type===0" @click="clickTitle(notification.id)">{{notification.title}}--</span>
             <span class="notification-title" v-if="notification.type===1" @click="clickTitle(notification.id)">{{notification.title}}--</span>
             <span class="notification-title" v-if="notification.type===2" @click="clickTitle(notification.id)">{{notification.title}}--</span>
-            <span class="check" @click="checkDetail">查看</span>
+            <span class="check" @click="checkDetail($event,notification.type,notification.id)">查看</span>
           </div>
           <div class="content-container hidden" v-if="notification.type===0">
               <p>
@@ -27,7 +27,8 @@
           </div>
         </div>
       </div>
-      <el-pagination
+      <div id="pagination-container">
+          <el-pagination
             :background="true"
             :page-size="pageSize"
             :page-count="pageCount"
@@ -38,7 +39,42 @@
             @next-click="changePage('next')"
             @current-change="changePage()">
             </el-pagination>
+      </div>
+      
     </main>
+    <div id="send-notification-container-bg" v-if="showSendWindow" @click.self="toggle">
+        <div id="send-notification-container">
+            <div class="window-header">
+                <div id="close-window-btn"  @click.self="toggle">X</div>
+            </div>
+            <div class="window-body">
+                <label for="input-title" class="label-title">标题</label>
+                <el-input
+                placeholder="请输入通知标题"
+                v-model="inputTitle"
+                id="input-title"
+                maxlength="25"
+                show-word-limit
+                clearable>
+                </el-input>
+                <label for="input-content" class="label-title" >内容</label>
+                <el-input
+                size="large"
+                type="textarea"
+                placeholder="请输入内容"
+                v-model="inputContent"
+                id="input-content"
+                class="input-content"
+                maxlength="200"
+                show-word-limit
+                >
+                </el-input>
+                <div id="send-btn-container">
+                    <el-button type="primary"  plain @click="sendNotification">发送</el-button>
+                </div>
+            </div>
+        </div>
+    </div>
   </div>
 </template>
 
@@ -56,28 +92,13 @@ export default {
     },
     data(){
         return{
-            // checkAll: false,
-            checkednotificationIdList: [],
-            notificationIdList: ['123123', '1233', '12122223'],
-            cityOptions: ['123123', '123123', '12123'],
-            isIndeterminate: true,
-            notifications: [
-                {
-                    id: 0,
-                    title: '标题内容1',
-                    content: 'bablablalba'
-                },
-                {
-                    id: 1,
-                    title: '标题内容2',
-                    content: 'bablablalbbablablalbbablablalbbablablalbbablablalbbablablalbbablablalbbablablalbbablablalba'
-                },
-                {
-                    id: 2,
-                    title: '标题内容3',
-                    content: 'bablablalba'
-                }
-            ],
+            // 发送通知窗口的开关，和标题内容
+            showSendWindow: false,
+            inputTitle: '',
+            inputContent: '',
+            // 用于存储id的数组
+            notificationIdList: [],
+            notifications: [],
             checked: false,
             checkModel: [],
             checkedNames: '',
@@ -88,7 +109,31 @@ export default {
         }
     },
     methods: {
-
+        // 开关发送通知窗口
+        toggle(){
+            this.showSendWindow = !this.showSendWindow
+        },
+        // 发送通知
+        sendNotification(){
+            this.$axios.get(prefix.api + notificationApi.getNotifications, {
+                params: {
+                    title: this.inputTitle,
+                    content: this.inputContent
+                }
+            }).then((response)=>{
+                if(!responseHandler(response.data, this)){
+                    // 提示出错
+                    Message.error('服务器裂开了')
+                    return
+                }
+                // 关闭窗口
+                this.toggle()
+                // 清空输入内容
+                this.inputContent = ''
+                this.inputTitle = ''
+                Message.success('发送成功')
+            })
+        },
         // 这两个方法都是绑定了checkbox的点击事件
         clickCheckbox(e){
             console.log('点击了checkbox')
@@ -105,8 +150,17 @@ export default {
         },
 
         // 这个是查看通知详情的按钮
-        checkDetail(e){
-            e.currentTarget.parentElement.nextSibling.classList['value'] = e.currentTarget.parentElement.nextSibling.classList['value'] === 'content-container display' ? 'content-container hidden' : 'content-container display'
+        checkDetail(e, type, id){
+            if(type === 0){
+                e.currentTarget.parentElement.nextSibling.classList['value'] = e.currentTarget.parentElement.nextSibling.classList['value'] === 'content-container display' ? 'content-container hidden' : 'content-container display'
+                return
+            }
+            if(type === 1){
+                this.goToNewsPage(id)
+            }
+            if(type === 2){
+                this.goToQuestionPage(id)
+            }
         },
         // 全选按钮
         checkAll(){
@@ -152,6 +206,22 @@ export default {
                 default:
                     this.getNotifications(this.currentPage)
             }
+        },
+        // 跳转新闻页
+        goToNewsPage(newsId){
+            this.$router.push({ name: `NewsDetail`,
+                params: {
+                    newsId
+                }
+            })
+        },
+        // 跳转至在线问答详情页
+        goToQuestionPage(questionId){
+            this.$router.push({ name: `QuestionSpecific`,
+                params: {
+                    questionId
+                }
+            })
         }
     },
     watch: {
@@ -176,78 +246,86 @@ export default {
         })
         // console.log(arr)
         this.notificationIdList = arr
-        // console.log(this.cityOptions)
         this.getNotifications()
     }
 }
 </script>
 
 <style lang="less" scoped>
-  #notification{
+#notification{
+    position: relative;
     height: 100%;
     width: 100%;
     padding: 30px 60px;
     .btn-container{
-      #check-all-btn{
-        display: block;
-        padding: 5px;
-      }
+        #check-all-btn{
+            display: block;
+            padding: 5px;
+        }
     }
     .notification-list{
-      margin-top: 10px;
-      max-width: 800px;
-      display: flex;
-      flex-direction: column;
-      border-radius: 15px;
-      overflow: hidden;
-      .notification-item{
-        /*禁止圈选*/
-        -moz-user-select:none; /*火狐*/
-        -webkit-user-select:none; /*webkit浏览器*/
-        -ms-user-select:none; /*IE10*/
-        -khtml-user-select:none; /*早期浏览器*/
-        user-select:none;
+        margin-top: 10px;
+        max-width: 800px;
         display: flex;
-        align-items: center;
-        height: 60px;
-        position: relative;
-        background: #f5f5f5;
-        margin: 0;
-        font-size: 20px;
-        &:hover{
-          color: #5e91fa;
-        }
-        .checkbox-container{
-          height: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 40px;
-          input{
-            z-index: 3;
-            font-size: 25px;
-            width: 25px;
-            height: 25px;
-            opacity: 1;
-            outline: none;
-          }
-        }
+        flex-direction: column;
+        overflow: hidden;
+        // background: #f5f5f5;
+        .notification-item{
+                /*禁止圈选*/
+                -moz-user-select:none; /*火狐*/
+                -webkit-user-select:none; /*webkit浏览器*/
+                -ms-user-select:none; /*IE10*/
+                -khtml-user-select:none; /*早期浏览器*/
+                box-shadow: inset 0 0 2px #CCC;
+                user-select:none;
+                display: flex;
+                align-items: center;
+                height: 60px;
+                position: relative;
+                background: #fff;
+                margin: 0;
+                font-size: 17px;
+                border: #dddedf solid 1px;
+                margin-top: 15px;
+                &:hover{
+                    color: #5e91fa;
+                }
+                .checkbox-container{
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 40px;
+                input{
+                    z-index: 3;
+                    font-size: 25px;
+                    width: 25px;
+                    height: 25px;
+                    opacity: 1;
+                    outline: none;
+                }
+                }
 
-        .notification-title{
-          display: flex;
-          align-items: center;
-          margin-right: 15px;
-          height: 100%;
-          line-height: 100%;
-        }
-        .check{
-          height: 100%;
-          flex: 0.1;
-          margin-left: auto;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
+                .notification-title{
+                    display: flex;
+                    align-items: center;
+                    margin-right: 15px;
+                    height: 100%;
+                    line-height: 100%;
+                }
+                .check{
+                    height: 100%;
+                    color: #fff;
+                    width: 70px;
+                    margin-left: auto;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: rgb(64, 158, 255);
+                &:hover{
+                    opacity: 0.7;
+                }
+            }
       }
       .content-container{
         overflow: hidden;
@@ -258,19 +336,81 @@ export default {
         font-size: 20px;
       }
     }
-  }
-  .hidden{
+    #send-notification-container-bg{
+        position: absolute;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 5;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        font-family: sans-serif;
+        #send-notification-container{
+            position: relative;
+            z-index: 6;
+            width: 400px;
+            background: #fff;
+            margin: 0 auto;
+            margin-top: 100px;
+            box-shadow: inset 0 0 5px #CCC;
+            .window-header{
+                height: 40px;
+                background: #5e91fa;
+                display: flex;
+                flex-direction: row-reverse;
+                #close-window-btn{
+                    height: 40px;
+                    line-height: 40px;
+                    width: 50px;
+                    color: #fff;
+                    text-align: center;
+                    right: 15px;
+                    top: 10px;
+                    cursor: pointer;
+                &:hover{
+                    background: rgb(250, 78, 78);
+                }
+            }
+            }
+            .window-body{
+                padding:15px;
+                background: rgb(251, 254, 255);
+                .label-title{
+                    display: block;
+                    margin: 10px 0;
+                    font-size: 25px;
+                    font-weight: 500;
+                    color: rgb(109, 109, 109);
+                }
+                /deep/#input-content{
+                    height: 300px;
+                }
+                #send-btn-container{
+                    margin-top: 20px;
+                    display: flex;
+                    flex-direction:row-reverse;
+                }
+            }
+        }
+    }
+}
+
+.hidden{
     display: none;
-  }
-  .display{
+}
+.display{
     display: block;
-  }
-  /*复选框的diy样式*/
-  .tui-checkbox:checked {
+}
+#pagination-container{
+  margin-top: 20px;
+  text-align: left;
+}
+/*复选框的diy样式*/
+.tui-checkbox:checked {
     background: #427fff;
     border: solid 1px #1673ff;
-  }
-  .tui-checkbox {
+}
+.tui-checkbox {
     width: 5rem;
     height: 5rem;
     background-color: #ffffff;
@@ -283,14 +423,13 @@ export default {
     position: relative;
     display: inline-block;
     vertical-align: top;
-    cursor: default;
     -webkit-appearance: none;
     -webkit-user-select: none;
     user-select: none;
     -webkit-transition: background-color ease 0.6s;
     transition: background-color ease 0.6s;
-  }
-  .tui-checkbox:checked::after {
+}
+.tui-checkbox:checked::after {
     top: 0.1rem;
     left: 0.09rem;
     position: absolute;
@@ -298,5 +437,6 @@ export default {
     border: #fff solid 2px;
     border-top: none;
     border-right: none;
-  }
+}
+
 </style>

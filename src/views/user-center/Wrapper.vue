@@ -202,6 +202,7 @@ export default {
             height:100%;
             font-family: 'Source Han Sans CN',sans-serif;
             font-weight: normal;
+            border: 0;
         }
 
         main{
