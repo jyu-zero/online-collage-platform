@@ -1,161 +1,198 @@
 <template>
     <div class="index">
-        <div class="up">
-            <span @click="toHomePage">主页</span>
-            <span class="a">></span>
-            <span @click="toIndex">新闻中心</span>
-            <span class="a">></span>
-            <span>新闻页面</span>
-        </div>
+        <el-breadcrumb class="up" separator-class="el-icon-arrow-right">
+            <el-breadcrumb-item :to="{ path: '/' }">主页</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/news-center' }">新闻中心</el-breadcrumb-item>
+            <el-breadcrumb-item>新闻页面</el-breadcrumb-item>
+        </el-breadcrumb>
         <div class="news">
             <div class="news-item"  v-for="newsvalue in news" :key="newsvalue.news_id">
-                <!-- <div class="title">{{ newsvalue.news_id }}</div> -->
                 <div class="title">{{ newsvalue.news_title }}</div>
                 <span class="time">{{ newsvalue.created_at }}</span>
                 <span class="author">{{ newsvalue.author }}</span>
-                <div class="block"></div>
                 <div class="content">
+                    <div class="">
+                        <el-divider></el-divider>
+                    </div>
                     {{ newsvalue.news_content }}
+                    <div class="">
+                        <el-divider></el-divider>
+                    </div>
                     <div class="appendix">附件：</div>
-                    <div>{{storagePath}}</div>
-                    <button class="" @click.stop="downLoad(storagePath)">下载</button>
+                </div>
+            <!-- 附件下载链接 -->
+                <div class="" v-for="path in storagePath" :key="path.index">
+                    <a :href="`${prefix.api}`+path" download="w3logo">{{path.split("/")[2]}}</a>
+                    <br>
                 </div>
             </div>
-            <div class="demo-image__lazy">
-                <!-- <el-image v-for="url in storage_path" :key="url" :src="url" lazy></el-image> -->
-            </div>
+            <!-- 附件下载链接完 -->
             <div class="block"></div>
-            <div>{{pre}}</div>
-            <div>{{next}}</div>
-            
+            <!-- 上、下一篇 -->
+            <el-tooltip content="Top center" placement="top">
+                <el-button @click="goToPre()">{{pre.news_title}}</el-button>
+                </el-tooltip>
+                <el-tooltip content="Bottom center" placement="bottom" effect="light">
+                <el-button @click="goToNext()">{{next.news_title}}</el-button>
+            </el-tooltip>
         </div>
     </div>
 </template>
 <script>
 import { prefix, responseHandler, newsApi } from '@/api'
-import { Message } from 'element-ui'
-// import { resolve } from 'dns'
+import { Message, Button, Divider, Tooltip, BreadcrumbItem, Breadcrumb } from 'element-ui'
 export default {
     name: 'Detail',
-    responseType: 'blob',
     components: {
-        [Message.name]: Message
+        [Message.name]: Message,
+        [Button.name]: Button,
+        [Divider.name]: Divider,
+        [Tooltip.name]: Tooltip,
+        [BreadcrumbItem.name]: BreadcrumbItem,
+        [Breadcrumb.name]: Breadcrumb
     },
     data() {
         return {
-            id: this.$route.query.newsId,
+            prefix,
+            // 接收参数
+            id: this.$route.params.newsId,
             news: [
                 {
                     news_id: 3,
-                    news_title: ' 新闻标题三 ',
-                    created_at: ' 2019-11-13 ',
-                    author: ' 张三 ',
-                    news_content: ' 内容111 '
+                    news_title: '',
+                    created_at: '',
+                    author: '',
+                    news_content: ''
                 }
             ],
-            pre: ' ',
-            next: ' ',
-            storagePath: [
-                ' http://localhost:8081/online-collage-platform-server/public/uploadFile/3.jpg ',
-                ' http://localhost:8081/online-collage-platform-server/public/uploadFile/3.jpg '
-            ]
+            pre: {
+                news_id: 2,
+                news_title: ''
+            },
+            next: {
+                news_id: 4,
+                news_title: ''
+            },
+            storagePath: [ ]
         }
     },
     created() {
         console.log(this.id)
         this.getNewDetail()
-        this.getRouterData()
     },
     methods: {
+        // 跳转至主页
         toHomePage(){
             console.log('跳转至主页')
-            this.$router.push({ path: '/' })
+            // this.$router.push({ path: '/' })
+            this.$router.push({ name: 'Index' })
         },
+        // 跳转回新闻中心页
         toIndex(){
             console.log('跳转至新闻中心')
-            this.$router.push({ path: '/News-center' })
+            // this.$router.push({ path: '/News-center' })
+            this.$router.push({ name: 'NewsCenter' })
         },
+        // 传参、获取详情页id及相关信息
         getNewDetail(){
             this.$axios.get(prefix.api + newsApi.getNewDetail, {
                 params: {
-                    news_id: this.id
+                    Newsid: this.id
                 }
             }).then(response => {
-                console.log(response)
+                // console.log(response.data)
                 if(!responseHandler(response.data, this)){
-                    // 在这里处理错误
+                    // 提示出错
                     Message.error('请求失败')
                 }
+                console.log(response)
                 this.news = response.data.data.new
                 this.pre = response.data.data.pre
                 this.next = response.data.data.next
                 this.storagePath = response.data.data.storage_path
             })
         },
-        getRouterData(){
-            this.id = this.$route.params.id
+        // 跳转回上一篇新闻
+        goToPre(){
+            console.log('跳转至上一篇')
+            // 接收id
+            this.$axios.get(prefix.api + newsApi.getNewDetail, {
+                params: {
+                    Newsid: this.id
+                }
+            }).then(response => {
+                // console.log(response.data)
+                if(!responseHandler(response.data, this)){
+                    // 提示出错
+                    Message.error('请求失败')
+                }
+                console.log(response)
+                this.news = response.data.data.new
+                this.pre = response.data.data.pre
+                this.next = response.data.data.next
+                this.storagePath = response.data.data.storage_path
+            })
         },
-        downLoad(storagePath){
-            // console.log(storagePath)
-            // this.$axios.get(prefix.api + newsApi.downLoad, {
-            //     responseType: `arraybuffer`
-            // }).then(response => {
-            //     if(response.status === 200){
-            //         // 字符内容转变成blob地址
-            //         let blob = new Blob([response.data], {
-            //             type: `application/msword`
-            //         })
-            //         // URL.createObjectURL()方法会根据传入的参数创建一个指向该参数对象的URL，这个URL的生命仅存在于它被创建的这个document里，新的对象URL指向执行的File对象或者是Blob对象。
-            //         let objectUrl = URL.createObjectURL(blob)
-            //         // 创建隐藏的可下载链接
-            //         let link = document.createElement('a')
-            //         let fname = `我的文档`
-            //         link.href = objectUrl
-            //         link.setAttribute('download', fname)
-            //         // 触发点击
-            //         document.body.appendChild(link)
-            //         link.click()
-            //     }else {
-            //         this.$message({
-            //             type: 'error',
-            //             message: '导出失败'
-            //         })
-            //     }
-            // })
+        // 跳转到下一篇新闻
+        goToNext(){
+            console.log('跳转至下一篇')
+            // 接收id
+            this.$axios.get(prefix.api + newsApi.getNewDetail, {
+                params: {
+                    Newsid: this.id
+                }
+            }).then(response => {
+                // console.log(response.data)
+                if(!responseHandler(response.data, this)){
+                    // 提示出错
+                    Message.error('请求失败')
+                }
+                console.log(response)
+                this.news = response.data.data.new
+                this.pre = response.data.data.pre
+                this.next = response.data.data.next
+                this.storagePath = response.data.data.storage_path
+            })
         }
     }
 }
 </script>
-<style lang="less">
+<style lang="less" scoped>
     .index{
         width: 1300px;
         height: 800px;
         margin-left: 250px;
         margin-top: 30px;
+        // border: 1px solid rgb(255, 4, 4);
     }
     .up{
         width: 1300px;
         height: 25px;
         display: flex;
         font-size: 20px;
+        // border: 1px solid rgb(0, 0, 0);
     }
     .a{
         width: 30px;
         height: 100%;
         text-align: center;
+        // border: 1px solid rgb(0, 0, 0);
     }
     .news{
         width: 1300px;
         height: 100%;
+        // border: 1px solid rgb(0, 0, 0);
     }
     .title{
         width: 1300px;
         height: 45px;
         margin-top: 20px;
         font-size: 30px;
+        // border: 1px solid rgb(0, 0, 0);
     }
     .time{
         margin-right: 15px;
+        // border: 1px solid rgb(0, 0, 0);
     }
     // 内容和时间、内容和下面链接的空白
     .block{
@@ -172,5 +209,22 @@ export default {
     .appendix{
         margin-top: 20px;
         margin-bottom: 10px;
+    }
+    .pre{
+        width: 125px;
+        // border: 1px solid rgb(0, 0, 0);
+        height: 25px;
+        text-align: center;
+        background: #f8f8f9;
+        // margin: 20px;
+        // border: none;
+    }
+    .next{
+        width: 125px;
+        // border: 1px solid rgb(0, 0, 0);
+        text-align: center;
+        height: 25px;
+        background-color:#f8f8f9;
+        // border: none;
     }
 </style>

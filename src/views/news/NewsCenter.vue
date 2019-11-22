@@ -1,40 +1,34 @@
 <template>
     <div class="index">
-        <div class="up">
-            <span @click="toHomePage">主页</span>
-            <span class="a">></span>
-            <span>新闻中心</span>
-        </div>
-
+        <el-breadcrumb class="head" separator-class="el-icon-arrow-right">
+            <el-breadcrumb-item :to="{ path: '/' }">主页</el-breadcrumb-item>
+            <el-breadcrumb-item>新闻中心</el-breadcrumb-item>
+        </el-breadcrumb>
         <h1>新闻中心</h1>
         <el-card class="box-card">
-            <div class="news">
-                <div class="title">
-                    <div class="new" @click="goToDetailPage(news.news_id)" v-for="news of newsList" :key="news.id">
-                        <!-- <span class="">{{news.is_pinned}}</span> -->
-                        <span class="" v-if="news.is_pinned===1">[置顶] </span>
-                        <span class="content">{{news.news_title}}</span>
-                        <span class="time">{{news.created_at}}</span>
-                        <el-divider></el-divider>
+            <div class="news" @click="goToDetailPage(news.news_id)" v-for="news of newsList" :key="news.id">
+                <!-- <span class="">{{news.is_pinned}}</span> -->
+                <div class="up">
+                    <div class="left">
+                        <div class="" v-if="news.is_pinned===1">[置顶] </div>
+                        <div class="content">{{news.news_title}}</div>
+                        <div class="time">({{news.created_at}})</div>
+                        <!-- <el-divider></el-divider> -->
                     </div>
+                    <div class="eye"><font-awesome-icon icon="eye" /></div>
+                    <div class="right">{{news.views}}</div>
                 </div>
-
-                <div class="views">
-                    <div class="new" v-for="news of newsList" :key="news.id">
-                        <span class="views"><font-awesome-icon icon="eye" /> {{news.views}}</span>
-                        <el-divider></el-divider>
-                    </div>
+                <!-- <el-divider></el-divider> -->
+                <div class="dowm">
+                    <el-divider></el-divider>
                 </div>
             </div>
         </el-card>
-        <div class="pagination">
+        <div class="page">
             <el-pagination
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-                :current-page.sync="currentPage1"
-                :page-size="5"
-                layout="total, prev, pager, next"
-                :total="4">
+                :page-count="pageCount"
+                @current-change="getNewsList"
+                layout="prev, pager, next">
             </el-pagination>
         </div>
     </div>
@@ -43,7 +37,7 @@
 
 <script>
 import { prefix, responseHandler, newsApi } from '@/api'
-import { Pagination, Message, Table, Card } from 'element-ui'
+import { Pagination, Message, Table, Card, Divider, BreadcrumbItem, Breadcrumb } from 'element-ui'
 export default {
     name: 'News',
     data() {
@@ -51,81 +45,66 @@ export default {
             newsList: [
                 {
                     is_pinned: 1,
-                    news_title: '新闻标题6 ',
-                    created_at: '(2019-11-16)',
+                    news_title: '',
+                    created_at: '',
                     views: 3,
                     news_id: 6
-                },
-                {
-                    is_pinned: 0,
-                    news_title: '121212121 ',
-                    created_at: '(2019-10-30)',
-                    views: 0,
-                    news_id: 1
-                },
-                {
-                    is_pinned: 0,
-                    news_title: '这是新闻标题2 ',
-                    created_at: '(2019-11-12)',
-                    views: 0,
-                    news_id: 2
-                },
-                {
-                    is_pinned: 0,
-                    news_title: '111 ',
-                    created_at: '(2019-11-15)',
-                    views: 0,
-                    news_id: 5
                 }
             ],
-            currentPage1: 5,
-            currentPage2: 5,
-            currentPage3: 5,
-            currentPage4: 4
+            pageCount: 1
         }
     },
     components: {
         [Pagination.name]: Pagination,
         [Message.name]: Message,
         [Table.name]: Table,
-        // [el-table-column.name]: el-table-columnElTableColumn
-        // [util.name]: util
-        [Card.name]: Card
+        [Card.name]: Card,
+        [Divider.name]: Divider,
+        [BreadcrumbItem.name]: BreadcrumbItem,
+        [Breadcrumb.name]: Breadcrumb
+    },
+    created() {
+        this.getNewsList()
     },
     methods: {
-        getNewList(page = 1){
-            this.$axios.get(prefix.api + newsApi.getNewList).then((response)=>{
-                if(!responseHandler(response.data, this)){
-                    // 在这里处理错误
-                    Message.error('请求失败')
-                    this.newsLists = this.response.data.news[0]
+        getNewsList(page = 1){
+            this.$axios.get(prefix.api + newsApi.getNewsList, {
+                params: {
+                    // 传参 page
+                    page
                 }
             })
+                .then((response)=>{
+                    console.log(response.data)
+                    if(!responseHandler(response.data, this)){
+                        // 在这里处理错误
+                        Message.error('请求失败')
+                    }
+                    this.newsList = response.data.data.news
+                    this.pageCount = response.data.data.pageCount
+                })
         },
         toHomePage(){
             console.log('跳转至主页')
-            this.$router.push({ path: '/' })
+            this.$router.push({ name: 'Index' })
+            // this.$router.push({ path: '/' })
         },
-        // query方式传参
+        // param
         goToDetailPage(id){
             console.log('跳转至新闻具体页面')
             console.log(id)
-            this.$router.push({ path: '/news-detail',
-                query: {
+            // this.$router.push({ name: 'NewsDetail',
+            this.$router.push({ name: 'NewsDetail',
+                params: {
                     newsId: id
                 } })
-        },
-        handleSizeChange(val) {
-            console.log(`每页 ${val} 条`)
-        },
-        handleCurrentChange(val) {
-            console.log(`当前页: ${val}`)
         }
     }
 }
 
 </script>
-<style lang="less">
+
+<style lang="less" scoped>
     .index{
         width: 1300px;
         height: 600px;
@@ -133,7 +112,7 @@ export default {
         margin-left: 175px;
         margin-top: 30px;
     }
-    .up{
+    .head{
         width: 1300px;
         height: 25px;
         display: flex;
@@ -146,33 +125,43 @@ export default {
         text-align: center;
         // border: 1px solid rgb(0, 0, 0);
     }
-    .news{
-        width: 1260px;
+    // 左侧：标题
+    .left{
+        width: 1180px;
+        height: 100%;
         // border: 1px solid rgb(0, 0, 0);
         display: flex;
+        // 手势
+        cursor: pointer;
     }
-    .new{
-        margin-bottom: 10px;
-        margin-top: 10px;
-        font-size: 15px;
+    // 眼睛
+    .eye{
+        width: 30px;
+        height: 100%;
+        // border: 1px solid rgb(0, 0, 0);
     }
-    .title{
-        width: 1200px;
+    // 右侧：浏览人数
+    .right{
+        height: 100%;
+        display: flex;
+        // border: 1px solid rgb(0, 0, 0);
+        width: 50px;
+    }
+    // 新闻列表
+    .news{
+        width: 1260px;
         height: 100%;
         // border: 1px solid rgb(0, 0, 0);
         font-size: 20px;
+        margin-top: 20px;
+        // display: flex;
     }
-    .views{
-        width: 100px;
-        height: 100%;
-        // border: 1px solid rgb(0, 0, 0);
-        // font-size: 20px;
-        // margin-bottom: 10px;
+    .up{
+        display: flex;
     }
     .pagination{
         margin-top: 20px;
     }
-
     .box-card {
         width: 1300px;
     }
