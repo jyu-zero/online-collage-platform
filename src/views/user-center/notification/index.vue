@@ -15,31 +15,44 @@
             <div class="checkbox-container" >
                 <input @click="clickCheckbox" type="checkbox" v-model="checkModel" class="check_box tui-checkbox"  :value="notification.id">
             </div>
-            <span class="notification-title" @click="clickTitle(notification.id)">{{notification.title}}--</span>
+            <span class="notification-title" v-if="notification.type===0" @click="clickTitle(notification.id)">{{notification.title}}--</span>
+            <span class="notification-title" v-if="notification.type===1" @click="clickTitle(notification.id)">{{notification.title}}--</span>
+            <span class="notification-title" v-if="notification.type===2" @click="clickTitle(notification.id)">{{notification.title}}--</span>
             <span class="check" @click="checkDetail">查看</span>
           </div>
-          <div class="content-container hidden">
+          <div class="content-container hidden" v-if="notification.type===0">
               <p>
                 {{notification.content}}
               </p>
           </div>
         </div>
       </div>
+      <el-pagination
+            :background="true"
+            :page-size="pageSize"
+            :page-count="pageCount"
+            :current-page="currentPage"
+            layout="prev, pager, next"
+            :total="total"
+            @prev-click="changePage('prev')"
+            @next-click="changePage('next')"
+            @current-change="changePage()">
+            </el-pagination>
     </main>
   </div>
 </template>
 
 <script>
-import { Button, Input, Checkbox, CheckboxGroup } from 'element-ui'
-
-// import { prefix, responseHandler, userApi, goodsApi } from '@/api'
+import { Button, Input, Checkbox, CheckboxGroup, Message, Pagination } from 'element-ui'
+import { prefix, responseHandler, notificationApi } from '@/api'
 export default {
     name: 'Notification',
     components: {
         [Button.name]: Button,
         [Input.name]: Input,
         [Checkbox.name]: Checkbox,
-        [CheckboxGroup.name]: CheckboxGroup
+        [CheckboxGroup.name]: CheckboxGroup,
+        [Pagination.name]: Pagination
     },
     data(){
         return{
@@ -65,43 +78,13 @@ export default {
                     content: 'bablablalba'
                 }
             ],
-            data_list: [
-                {
-                    id: 0,
-                    title: '标题内容1',
-                    content: 'bablablalba'
-                },
-                {
-                    id: 1,
-                    title: '标题内容2',
-                    content: 'bablablalba'
-                },
-                {
-                    id: 2,
-                    title: '标题内容3',
-                    content: 'bablablalba'
-                }
-            ],
-            list: [
-                {
-                    id: 0,
-                    title: '标题内容1',
-                    content: 'bablablalba'
-                },
-                {
-                    id: 1,
-                    title: '标题内容2',
-                    content: 'bablablalba'
-                },
-                {
-                    id: 2,
-                    title: '标题内容3',
-                    content: 'bablablalba'
-                }
-            ],
             checked: false,
             checkModel: [],
-            checkedNames: ''
+            checkedNames: '',
+            pageCount: 5,
+            pageSize: 5,
+            currentPage: 1,
+            total: 0
         }
     },
     methods: {
@@ -114,13 +97,11 @@ export default {
             // e.currentTarget.firstElementChild.checked = !e.currentTarget.firstElementChild.checked
         },
         clickTitle(id){
-            console.log(this.checkModel.indexOf(id))
             if (this.checkModel.indexOf(id) < 0){
                 this.checkModel.push(id)
                 return
             }
             this.checkModel.splice(this.checkModel.findIndex(item => item === id), 1)
-            console.log(this.checkModel)
         },
 
         // 这个是查看通知详情的按钮
@@ -138,17 +119,53 @@ export default {
                     }
                 })
             }
+        },
+        getNotifications(page = 1){
+            page = 1
+            console.log(this.currentPage)
+            this.$axios.get(prefix.api + notificationApi.getNotifications, {
+                params: {
+                    page,
+                    pageSize: 1
+                }
+            }).then((response)=>{
+                if(!responseHandler(response.data, this)){
+                    // 提示出错
+                    Message.error('服务器裂开了')
+                    return
+                }
+                this.notifications = []
+                this.notifications = response.data.data.notificationList
+                this.pageCount = response.data.data.pageCount
+                this.total = this.pageCount * this.pageSize
+            })
+        },
+        // 换页
+        changePage(val){
+            switch(val){
+                case 'prev':
+                    this.getNotifications(--this.currentPage)
+                    break
+                case 'next':
+                    this.getNotifications(++this.currentPage)
+                    break
+                default:
+                    this.getNotifications(this.currentPage)
+            }
         }
     },
     watch: {
         // 观察用户选择了哪个通知项，同步到checkmodel中
         checkModel(){
-            console.log(this.checkModel)
-            if(this.checkModel.length === this.list.length){
+            if(this.checkModel.length === this.notifications.length){
                 this.checked = true
             }else{
                 this.checked = false
             }
+            console.log(this.checkModel)
+        },
+        currentPage(newVal, oldVal){
+            console.log(newVal, oldVal)
         }
     },
     created() {
@@ -157,9 +174,10 @@ export default {
         arr = this.notifications.map(function(item, index, arr){
             return item.id
         })
-        console.log(arr)
+        // console.log(arr)
         this.notificationIdList = arr
-        console.log(this.cityOptions)
+        // console.log(this.cityOptions)
+        this.getNotifications()
     }
 }
 </script>
@@ -176,10 +194,10 @@ export default {
       }
     }
     .notification-list{
-        margin-top: 10px;
-        max-width: 750px;
-        display: flex;
-        flex-direction: column;
+      margin-top: 10px;
+      max-width: 800px;
+      display: flex;
+      flex-direction: column;
       border-radius: 15px;
       overflow: hidden;
       .notification-item{

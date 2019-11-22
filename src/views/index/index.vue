@@ -2,7 +2,7 @@
     <div class="home-page" >
       <!--头部-->
       <header v-cloak>
-        <h1>线上学院平台</h1>
+        <h1>在线学院平台</h1>
         <!--下拉菜单-->
         <div class="header-right"  v-if="isLogin" >
           <div class="new-msg">
@@ -48,7 +48,7 @@
                       <span class="news-date">({{item.created_at}})</span>
                       <span class="watch-times-count">
                         <font-awesome-icon icon="eye" />
-                         {{item.viewCount}}
+                         {{item.views}}
                       </span>
                     </dt>
                   </dl>
@@ -315,7 +315,7 @@ export default {
                     Message.error(response.data.msg)
                     return
                 }
-                this.news = response.data.data.news
+                this.news = response.data.data
             })
         },
 
@@ -452,14 +452,15 @@ export default {
 .home-page{
   width: 100%;
   background: @pageBg;
-
+  min-width: 1200px;
 }
 header{
   z-index: 2;
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
+  min-width: 1200px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -513,7 +514,8 @@ main{
   z-index: 1;
   height: 100%;
   /*宽度问题有必要探讨一下*/
-  max-width: 1400px;
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   margin: 0 auto;
   *{
