@@ -149,8 +149,8 @@
                     <h3>设置三个物品校验问题</h3>
                     <span>仅有回答全部正确的人才能取得您的联系方式</span>
                     <!-- question.goods_id这个东西怎么获取 -->
-                    <ul class="check-questions" v-for="(question,index) of questionAndAnswers" :key="question.goods_id">
-                        <li>
+                    <ul class="check-questions">
+                        <li v-for="(question,index) of questionAndAnswers" :key="question.questionContent">
                             <span>问题{{index+1}}
                                 <el-input
                                 placeholder="请输入内容"
@@ -163,7 +163,7 @@
                                     <div class="option"><span>A</span></div>
                                     <el-input
                                     placeholder="请输入内容"
-                                    v-model="question.questionAnswer[0].answerOne"
+                                    v-model="question.questionAnswer[0].answer"
                                     clearable>
                                     </el-input>
                                 </dt>
@@ -171,7 +171,7 @@
                                     <div class="option"><span>B</span></div>
                                     <el-input
                                     placeholder="请输入内容"
-                                    v-model="question.questionAnswer[1].answerTwo"
+                                    v-model="question.questionAnswer[1].answer"
                                     clearable>
                                     </el-input>
                                 </dt>
@@ -179,7 +179,7 @@
                                     <div class="option"><span>C</span></div>
                                     <el-input
                                     placeholder="请输入内容"
-                                    v-model="question.questionAnswer[2].answerThree"
+                                    v-model="question.questionAnswer[2].answer"
                                     clearable>
                                     </el-input>
                                 </dt>
@@ -187,22 +187,22 @@
                                     <div class="option"><span>D</span></div>
                                     <el-input
                                     placeholder="请输入内容"
-                                    v-model="question.questionAnswer[3].answerFour"
+                                    v-model="question.questionAnswer[3].answer"
                                     clearable>
                                     </el-input>
                                 </dt>
-                                <!-- 正确答案 -->
-                                <dt>
-                                    <el-select v-model="value" placeholder="请设置正确选项">
-                                        <el-option
-                                        v-for="item in question.questionAndAnswers"
-                                        :key="item.answerOne"
-                                        :label="item.answerOne"
-                                        :value="item.answerOne"
-                                        >
-                                        </el-option>
-                                    </el-select>
-                                </dt>
+                            </dl>
+                            <!-- 正确答案 -->
+                            <dl>
+                                <el-select v-model="value" placeholder="请设置正确选项">
+                                    <el-option
+                                    v-for="item in question.questionAnswer"
+                                    :key="item.value"
+                                    :label="item.answer"
+                                    :value="item.value"
+                                    >
+                                    </el-option>
+                                </el-select>
                             </dl>
                         </li>
                     </ul>
@@ -244,7 +244,8 @@
 </template>
 
 <script>
-import { Button, Dialog, Input, Upload, MessageBox, Radio, Message, Select } from 'element-ui'
+import { Button, Dialog, Input, Upload, MessageBox, Radio, Message, Select, Option } from 'element-ui'
+import { prefix, goodsApi } from '@/api'
 export default {
     components: {
         name: 'LostAndFoundDialog',
@@ -255,7 +256,8 @@ export default {
         [MessageBox.name]: MessageBox,
         [Radio.name]: Radio,
         [Message.name]: Message,
-        [Select.name]: Select
+        [Select.name]: Select,
+        [Option.name]: Option
     },
     data() {
         return {
@@ -277,34 +279,31 @@ export default {
             value: '',
             // 问题及其答案
             questionAndAnswers: [
-                // {
-                //     questionContent:[]
-                // },
                 {
                     questionContent: '1',
                     questionAnswer: [
-                        { answerOne: '11' },
-                        { answerTwo: '12' },
-                        { answerThree: '13' },
-                        { answerFour: '14' }
+                        { value: '选项1', answer: '11' },
+                        { value: '选项2', answer: '12' },
+                        { value: '选项3', answer: '13' },
+                        { value: '选项4', answer: '14' }
                     ]
                 },
                 {
                     questionContent: '2',
                     questionAnswer: [
-                        { answerOne: '21' },
-                        { answerTwo: '22' },
-                        { answerThree: '23' },
-                        { answerFour: '24' }
+                        { value: '选项1', answer: '21' },
+                        { value: '选项2', answer: '22' },
+                        { value: '选项3', answer: '23' },
+                        { value: '选项4', answer: '24' }
                     ]
                 },
                 {
                     questionContent: '3',
                     questionAnswer: [
-                        { answerOne: '31' },
-                        { answerTwo: '32' },
-                        { answerThree: '33' },
-                        { answerFour: '34' }
+                        { value: '选项1', answer: '31' },
+                        { value: '选项2', answer: '32' },
+                        { value: '选项3', answer: '33' },
+                        { value: '选项4', answer: '34' }
                     ]
                 }
             ],
@@ -389,6 +388,18 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
+                this.$axios.post(prefix.api + goodsApi.addLost, {
+                    user_id: 1,
+                    title: this.inputTitle,
+                    name: this.inputName,
+                    place: this.inputPlace,
+                    time: this.inputTime,
+                    contact_name: this.inputUserName,
+                    contact_num: this.inputTelephone
+                })
+                    .then(response => {
+                        console.log(response.data)
+                    })
                 Message({
                     type: 'success',
                     message: '发布成功!'
@@ -588,11 +599,6 @@ ul,li {
                     }
                 }
                 :nth-child(5){
-                    .el-input{
-                        // height: 500px;
-                        // width: 500px;
-                        
-                    }
                     i{
                         line-height: 16px;
                         // background-color: pink;
