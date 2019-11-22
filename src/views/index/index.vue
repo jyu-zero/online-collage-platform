@@ -419,7 +419,6 @@ export default {
                     break
             }
         },
-
         // 资源共享跳转
         goToSourceShare(fileId){
             // 1.空则跳转至丢失页面

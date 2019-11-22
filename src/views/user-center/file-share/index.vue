@@ -9,27 +9,35 @@
         <!-- 资料表格 -->
         <el-table :data="document" style="width: 100%;padding-left: 80px ">
             <el-table-column type="selection" width="55"> </el-table-column>
-                <el-table-column prop="fileName" label="文件名" width="180">
+                <el-table-column :prop="document.file_name" label="文件名" width="180">
                 <template slot-scope="scope">
-                    <i class="el-icon-document">{{scope.row.fileName}}</i>
+                    <i class="el-icon-document">{{scope.row.file_name}}</i>
                 </template>
                 </el-table-column>
-            <el-table-column prop="time" label="上传时间" width="180">  </el-table-column>
-            <el-table-column  prop="view_range" label="可见范围" width="120"> </el-table-column>
-            <el-table-column prop="type" label="标签"  width="150" >
+            <el-table-column :prop="document.create_at" label="上传时间" width="180">
                 <template slot-scope="scope">
-                <el-tag>{{scope.row.type}}</el-tag>
+                    {{scope.row.create_at}}
                 </template>
             </el-table-column>
-            <el-table-column  label="下载次数" width="150">
+            <el-table-column :prop="document.file_right_id" label="可见范围" width="120">
+                <template slot-scope="scope">
+                    {{scope.row.file_right_id}}
+                </template>
+            </el-table-column>
+            <el-table-column :prop="document.tag_id" label="标签"  width="150" >
+                <template slot-scope="scope">
+                <el-tag>{{scope.row.tag_id}}</el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column :prop="document.download_counts" label="下载次数" width="150">
                 <template slot-scope="scope" style="font-size: 20px;">
-                <i class="el-icon-download">{{scope.row.downloadTimes}}</i>
+                <i class="el-icon-download">{{scope.row.download_counts}}</i>
                 </template>
             </el-table-column>
             <el-table-column label="操作"  width="200">
                 <template slot-scope="scope">
-                  <el-button type="text" @click="handleEdit(scope.$index, scope.row)">删除</el-button>
-                  <el-button size="mini" @click="handleDelete(scope.$index, scope.row)">下载</el-button>
+                  <el-button type="text" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                  <el-button size="mini" @click="handleDownload(scope.$index, scope.row)">下载</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -52,13 +60,13 @@
             <div>
                 <p>可见范围</p>
                 <el-select v-model="range" multiple>
-                    <el-option  v-for="item in set_view_ranges" :key="item.value" :label="item.label" :value="item.value"> </el-option>
+                    <el-option  v-for="item in rangesOption" :key="item.value" :label="item.label" :value="item.value"> </el-option>
                 </el-select>
             </div>
             <div>
                 <p>分类</p>
-                <el-select v-model="type" >
-                    <el-option  v-for="item in types" :key="item.value"  :label="item.label" :value="item.value">
+                <el-select v-model="setType" >
+                    <el-option  v-for="item in typesOption" :key="item.value"  :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
             </div>
@@ -71,8 +79,10 @@
 </template>
 
 <script>
-import { Select, Option, Button, Table, TableColumn, Tag, Icon, Upload, Container, Main } from'element-ui'
+import { Select, Option, Button, Table, TableColumn, Tag, Icon, Upload, Container, Main, Message, Pagination } from'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
+import { prefix, responseHandler, fileApi } from '@/api'
+import axios from 'axios'
 export default {
     name: 'FileShare',
     components: {
@@ -85,11 +95,13 @@ export default {
         [Icon.name]: Icon,
         [Upload.name]: Upload,
         [Container.name]: Container,
-        [Main.name]: Main
+        [Main.name]: Main,
+        [Message.name]: Message,
+        [Pagination.name]: Pagination
     },
     data (){
         return {
-            types: [{
+            typesOption: [{
                 value: '选项1',
                 label: '学习资料'
             }, {
@@ -111,9 +123,9 @@ export default {
                 value: '选项7',
                 label: '源程序程序'
             }],
-            type: '',
+            setType: '',
             range: [],
-            set_view_ranges: [{
+            rangesOption: [{
                 value: '选项1',
                 label: '全学院'
             }, {
@@ -124,39 +136,44 @@ export default {
                 label: '1302'
             }],
             showModal: false,
-            document: [{
-                fileName: '啊速度就会幸福大家',
-                time: '2016-05-02',
-                view_range: ' 1518 弄',
-                type: '家',
-                downloadTimes: 5
-            }, {
-                fileName: '啊速度就会幸福大家',
-                time: '2016-05-04',
-                view_range: ' 1517 弄',
-                type: '公司',
-                downloadTimes: 5
-            }, {
-                fileName: '啊速度就会幸福大家',
-                time: '2016-05-01',
-                view_range: ' 1519 弄',
-                type: '家',
-                downloadTimes: 5
-            }, {
-                fileName: '啊速度就会幸福大家',
-                time: '2016-05-03',
-                view_range: ' 1516 弄',
-                type: '公司',
-                downloadTimes: 5
-            }]
+            document: []
         }
     },
+    created(){
+        this.$axios.post(prefix.api + fileApi.getAllFile).then(response => {
+            if(!responseHandler(response.data, this)){
+                Message.error(response.data.msg)
+            }
+            this.document = response.data.data
+        })
+    },
     methods: {
-        handleEdit(index, row) {
+        handleDownload(index, row) {
             console.log(index, row)
         },
         handleDelete(index, row) {
-            console.log(index, row)
+            // console.log(this.document[index].id)
+            this.$axios.post(prefix.api + fileApi.deleteFile, {
+                fileId: this.document[index].id
+            }).then(response => {
+                if(!responseHandler(response.data, this)){
+                    Message.error(response.data.msg)
+                }
+                this.$axios.post(prefix.api + fileApi.getAllFile)
+            })
+        },
+        uploadFile(){
+            this.$axios.post(prefix.api + fileApi.upload, {
+                type: this.type,
+                range: this.range
+            }).then(response => {
+                if(!responseHandler(response.data, this)){
+                    Message.error(response.data.msg)
+                }
+                // this.$axios.post(prefix.api + fileApi.getAllFile)
+                this.type = ''
+                this.range = []
+            })
         }
     }
 }

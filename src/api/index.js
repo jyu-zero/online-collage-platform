@@ -1,5 +1,6 @@
 import user from './user'
 import goods from './goods'
+import file from './file'
 import news from './news'
 import notification from './notification'
 import apiPrefix from './apiPrefix'
@@ -21,3 +22,5 @@ export const notificationApi = notification
 export const responseHandler = _responseHandler
 
 export const prefix = apiPrefix
+
+export const fileApi = file

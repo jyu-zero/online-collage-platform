@@ -2,7 +2,7 @@
 <template>
         <el-main>
             <div class="lost-details-main">
-                <el-row type="flex" justify="center" class="lost-title"><h1>求救大家，有没有谁看见我丢的东西</h1></el-row>
+                <el-row type="flex" justify="center" class="lost-title"><h1>{{goodTitle}}</h1></el-row>
                 <el-row type="flex" >
                     <!-- 展示物品图 -->
                     <el-col>
@@ -50,7 +50,7 @@
                                 <el-row class="contact-information">
                                     <el-collapse v-model="activeNames" @change="handleChange">
                                         <el-collapse-item title="点击查看联系人信息" name="1">
-                                            <el-row class="contact-information-contain">{{contact}}</el-row>
+                                            <el-row class="contact-information-contain">{{contactName}} {{contactPhone}}</el-row>
                                         </el-collapse-item>
                                     </el-collapse>
                                 </el-row>
@@ -85,23 +85,36 @@ export default {
     data() {
         return {
             lostImageUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
-            title: '',
-            goodName: '金士顿U盘',
-            lostPlace: '嘉应学院',
-            lostTime: '2019.11.11',
-            contact: '小胖欣 1312311646'
+            goodTitle: '',
+            goodName: '',
+            lostPlace: '',
+            lostTime: '',
+            contactName: '',
+            contactPhone: ''
         }
     },
     created () {
+        this.getRouterData()
         axios
             .post(prefix.api + goodsApi.getLostDetails, {
-                good_id: 1
+                good_id: this.good_id,
+                sort: this.sort
             })
             .then(response => {
-                this.goodName = response.data.data.name
-                this.lostPlace = response.data.data.place
-                this.lostTime = response.data.data.time
+                this.goodTitle = response.data.data.rs[0].title
+                this.goodName = response.data.data.rs[0].name
+                this.lostPlace = response.data.data.rs[0].place
+                this.lostTime = response.data.data.rs[0].time
+                this.contactName = response.data.data.rs[0].contact_name
+                this.contactPhone = response.data.data.rs[0].contact_num
+                this.lostImageUrl = response.data.data.rs[0].contact_image
             })
+    },
+    methods: {
+        getRouterData() {
+            this.good_id = this.$route.params.good_id
+            this.good_id = this.$route.params.sort
+        }
     }
 }
 </script>

@@ -4,8 +4,8 @@
         <div class="lost-found-head-list">
             <h2>失物招领</h2>
             <el-button type="primary" title="点击去我的失物招领" @click="goToUserCenterLostAndFound">我的失物招领</el-button>
-            <LostAndFoundDialog title="点击发布失物信息" :typeStyle="'warning'" head>我丢东西了</LostAndFoundDialog>
-            <LostAndFoundDialog title="点击发布招领信息" :typeStyle="'warning'" head>我找到东西了</LostAndFoundDialog>
+            <LostAndFoundDialog :buttonTitle="'点击发布失物信息'" :typeStyle="'warning'" head :prompt="'我丢东西了'">我丢东西了</LostAndFoundDialog>
+            <LostAndFoundDialog :buttonTitle="'点击发布招领信息'" :typeStyle="'warning'" head :prompt="'我捡到东西了'">我捡到东西了</LostAndFoundDialog>
             <el-input class="el-input" placeholder="请输入内容" v-model="input" clearable></el-input>
         </div>
         <div class="lost-found-list">
@@ -38,10 +38,13 @@
                     <div class="to-details">
                         <el-button title="点击查看详情和图片" type="primary" v-if="item.sort==0" @click="goToLostDetails">查看详情</el-button>
                         <el-button title="点击查看详情和图片" type="primary" v-if="item.sort==1" @click="goToFoundDetails">查看详情</el-button>
-                        <LostAndFoundDialog title="" :typeStyle="'primary'" v-if="item.status==0" list>未完成</LostAndFoundDialog>
-                        <LostAndFoundDialog title="" :typeStyle="'warning'" :disabled="'disabled'" v-if="item.status==1" list>已完成</LostAndFoundDialog>
+                        <!-- :buttonTitle="'点击设置失物状态'" -->
+                        <LostAndFoundDialog :typeStyle="'primary'" :disabled="'disabled'" v-if="item.status==0&&item.sort==0" list :prompt="'未完成'">未完成</LostAndFoundDialog>
+                        <!-- :buttonTitle="'点击设置招领状态'" -->
+                        <LostAndFoundDialog :typeStyle="'primary'" :disabled="'disabled'" v-if="item.status==0&&item.sort==1" list :prompt="'未完成'">未完成</LostAndFoundDialog>
+                        <LostAndFoundDialog :typeStyle="'warning'" :disabled="'disabled'" v-if="item.status==1" list>已完成</LostAndFoundDialog>
                     </div>
-                </li>
+               </li>
             </ul>
             <!-- 分页 -->
             <div class="list-pagination">
@@ -64,7 +67,7 @@
 </template>
 
 <script>
-import { Button, Message, Pagination, Input } from 'element-ui'
+import { Button, Message, Pagination, Input, MessageBox } from 'element-ui'
 import LostAndFoundDialog from '../../components/lost-and-found/LostAndFoundDialog'
 import { prefix, goodsApi } from '@/api'
 export default {
@@ -74,14 +77,19 @@ export default {
         [Message.name]: Message,
         [Pagination.name]: Pagination,
         [Input.name]: Input,
+        [MessageBox.name]: MessageBox,
         LostAndFoundDialog
     },
     data() {
         return {
-            // 改变按钮组件type的属性
+            // 动态改变按钮组件type的属性
             typeStyle: '',
-            // 改变按钮组件的类型
+            // 动态改变按钮组件的类型
             disabled: '',
+            // 弹窗的标题提示
+            prompt: '',
+            // 动态改变按钮的提示,多此一步是为了解决弹窗中出现title冒泡的问题
+            buttonTitle: '',
             currentPage3: 5,
             input: '',
             // 我的失物招领数据
