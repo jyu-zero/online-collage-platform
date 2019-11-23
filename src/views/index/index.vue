@@ -38,19 +38,19 @@
                       <h2>新闻中心</h2>
                       <span @click="goToNewsPage">查看更多</span>
                   </div>
-                  <dl class="news-list">
-                    <dt class="news-item"
+                  <dl class="news-list" @click="goToNewsPage">
+                      <dt class="news-item"
                         v-for="(item,index) of news"
                         :key="index"
-                        @click="goToNewsPage(index)">
-                      <span class="set-top-label" v-if="item.is_pinned===1">[置顶] </span>
-                      <span class="news-title">{{item.news_title}}  </span>
-                      <span class="news-date">({{item.created_at}})</span>
-                      <span class="watch-times-count">
-                        <font-awesome-icon icon="eye" />
-                         {{item.views}}
-                      </span>
-                    </dt>
+                        :data-index='index'>
+                          <span class="set-top-label" v-if="item.is_pinned===1">[置顶] </span>
+                          <span class="news-title">{{item.news_title}}  </span>
+                          <span class="news-date">({{item.created_at}})</span>
+                          <span class="watch-times-count">
+                              <font-awesome-icon icon="eye" />
+                              {{item.views}}
+                          </span>
+                      </dt>
                   </dl>
                 </div>
                 <!--在线问答-->
@@ -59,35 +59,37 @@
                       <h2>在线问答</h2>
                       <span @click="goToQuestionPage()">查看更多</span>
                   </div>
-                  <dl class="question-list">
-                    <dt class="question-item"
+                  <dl class="question-list"
+                  @click="goToQuestionPage">
+                      <dt class="question-item"
                         v-for="item of questions"
                         :key="item.questionId"
-                        @click="goToQuestionPage(item.questionId)">
-                      <div class="question-status">
-                        <span v-if="item.status===1">已解决</span>
-                        <span v-else>待解决</span>
-                      </div>
-                      <div class="question-info">
-                        <h3>{{item.title}}<span v-if="item.isPinned">置顶</span></h3>
-                        <div>
-                          <div>
-                            由
-                            <span class="quizzer"> {{item.name}} </span>
-                            提问
-                            <span class="question-time">{{item.time}}  </span>
-                            <font-awesome-icon icon="tag" />
-                            <span class="question-type">{{item.typeName}}</span>
+                        :data-id="item.questionId"
+                        >
+                          <div class="question-status">
+                              <span v-if="item.status===1">已解决</span>
+                              <span v-else>待解决</span>
                           </div>
-                          <div class="view-reply-count">
-                            <font-awesome-icon icon="eye" />
-                            <span class="count">{{item.viewCount}}</span>
-                            <font-awesome-icon icon="comment-dots" />
-                            <span class="count">{{item.solutionsNum}}</span>
+                          <div class="question-info">
+                              <h3>{{item.title}}<span v-if="item.isPinned">置顶</span></h3>
+                              <div>
+                                  <div>
+                                      由
+                                      <span class="quizzer"> {{item.name}} </span>
+                                      提问
+                                      <span class="question-time">{{item.time}}  </span>
+                                      <font-awesome-icon icon="tag" />
+                                      <span class="question-type">{{item.typeName}}</span>
+                                  </div>
+                                  <div class="view-reply-count">
+                                      <font-awesome-icon icon="eye" />
+                                      <span class="count">{{item.viewCount}}</span>
+                                      <font-awesome-icon icon="comment-dots" />
+                                      <span class="count">{{item.solutionsNum}}</span>
+                                  </div>
+                              </div>
                           </div>
-                        </div>
-                      </div>
-                    </dt>
+                      </dt>
                   </dl>
                 </div>
             </div>
@@ -137,7 +139,7 @@
                 <div class="source-share">
               <div class="container-header">
                 <h2>资料共享</h2>
-                <span @click="goToSourceShare()">查看更多</span>
+                <span @click="goToSourceShare">查看更多</span>
               </div>
               <dl class="document-list">
                 <dt class="document-item" v-for="item of documents" :key="item.id" >
@@ -218,7 +220,23 @@ export default {
             loginWindow: false,
             dialogVisible: false,
             // 新闻数据
-            news: [],
+            news: [
+                {
+                    'news_title': '啊哈哈哈',
+                    'views': 66,
+                    'created_at': '2019-06-08'
+                },
+                {
+                    'news_title': '啊哈哈哈',
+                    'views': 66,
+                    'created_at': '2019-06-08'
+                },
+                {
+                    'news_title': '啊哈哈哈',
+                    'views': 66,
+                    'created_at': '2019-06-08'
+                }
+            ],
             questions: [],
             goods: [],
             documents: [
@@ -362,31 +380,43 @@ export default {
         goToUserCenter(){
             this.$router.push({ path: '/user-center/' })
         },
+        // 递归寻找dt元素
+        recursion(e){
+            // 不断往上爬直到获取dt，遇到body则返回null
+            if(e.tagName !== 'DT'){
+                if(e.tagName === 'BODY'){
+                    return null
+                }
+                return this.recursion(e.parentNode)
+            }
+            return e
+        },
         // 新闻中心跳转
-        goToNewsPage(newsId){
-            // 1.空则跳转至丢失页面
-            if (!newsId){
+        goToNewsPage(event){
+            let element = this.recursion(event.target)
+            // 1.空则跳转至新闻中心
+            if (!element){
                 this.$router.push({ name: 'NewsCenter' })
             }
-            // 2.id存在则跳转至详情页
+            // 2.element(dt)存在则跳转至详情页
             this.$router.push({ name: `NewsDetail`,
                 params: {
-                    newsId
+                    newsId: element.dataset.index
                 }
             })
         },
 
         // 在线问答跳转
-        goToQuestionPage(questionId){
-            // 1.id为undefined就跳转至在线问答主页
-            if (!questionId){
+        goToQuestionPage(event){
+            let element = this.recursion(event.target)
+            // 1.id为null就跳转至在线问答主页
+            if (!element){
                 this.$router.push({ name: 'Question' })
-                return
             }
-            // 2.id为undefined就跳转至在线问答详情页
+            // 2.element(dt)存在就跳转至在线问答详情页
             this.$router.push({ name: `QuestionSpecific`,
                 params: {
-                    questionId
+                    questionId: element.dataset.id
                 }
             })
         },
@@ -420,17 +450,8 @@ export default {
             }
         },
         // 资源共享跳转
-        goToSourceShare(fileId){
-            // 1.空则跳转至丢失页面
-            if (!fileId){
-                this.$router.push({ name: 'SourceShare' })
-            }
-            // 2.id存在则跳转至详情页
-            this.$router.push({ name: `NewsDetail`,
-                params: {
-                    fileId
-                }
-            })
+        goToSourceShare(){
+            this.$router.push({ name: 'SourceShare' })
         }
     },
     created () {
