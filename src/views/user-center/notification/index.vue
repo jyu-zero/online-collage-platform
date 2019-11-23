@@ -3,7 +3,8 @@
     <main>
       <div id="btn-container">
       <el-button type="primary" @click="toggle">发送通知</el-button>
-      <el-button>标记为已读</el-button>
+      <el-button @click="setSelectRead">标记为已读</el-button>
+      <el-button @click="setSelectNoRead">标记为未读</el-button>
         <el-button @click="checkAll">
           <input type="checkbox"  id="check-all" v-model="checked"  style="display:none">
           <span  @click.stop="checkAll">全选</span>
@@ -13,11 +14,11 @@
         <div v-for="notification of notifications" :key="notification.id" >
           <div class="notification-item" >
             <div class="checkbox-container" >
-                <input @click="clickCheckbox" type="checkbox" v-model="checkModel" class="check_box tui-checkbox"  :value="notification.id">
+                <input type="checkbox" v-model="checkModel" class="check_box tui-checkbox"  :value="notification.id">
             </div>
-            <span class="notification-title" v-if="notification.type===0" @click="clickTitle(notification.id)">{{notification.title}}--</span>
-            <span class="notification-title" v-if="notification.type===1" @click="clickTitle(notification.id)">{{notification.title}}--</span>
-            <span class="notification-title" v-if="notification.type===2" @click="clickTitle(notification.id)">{{notification.title}}--</span>
+            <span class="notification-title" :class="{'alreadyRead' :readArray.indexOf(notification.id)>0}" v-if="notification.type===0" @click="clickTitle(notification.id)">{{notification.title}}--</span>
+            <span class="notification-title" :class="{'alreadyRead' :readArray.indexOf(notification.id)>0}" v-if="notification.type===1" @click="clickTitle(notification.id)">{{notification.title}}--</span>
+            <span class="notification-title" :class="{'alreadyRead' :readArray.indexOf(notification.id)>0}" v-if="notification.type===2" @click="clickTitle(notification.id)">{{notification.title}}--</span>
             <span class="check" @click="checkDetail($event,notification.type,notification.id)">查看</span>
           </div>
           <div class="content-container hidden" v-if="notification.type===0">
@@ -97,22 +98,77 @@ export default {
             inputTitle: '',
             inputContent: '',
             // 用于存储id的数组
-            notificationIdList: [],
-            notifications: [],
+            notifications: [
+                {
+                    'id': 9,
+                    'title': '上课通知',
+                    'content': '这个周末补课哈',
+                    'type': 0
+                },
+                {
+                    'id': 5,
+                    'title': '上课通知',
+                    'content': '这个周末补课哈',
+                    'type': 0
+                },
+                {
+                    'id': 22,
+                    'title': '上课通知',
+                    'content': '这个周末补课哈',
+                    'type': 0
+                },
+                {
+                    'id': 44,
+                    'title': '问答',
+                    'type': 2
+                },
+                {
+                    'id': 32,
+                    'title': '新闻',
+                    'type': 1
+                }
+            ],
             checked: false,
             checkModel: [],
             checkedNames: '',
+            // 总页数，尺寸，当前页面，总条数
             pageCount: 5,
             pageSize: 5,
             currentPage: 1,
-            total: 0
+            total: 30,
+            // 已读item会被记录在这里
+            readArray: []
         }
     },
     methods: {
+        // 获取通知栏数据
+        getNotifications(page = 1){
+            this.$axios.get(prefix.api + notificationApi.getNotifications, {
+                params: {
+                    page,
+                    pageSize: 1
+                }
+            }).then((response)=>{
+                if(!responseHandler(response.data, this)){
+                    // 提示出错
+                    Message.error('服务器裂开了')
+                    return
+                }
+                this.notifications = []
+                this.notifications = response.data.data.notificationList
+                this.pageCount = response.data.data.pageCount
+                this.total = this.pageCount * this.pageSize
+                let arr = []
+                this.notifications.forEach(element => {
+                    arr.push([element.id, 0])
+                })
+            })
+        },
         // 开关发送通知窗口
         toggle(){
             this.showSendWindow = !this.showSendWindow
         },
+        // ------------------------------上半部分的<按钮功能>--------------
         // 发送通知
         sendNotification(){
             this.$axios.get(prefix.api + notificationApi.getNotifications, {
@@ -134,13 +190,7 @@ export default {
                 Message.success('发送成功')
             })
         },
-        // 这两个方法都是绑定了checkbox的点击事件
-        clickCheckbox(e){
-            console.log('点击了checkbox')
-            console.log(e.currentTarget.checked)
-            // console.log(e.currentTarget.firstElementChild.checked)
-            // e.currentTarget.firstElementChild.checked = !e.currentTarget.firstElementChild.checked
-        },
+        // 点击标题时勾上复选框
         clickTitle(id){
             if (this.checkModel.indexOf(id) < 0){
                 this.checkModel.push(id)
@@ -148,11 +198,35 @@ export default {
             }
             this.checkModel.splice(this.checkModel.findIndex(item => item === id), 1)
         },
-
+        // 选择项设置已读
+        setSelectRead(){
+            this.checkModel.forEach(element => {
+                this.setRead(element)
+            })
+            localStorage.setItem('alreadyReadList', this.readArray)
+        },
+        // 选择项设置未读
+        setSelectNoRead(){
+            this.checkModel.forEach(element => {
+                this.readArray = this.readArray.filter(function(item) {
+                    return String(item) !== String(element)
+                })
+            })
+            localStorage.setItem('alreadyReadList', this.readArray)
+            this.checkModel = []
+        },
+        // 设置已读
+        setRead(id) {
+            this.readArray.push(id)
+            this.readArray = this.unique(this.readArray)
+            localStorage.setItem('alreadyReadList', this.readArray)
+            this.checkModel = []
+        },
         // 这个是查看通知详情的按钮
         checkDetail(e, type, id){
             if(type === 0){
                 e.currentTarget.parentElement.nextSibling.classList['value'] = e.currentTarget.parentElement.nextSibling.classList['value'] === 'content-container display' ? 'content-container hidden' : 'content-container display'
+                this.setRead(id)
                 return
             }
             if(type === 1){
@@ -164,9 +238,11 @@ export default {
         },
         // 全选按钮
         checkAll(){
+            // 如果全选按钮被点过一次，下次点就是取消全选
             if(this.checked){
                 this.checkModel = []
             }else{
+                // 如果是第一次点，就是全选了
                 this.notifications.forEach((item)=>{
                     if(this.checkModel.indexOf(item.id) === -1){
                         this.checkModel.push(item.id)
@@ -174,26 +250,7 @@ export default {
                 })
             }
         },
-        getNotifications(page = 1){
-            page = 1
-            console.log(this.currentPage)
-            this.$axios.get(prefix.api + notificationApi.getNotifications, {
-                params: {
-                    page,
-                    pageSize: 1
-                }
-            }).then((response)=>{
-                if(!responseHandler(response.data, this)){
-                    // 提示出错
-                    Message.error('服务器裂开了')
-                    return
-                }
-                this.notifications = []
-                this.notifications = response.data.data.notificationList
-                this.pageCount = response.data.data.pageCount
-                this.total = this.pageCount * this.pageSize
-            })
-        },
+        // ------------------------------下半部分的<换页功能>--------------
         // 换页
         changePage(val){
             switch(val){
@@ -214,6 +271,7 @@ export default {
                     newsId
                 }
             })
+            this.setRead(newsId)
         },
         // 跳转至在线问答详情页
         goToQuestionPage(questionId){
@@ -222,6 +280,18 @@ export default {
                     questionId
                 }
             })
+            this.setRead(questionId)
+        },
+
+        // 数组去重
+        unique(arr){
+            let newArr = []
+            arr.forEach(item=>{
+                if(newArr.indexOf(item) === -1){
+                    newArr.push(item)
+                }
+            })
+            return newArr
         }
     },
     watch: {
@@ -232,21 +302,21 @@ export default {
             }else{
                 this.checked = false
             }
-            console.log(this.checkModel)
-        },
-        currentPage(newVal, oldVal){
-            console.log(newVal, oldVal)
         }
     },
     created() {
-        // 把各个通知的id放到notificationIdList中
-        let arr = []
-        arr = this.notifications.map(function(item, index, arr){
-            return item.id
+        // 先判断本地存储是否有alreadyReadList
+        if(!localStorage.getItem('alreadyReadList')){
+            // 没有则创建一个
+            localStorage.setItem('alreadyReadList', '')
+        }
+        // 将alreadyReadList存储到本地的已读列表中
+        this.readArray = localStorage.getItem('alreadyReadList').split(',')
+        let numberic = []
+        this.readArray.forEach(element => {
+            numberic.push(Number(element))
         })
-        // console.log(arr)
-        this.notificationIdList = arr
-        this.getNotifications()
+        this.readArray = numberic
     }
 }
 </script>
@@ -400,6 +470,9 @@ export default {
 }
 .display{
     display: block;
+}
+.alreadyRead{
+    color: #ccc;
 }
 #pagination-container{
   margin-top: 20px;
