@@ -305,6 +305,7 @@ export default {
         }
     },
     created() {
+        this.getNotifications()
         // 先判断本地存储是否有alreadyReadList
         if(!localStorage.getItem('alreadyReadList')){
             // 没有则创建一个
