@@ -11,7 +11,7 @@
           </div>
           <el-dropdown trigger="click"  >
                   <span class="el-dropdown-link " id='dropdown-btn'>
-                      <div >
+                      <div>
                           <div class="user-name" >{{this.studentName}}</div>
                           <div class="user-id" >{{this.studentId}}</div>
                       </div>
@@ -39,7 +39,10 @@
                       <span @click="goToNewsPage">查看更多</span>
                   </div>
                   <dl class="news-list">
-                    <dt class="news-item" v-for="(item,index) of news" :key="index" >
+                    <dt class="news-item"
+                        v-for="(item,index) of news"
+                        :key="index"
+                        @click="goToNewsPage(index)">
                       <span class="set-top-label" v-if="item.is_pinned===1">[置顶] </span>
                       <span class="news-title">{{item.news_title}}  </span>
                       <span class="news-date">({{item.created_at}})</span>
@@ -54,16 +57,19 @@
                 <div class="online-question">
                   <div class="container-header">
                       <h2>在线问答</h2>
-                      <span @click="goToQuestionPage">查看更多</span>
+                      <span @click="goToQuestionPage()">查看更多</span>
                   </div>
                   <dl class="question-list">
-                    <dt class="question-item" v-for="item of questions" :key="item.questionId" >
+                    <dt class="question-item"
+                        v-for="item of questions"
+                        :key="item.questionId"
+                        @click="goToQuestionPage(item.questionId)">
                       <div class="question-status">
                         <span v-if="item.status===1">已解决</span>
                         <span v-else>待解决</span>
                       </div>
                       <div class="question-info">
-                        <h3>{{item.title}}<span v-if="item.setTop">置顶</span></h3>
+                        <h3>{{item.title}}<span v-if="item.isPinned">置顶</span></h3>
                         <div>
                           <div>
                             由
@@ -97,21 +103,24 @@
                       <li><p id="reply-count">41</p>我的失物</li>
                     </ul>
                   </div>
-                  <div id="user-center" @click="goToUserCenter">个人中心</div>
+                  <div id="user-center" @click="goToUserCenter()">个人中心</div>
                 </div>
                 <!--失物招领-->
                 <div class="lost-and-found">
                   <div class="container-header">
                     <h2>失物招领</h2>
-                    <span @click="goToLostAndFound">查看更多</span>
+                    <span @click="goToLostAndFound()">查看更多</span>
                   </div>
                   <dl class="lost-item-list">
-                    <dt class="lost-item" v-for="item of goods" :key="item.good_id" >
+                    <dt class="lost-item"
+                        v-for="(item,index) of goods"
+                        :key="index"
+                        @click="goToLostAndFound(item.good_id,item.sort)">
                       <div class="item-status">
-                        <span v-if="!item.lost">认领</span>
-                        <span v-if="item.lost">遗失</span>
+                        <span v-if="item.sort">认领</span>
+                        <span v-if="!item.sort">遗失</span>
                         <h3 class="goods-name">{{item.name}}</h3>
-                        <span>{{item.hoster}}</span>
+                        <span v-if="item.host">学院托管</span>
                       </div>
                       <div class="lost-msg">
                         <span class="lost-place">
@@ -128,7 +137,7 @@
                 <div class="source-share">
               <div class="container-header">
                 <h2>资料共享</h2>
-                <span @click="goToSourceShare">查看更多</span>
+                <span @click="goToSourceShare()">查看更多</span>
               </div>
               <dl class="document-list">
                 <dt class="document-item" v-for="item of documents" :key="item.id" >
@@ -197,8 +206,10 @@ export default {
     },
     data() {
         return {
+            // 页眉处的姓名学号
             studentName: '',
             studentId: '',
+            // 临时登录的帐号密码
             account: '',
             password: '',
             // 当前是否已登录
@@ -207,113 +218,9 @@ export default {
             loginWindow: false,
             dialogVisible: false,
             // 新闻数据
-            news: [
-                {
-                    id: 0,
-                    title: '身体棒棒',
-                    time: '2019-11-8',
-                    setTop: 1,
-                    viewCount: 22
-                },
-                {
-                    id: 1,
-                    title: '身体棒棒身体棒棒身体棒棒身体棒棒',
-                    time: '2019-11-8',
-                    setTop: 1,
-                    viewCount: 5
-                },
-                {
-                    id: 2,
-                    title: '身体棒棒身体棒棒身体棒棒身体棒棒身体棒棒',
-                    time: '2019-11-8',
-                    setTop: 1,
-                    viewCount: 3
-                }
-            ],
-            questions: [
-                {
-                    id: 0,
-                    content: '怎么吃饭吃不胖',
-                    name: '张三',
-                    type: '生活帮助',
-                    time: '2019-6-8',
-                    setTop: false,
-                    solve: true,
-                    viewCount: 22,
-                    comment: 66
-                },
-                {
-                    id: 1,
-                    content: '不存在的，越吃越胖',
-                    name: '李四',
-                    type: '生活帮助',
-                    time: '2019-6-8',
-                    setTop: false,
-                    solve: true,
-                    viewCount: 0,
-                    comment: 7
-                },
-                {
-                    id: 2,
-                    content: '迈开腿管住嘴',
-                    name: '刘五',
-                    type: '生活帮助',
-                    time: '2019-6-8',
-                    setTop: true,
-                    solve: true,
-                    viewCount: 8,
-                    comment: 23
-                },
-                {
-                    id: 3,
-                    content: '不存在的',
-                    name: '张三',
-                    type: '生活帮助',
-                    time: '2019-6-8',
-                    setTop: false,
-                    solve: false,
-                    viewCount: 12,
-                    comment: 3
-                }
-            ],
-            goods: [
-                {
-                    id: 0,
-                    lost: true,
-                    name: '蓝色小水杯',
-                    // 是否学院托管
-                    trusteeship: false,
-                    place: '中区主球场',
-                    time: '2019-02-23'
-                },
-                {
-                    id: 1,
-                    lost: false,
-                    name: '卡西欧手表',
-                    // 是否学院托管
-                    trusteeship: true,
-                    place: '中区篮球场',
-                    time: '2019-06-04'
-                },
-                {
-                    id: 2,
-                    lost: false,
-                    name: '小米手机',
-                    // 是否学院托管
-                    trusteeship: true,
-                    place: '南区食堂',
-                    time: '2018-12-16'
-                },
-                {
-                    id: 3,
-                    lost: false,
-                    name: '一卡通171100220',
-                    // 是否学院托管
-                    trusteeship: false,
-                    place: '全校',
-                    time: '2019-06-11'
-                }
-            ],
+            news: [],
+            questions: [],
+            goods: [],
             documents: [
                 {
                     id: 0,
@@ -358,9 +265,7 @@ export default {
                 this.isLogin = true
                 // 更新姓名以及一卡通id
                 this.studentName = response.data.data.name
-                this.studentId = response.data.data.student_id
-                // 获取失物招领内容
-                this.getGoods()
+                this.studentId = response.data.data.account
             })
         },
         // 弹出登录框
@@ -423,7 +328,6 @@ export default {
                     Message.error(response.data.msg)
                     return
                 }
-                console.log(response.data.data)
                 this.questions = response.data.data.information
             })
         },
@@ -436,8 +340,7 @@ export default {
                     Message.error('您还未登录')
                     return
                 }
-                this.goods = response.data.data
-                console.log(response.data.data)
+                this.goods = response.data.data.rs
             })
         },
 
@@ -455,30 +358,79 @@ export default {
         // },
 
         // 跳转部分
-        // 跳转人中心页面
+        // 个人中心跳转
         goToUserCenter(){
-            console.log('跳转至个人中心')
             this.$router.push({ path: '/user-center/' })
         },
-        // 跳转至新闻中心页面
-        goToNewsPage(){
-            console.log('跳转至新闻中心')
-            this.$router.push({ name: 'NewsCenter' })
+        // 新闻中心跳转
+        goToNewsPage(newsId){
+            // 1.空则跳转至丢失页面
+            if (!newsId){
+                this.$router.push({ name: 'NewsCenter' })
+            }
+            // 2.id存在则跳转至详情页
+            this.$router.push({ name: `NewsDetail`,
+                params: {
+                    newsId
+                }
+            })
         },
-        // 跳转至在线问答页面
-        goToQuestionPage(){
-            console.log('跳转至在线问答页面')
-            this.$router.push({ name: 'Question' })
+
+        // 在线问答跳转
+        goToQuestionPage(questionId){
+            // 1.id为undefined就跳转至在线问答主页
+            if (!questionId){
+                this.$router.push({ name: 'Question' })
+                return
+            }
+            // 2.id为undefined就跳转至在线问答详情页
+            this.$router.push({ name: `QuestionSpecific`,
+                params: {
+                    questionId
+                }
+            })
         },
-        // 跳转至失物招领页面
-        goToLostAndFound(){
-            console.log('跳转至失物招领页面')
-            this.$router.push({ name: 'LostAndFound' })
+
+        // 失物招领跳转
+        goToLostAndFound(goodsId, sort){
+            // 判断sort的值
+            // 1则跳转至认领页面
+            // 2则跳转至失物招领主页
+            // undefined则跳转至丢失页面
+            switch (sort) {
+                case 0:
+                    this.$router.push({ name: `LostDetails`,
+                        params: {
+                            good_id: goodsId,
+                            sort
+                        }
+                    })
+                    break
+                case 1:
+                    this.$router.push({ name: `FoundDetails`,
+                        params: {
+                            good_id: goodsId,
+                            sort
+                        }
+                    })
+                    break
+                case undefined:
+                    this.$router.push({ name: `LostAndFound` })
+                    break
+            }
         },
-        // 跳转至资源共享页面
-        goToSourceShare(){
-            console.log('跳转至资源共享页面')
-            this.$router.push({ name: 'SourceShare' })
+        // 资源共享跳转
+        goToSourceShare(fileId){
+            // 1.空则跳转至丢失页面
+            if (!fileId){
+                this.$router.push({ name: 'SourceShare' })
+            }
+            // 2.id存在则跳转至详情页
+            this.$router.push({ name: `NewsDetail`,
+                params: {
+                    fileId
+                }
+            })
         }
     },
     created () {
@@ -670,7 +622,6 @@ main{
           padding: 15px 0;
           box-sizing: border-box;
           flex-direction: column;
-          box-sizing: border-box;
           &:nth-child(n+2){
             border-top: 1px solid gray;
 
