@@ -14,7 +14,7 @@
                     <div class="">
                         <el-divider></el-divider>
                     </div>
-                    {{ toText(newsvalue.news_content) }}
+                    <span v-html="newsvalue.news_content"> {{newsvalue.news_content}} </span>
                     <div class="">
                         <el-divider></el-divider>
                     </div>
@@ -139,11 +139,6 @@ export default {
                         newsId: this.next[0].nextId
                     } })
             }
-        },
-        // 将 vue.js 获取的 html 文本转化为纯文本
-        toText(HTML){
-            var input = HTML
-            return input.replace(/<(style|script|iframe)[^>]*?>[\s\S]+?<\/\1\s*>/gi, '').replace(/<[^>]+?>/g, '').replace(/\s+/g, ' ').replace(/ /g, ' ').replace(/>/g, ' ')
         }
     }
 }
@@ -151,7 +146,7 @@ export default {
 <style lang="less" scoped>
     .index{
         width: 1300px;
-        height: 800px;
+        max-height: 2000px;
         margin-left: 250px;
         margin-top: 30px;
         // border: 1px solid rgb(255, 4, 4);
@@ -196,7 +191,10 @@ export default {
         width: 1120px;
         // height: 100px;
         // border: 1px solid rgb(0, 0, 0);
-        text-align:center
+        text-align:center;
+        img{
+            text-align: center;
+        }
     }
     // 附件样式
     .appendix{
@@ -219,5 +217,8 @@ export default {
         height: 25px;
         background-color:#f8f8f9;
         // border: none;
+    }
+    Style Attribute {
+        text-align: center !important;
     }
 </style>
