@@ -22,7 +22,8 @@
                 <div class="appendix">附件：</div>
             <!-- 附件下载链接 -->
                 <div class="" v-for="path in storagePath" :key="path.index">
-                    <a :href="`${prefix.api}`+path" download="w3logo">{{path.split("/")[2]}}</a>
+                    <a :href="`${prefix.api}`+path" download="w3logo">{{path.split("-")[1]}}</a>
+                    <!-- <a :href="`${prefix.api}`+path" download="w3logo">{{path.split("/")[2]}}</a> -->
                     <br>
                 </div>
             </div>

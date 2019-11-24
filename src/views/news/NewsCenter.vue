@@ -99,6 +99,8 @@ export default {
                 } })
             // 获取cookie并传给后端
             var cookies = document.cookie
+            console.log(' 获取cookie')
+            console.log(cookies)
             this.$axios.post(prefix.api + newsApi.getNewsList, {
                 params: {
                     cookies
