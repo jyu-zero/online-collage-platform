@@ -10,7 +10,7 @@
                 <!-- <span class="">{{news.is_pinned}}</span> -->
                 <div class="up">
                     <div class="left">
-                        <div class="" v-if="news.is_pinned===1">[置顶] </div>
+                        <div class="whethertop" v-if="news.is_pinned===1">[置顶] </div>
                         <div class="content">{{news.news_title}}</div>
                         <div class="time">({{news.created_at}})</div>
                         <!-- <el-divider></el-divider> -->
@@ -26,6 +26,7 @@
         </el-card>
         <div class="page">
             <el-pagination
+                @font-size=90
                 :page-count="pageCount"
                 @current-change="getNewsList"
                 layout="prev, pager, next">
@@ -75,7 +76,7 @@ export default {
                 }
             })
                 .then((response)=>{
-                    console.log(response.data)
+                    // console.log(response.data)
                     if(!responseHandler(response.data, this)){
                         // 在这里处理错误
                         Message.error('请求失败')
@@ -85,18 +86,22 @@ export default {
                 })
         },
         toHomePage(){
-            console.log('跳转至主页')
+            // console.log('跳转至主页')
             this.$router.push({ name: 'Index' })
             // this.$router.push({ path: '/' })
         },
-        // param
+        // TODO
         goToDetailPage(id){
-            console.log('跳转至新闻具体页面')
-            console.log(id)
-            // this.$router.push({ name: 'NewsDetail',
+            // console.log('跳转至新闻具体页面')
             this.$router.push({ name: 'NewsDetail',
                 params: {
                     newsId: id
+                } })
+            // 获取cookie并传给后端
+            var cookies = document.cookie
+            this.$axios.post(prefix.api + newsApi.getNewsList, {
+                params: {
+                    cookies
                 } })
         }
     }
@@ -104,7 +109,7 @@ export default {
 
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
     .index{
         width: 1300px;
         height: 600px;
@@ -133,7 +138,20 @@ export default {
         display: flex;
         // 手势
         cursor: pointer;
+        // 是否置顶样式
+        .whethertop{
+            font-size: 20px;
+            font-weight:900;
+            // color: red;
+        }
+        // created_at 时间
+        .time{
+            // border: 1px solid rgb(0, 0, 0);
+            font-size: 15px;
+            margin-top: 5px;
+        }
     }
+    
     // 眼睛
     .eye{
         width: 30px;
@@ -153,7 +171,7 @@ export default {
         height: 100%;
         // border: 1px solid rgb(0, 0, 0);
         font-size: 20px;
-        margin-top: 20px;
+        // margin-top: 1px;
         // display: flex;
     }
     .up{
@@ -164,5 +182,13 @@ export default {
     }
     .box-card {
         width: 1300px;
+    }
+    .page{
+        margin-top: 30px;
+        font-size: 20px;
+        // border: 1px solid rgb(0, 0, 0);
+    }
+    .el-pager li {
+        font-size: 25px !important;
     }
 </style>

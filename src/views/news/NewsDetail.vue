@@ -14,12 +14,12 @@
                     <div class="">
                         <el-divider></el-divider>
                     </div>
-                    {{ newsvalue.news_content }}
+                    {{ toText(newsvalue.news_content) }}
                     <div class="">
                         <el-divider></el-divider>
                     </div>
-                    <div class="appendix">附件：</div>
                 </div>
+                <div class="appendix">附件：</div>
             <!-- 附件下载链接 -->
                 <div class="" v-for="path in storagePath" :key="path.index">
                     <a :href="`${prefix.api}`+path" download="w3logo">{{path.split("/")[2]}}</a>
@@ -29,12 +29,15 @@
             <!-- 附件下载链接完 -->
             <div class="block"></div>
             <!-- 上、下一篇 -->
-            <el-tooltip content="Top center" placement="top">
-                <el-button @click="goToPre()">{{pre.news_title}}</el-button>
-                </el-tooltip>
-                <el-tooltip content="Bottom center" placement="bottom" effect="light">
-                <el-button @click="goToNext()">{{next.news_title}}</el-button>
-            </el-tooltip>
+            <div class="">
+                上一篇：
+                <el-button @click="goToPre()">{{pre[0].preTitle}}</el-button>
+            </div>
+            <br>
+            <div class="">
+                下一篇：
+                <el-button @click="goToNext()">{{next[0].nextTitle}}</el-button>
+            </div>
         </div>
     </div>
 </template>
@@ -56,48 +59,38 @@ export default {
             prefix,
             // 接收参数
             id: this.$route.params.newsId,
-            news: [
-                {
-                    news_id: 3,
-                    news_title: '',
-                    created_at: '',
-                    author: '',
-                    news_content: ''
-                }
-            ],
-            pre: {
-                news_id: 2,
-                news_title: ''
-            },
-            next: {
-                news_id: 4,
-                news_title: ''
-            },
-            storagePath: [ ]
+            news: [],
+            pre: [],
+            next: [],
+            storagePath: []
         }
     },
     created() {
-        console.log(this.id)
         this.getNewDetail()
+    },
+    // 使用watch监听路由变化
+    watch: {
+        '$route'(to, from) {
+            this.$router.go(0)
+        }
     },
     methods: {
         // 跳转至主页
         toHomePage(){
-            console.log('跳转至主页')
+            // console.log('跳转至主页')
             // this.$router.push({ path: '/' })
             this.$router.push({ name: 'Index' })
         },
         // 跳转回新闻中心页
         toIndex(){
-            console.log('跳转至新闻中心')
-            // this.$router.push({ path: '/News-center' })
+            // console.log('跳转至新闻中心')
             this.$router.push({ name: 'NewsCenter' })
         },
         // 传参、获取详情页id及相关信息
         getNewDetail(){
             this.$axios.get(prefix.api + newsApi.getNewDetail, {
                 params: {
-                    Newsid: this.id
+                    newsId: this.id
                 }
             }).then(response => {
                 // console.log(response.data)
@@ -110,49 +103,47 @@ export default {
                 this.pre = response.data.data.pre
                 this.next = response.data.data.next
                 this.storagePath = response.data.data.storage_path
+                console.log(this.pre[0].preTitle)
+                console.log(this.next[0].nextTitle)
             })
         },
         // 跳转回上一篇新闻
         goToPre(){
-            console.log('跳转至上一篇')
-            // 接收id
-            this.$axios.get(prefix.api + newsApi.getNewDetail, {
-                params: {
-                    Newsid: this.id
-                }
-            }).then(response => {
-                // console.log(response.data)
-                if(!responseHandler(response.data, this)){
-                    // 提示出错
-                    Message.error('请求失败')
-                }
-                console.log(response)
-                this.news = response.data.data.new
-                this.pre = response.data.data.pre
-                this.next = response.data.data.next
-                this.storagePath = response.data.data.storage_path
-            })
+            // console.log(this.pre[0].preId)
+            // console.log('跳转至上一篇')
+            if(this.pre[0].preTitle === '没有上一篇'){
+                // this.$router.push({ name: 'NewsCenter' })
+                this.$router.push({ name: 'NewsDetail',
+                    params: {
+                        newsId: this.id
+                    } })
+            }else{
+                this.$router.push({ name: 'NewsDetail',
+                    params: {
+                        newsId: this.pre[0].preId
+                    } })
+            }
         },
         // 跳转到下一篇新闻
         goToNext(){
-            console.log('跳转至下一篇')
-            // 接收id
-            this.$axios.get(prefix.api + newsApi.getNewDetail, {
-                params: {
-                    Newsid: this.id
-                }
-            }).then(response => {
-                // console.log(response.data)
-                if(!responseHandler(response.data, this)){
-                    // 提示出错
-                    Message.error('请求失败')
-                }
-                console.log(response)
-                this.news = response.data.data.new
-                this.pre = response.data.data.pre
-                this.next = response.data.data.next
-                this.storagePath = response.data.data.storage_path
-            })
+            // console.log('跳转至下一篇')
+            if(this.next[0].nextTitle === '没有下一篇'){
+                // this.$router.push({ name: 'NewsCenter' })
+                this.$router.push({ name: 'NewsDetail',
+                    params: {
+                        newsId: this.id
+                    } })
+            }else{
+                this.$router.push({ name: 'NewsDetail',
+                    params: {
+                        newsId: this.next[0].nextId
+                    } })
+            }
+        },
+        // 将 vue.js 获取的 html 文本转化为纯文本
+        toText(HTML){
+            var input = HTML
+            return input.replace(/<(style|script|iframe)[^>]*?>[\s\S]+?<\/\1\s*>/gi, '').replace(/<[^>]+?>/g, '').replace(/\s+/g, ' ').replace(/ /g, ' ').replace(/>/g, ' ')
         }
     }
 }
@@ -184,11 +175,12 @@ export default {
         // border: 1px solid rgb(0, 0, 0);
     }
     .title{
-        width: 1300px;
+        width: 1120px;
         height: 45px;
         margin-top: 20px;
         font-size: 30px;
         // border: 1px solid rgb(0, 0, 0);
+        text-align:center
     }
     .time{
         margin-right: 15px;
@@ -204,6 +196,7 @@ export default {
         width: 1120px;
         // height: 100px;
         // border: 1px solid rgb(0, 0, 0);
+        text-align:center
     }
     // 附件样式
     .appendix{
