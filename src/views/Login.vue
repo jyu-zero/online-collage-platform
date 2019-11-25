@@ -32,14 +32,14 @@ export default {
     data(){
         return{
             labelPosition: 'right',
-            id: '',
+            account: '',
             password: ''
         }
     },
     methods: {
         login() {
             // 登录验证
-            if(this.id.trim() === '') {
+            if(this.account.trim() === '') {
                 Message.error('请输入账号!')
                 return
             }
@@ -49,7 +49,7 @@ export default {
             }
             this.$axios
                 .post(prefix.api + userApi.login, {
-                    id: this.id,
+                    account: this.account,
                     password: this.password
                 })
                 .then((response) => {
