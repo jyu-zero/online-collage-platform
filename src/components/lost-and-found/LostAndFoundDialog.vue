@@ -148,12 +148,13 @@
                 <div class="question-list">
                     <h3>设置三个物品校验问题</h3>
                     <span>仅有回答全部正确的人才能取得您的联系方式</span>
+                    <!-- question.goods_id这个东西怎么获取 -->
                     <ul class="check-questions">
-                        <li>
-                            <span>问题一
+                        <li v-for="(question,index) of questionAndAnswers" :key="question.questionContent">
+                            <span>问题{{index+1}}
                                 <el-input
                                 placeholder="请输入内容"
-                                v-model="question1"
+                                v-model="question.questionContent"
                                 clearable>
                                 </el-input>
                             </span>
@@ -162,7 +163,7 @@
                                     <div class="option"><span>A</span></div>
                                     <el-input
                                     placeholder="请输入内容"
-                                    v-model="question1A"
+                                    v-model="question.questionAnswer[0].answer"
                                     clearable>
                                     </el-input>
                                 </dt>
@@ -170,7 +171,7 @@
                                     <div class="option"><span>B</span></div>
                                     <el-input
                                     placeholder="请输入内容"
-                                    v-model="question1B"
+                                    v-model="question.questionAnswer[1].answer"
                                     clearable>
                                     </el-input>
                                 </dt>
@@ -178,7 +179,7 @@
                                     <div class="option"><span>C</span></div>
                                     <el-input
                                     placeholder="请输入内容"
-                                    v-model="question1C"
+                                    v-model="question.questionAnswer[2].answer"
                                     clearable>
                                     </el-input>
                                 </dt>
@@ -186,94 +187,22 @@
                                     <div class="option"><span>D</span></div>
                                     <el-input
                                     placeholder="请输入内容"
-                                    v-model="question1D"
+                                    v-model="question.questionAnswer[3].answer"
                                     clearable>
                                     </el-input>
                                 </dt>
                             </dl>
-                        </li>
-                        <li>
-                            <span>问题二</span>
-                            <el-input
-                            placeholder="请输入内容"
-                            v-model="question2"
-                            clearable>
-                            </el-input>
+                            <!-- 正确答案 -->
                             <dl>
-                                <dt>
-                                    <div class="option"><span>A</span></div>
-                                    <el-input
-                                    placeholder="请输入内容"
-                                    v-model="question1A"
-                                    clearable>
-                                    </el-input>
-                                </dt>
-                                <dt>
-                                    <div class="option"><span>B</span></div>
-                                    <el-input
-                                    placeholder="请输入内容"
-                                    v-model="question1B"
-                                    clearable>
-                                    </el-input>
-                                </dt>
-                                <dt>
-                                    <div class="option"><span>C</span></div>
-                                    <el-input
-                                    placeholder="请输入内容"
-                                    v-model="question1C"
-                                    clearable>
-                                    </el-input>
-                                </dt>
-                                <dt>
-                                    <div class="option"><span>D</span></div>
-                                    <el-input
-                                    placeholder="请输入内容"
-                                    v-model="question1D"
-                                    clearable>
-                                    </el-input>
-                                </dt>
-                            </dl>
-                        </li>
-                        <li>
-                            <span>问题三</span>
-                            <el-input
-                            placeholder="请输入内容"
-                            v-model="question3"
-                            clearable>
-                            </el-input>
-                            <dl>
-                                <dt>
-                                    <div class="option"><span>A</span></div>
-                                    <el-input
-                                    placeholder="请输入内容"
-                                    v-model="question1A"
-                                    clearable>
-                                    </el-input>
-                                </dt>
-                                <dt>
-                                    <div class="option"><span>B</span></div>
-                                    <el-input
-                                    placeholder="请输入内容"
-                                    v-model="question1B"
-                                    clearable>
-                                    </el-input>
-                                </dt>
-                                <dt>
-                                    <div class="option"><span>C</span></div>
-                                    <el-input
-                                    placeholder="请输入内容"
-                                    v-model="question1C"
-                                    clearable>
-                                    </el-input>
-                                </dt>
-                                <dt>
-                                    <div class="option"><span>D</span></div>
-                                    <el-input
-                                    placeholder="请输入内容"
-                                    v-model="question1D"
-                                    clearable>
-                                    </el-input>
-                                </dt>
+                                <el-select v-model="value" placeholder="请设置正确选项">
+                                    <el-option
+                                    v-for="item in question.questionAnswer"
+                                    :key="item.value"
+                                    :label="item.answer"
+                                    :value="item.value"
+                                    >
+                                    </el-option>
+                                </el-select>
                             </dl>
                         </li>
                     </ul>
@@ -315,7 +244,8 @@
 </template>
 
 <script>
-import { Button, Dialog, Input, Upload, MessageBox, Radio, Message } from 'element-ui'
+import { Button, Dialog, Input, Upload, MessageBox, Radio, Message, Select, Option } from 'element-ui'
+import { prefix, goodsApi } from '@/api'
 export default {
     components: {
         name: 'LostAndFoundDialog',
@@ -325,7 +255,9 @@ export default {
         [Upload.name]: Upload,
         [MessageBox.name]: MessageBox,
         [Radio.name]: Radio,
-        [Message.name]: Message
+        [Message.name]: Message,
+        [Select.name]: Select,
+        [Option.name]: Option
     },
     data() {
         return {
@@ -343,14 +275,38 @@ export default {
             inputUserName: '',
             // 发布者联系方式
             inputTelephone: '',
+            // 正确答案
+            value: '',
             // 问题及其答案
-            question1: '',
-            question1A: '',
-            question1B: '',
-            question1C: '',
-            question1D: '',
-            question2: '',
-            question3: '',
+            questionAndAnswers: [
+                {
+                    questionContent: '1',
+                    questionAnswer: [
+                        { value: '选项1', answer: '11' },
+                        { value: '选项2', answer: '12' },
+                        { value: '选项3', answer: '13' },
+                        { value: '选项4', answer: '14' }
+                    ]
+                },
+                {
+                    questionContent: '2',
+                    questionAnswer: [
+                        { value: '选项1', answer: '21' },
+                        { value: '选项2', answer: '22' },
+                        { value: '选项3', answer: '23' },
+                        { value: '选项4', answer: '24' }
+                    ]
+                },
+                {
+                    questionContent: '3',
+                    questionAnswer: [
+                        { value: '选项1', answer: '31' },
+                        { value: '选项2', answer: '32' },
+                        { value: '选项3', answer: '33' },
+                        { value: '选项4', answer: '34' }
+                    ]
+                }
+            ],
             // 图片的名字和url
             fileList: [
                 // { name: '', url: '' }
@@ -394,7 +350,7 @@ export default {
         },
         sort: {
             type: Number,
-            default: 2
+            default: 3
         }
     },
     methods: {
@@ -432,6 +388,18 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
+                this.$axios.post(prefix.api + goodsApi.addLost, {
+                    user_id: 1,
+                    title: this.inputTitle,
+                    name: this.inputName,
+                    place: this.inputPlace,
+                    time: this.inputTime,
+                    contact_name: this.inputUserName,
+                    contact_num: this.inputTelephone
+                })
+                    .then(response => {
+                        console.log(response.data)
+                    })
                 Message({
                     type: 'success',
                     message: '发布成功!'
@@ -625,9 +593,16 @@ ul,li {
                     .el-input__inner{
                         width: 350px;
                         height: 35px;
-                        .el-input__suffix{
-                            background-color: pink;
-                        }
+                    }
+                    .el-input__suffix{
+                        margin-right: 10px;
+                    }
+                }
+                :nth-child(5){
+                    i{
+                        line-height: 16px;
+                        // background-color: pink;
+                        transform-origin: center;
                     }
                 }
                 
