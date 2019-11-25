@@ -92,7 +92,7 @@ export default {
                     Message.error(response.data.msg)
                 }
                 Message.success(response.data.msg)
-                this.$router.push({ name: 'HomePage' })
+                this.$router.push({ name: 'Login' })
             })
         },
         // 获取学生姓名卡号
@@ -101,7 +101,7 @@ export default {
                 if(!responseHandler(response.data, this)){
                     // 提示出错
                     Message.error('您还未登录')
-                    this.$router.push({ name: 'HomePage' })
+                    this.$router.push({ name: 'Login' })
                     return
                 }
                 // 更新姓名以及一卡通id

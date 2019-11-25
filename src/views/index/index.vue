@@ -24,8 +24,6 @@
           </el-dropdown>
         </div>
         <!--下拉菜单.结束-->
-        <!--登录按钮-->
-        <el-button  id="go-to-login" type="info"  plain v-if="!isLogin" @click="showLoginWindow" >登录</el-button>
       </header>
 
       <!--主体部分-->
@@ -165,30 +163,6 @@
             </div>
 
         </main>
-        <!--登录窗口-->
-        <div id="login-container" v-if="loginWindow" >
-          <span id="cancel-btn"  @click="showLoginWindow">×</span>
-          <h2>登录窗口</h2>
-          <p>学号</p>
-          <el-input  v-model="account" placeholder="请输入学号" ></el-input>
-          <p>密码</p>
-          <el-input  type="password" v-model="password" placeholder="请输入密码"></el-input>
-          <p><el-button type="text" @click="dialogVisible = true">忘记密码？</el-button></p>
-          <div class="btn-container">
-          <el-button  id="login-btn" type="info" @click="login"  plain >登录</el-button>
-          </div>
-        </div>
-        <!--忘记密码的弹窗提示-->
-        <el-dialog
-        title="提示"
-        :visible.sync="dialogVisible"
-        width="30%"
-       >
-        <span>请带上学生证,并写一份保证书前往锡昌科技大楼116重置密码</span>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="dialogVisible = false" type="info" plain class="understand-btn">了解</el-button>
-        </span>
-      </el-dialog>
     </div>
 </template>
 
@@ -209,11 +183,8 @@ export default {
     data() {
         return {
             // 页眉处的姓名学号
-            studentName: '',
-            studentId: '',
-            // 临时登录的帐号密码
+            name: '',
             account: '',
-            password: '',
             // 当前是否已登录
             isLogin: false,
             // 登录窗口开关变量
@@ -278,40 +249,14 @@ export default {
                 if(!responseHandler(response.data, this)){
                     // 提示出错
                     Message.error('您还未登录')
+                    this.$router.push({ name: 'Login' })
                     return
                 }
                 this.isLogin = true
                 // 更新姓名以及一卡通id
-                this.studentName = response.data.data.name
-                this.studentId = response.data.data.account
+                this.name = response.data.data.name
+                this.account = response.data.data.account
             })
-        },
-        // 弹出登录框
-        showLoginWindow() {
-            this.loginWindow = !this.loginWindow
-            this.account = ''
-            this.password = ''
-        },
-        // 登录
-        login(){
-            if(!this.account || !this.password){
-                Message.error('帐号密码不能为空')
-                return
-            }
-            this.$axios
-                .post(prefix.api + userApi.login, { account: this.account, password: this.password })
-                .then((response)=>{
-                    if(!responseHandler(response.data, this)){
-                        // 提示出错
-                        Message.error(response.data.msg)
-                        return;
-                    }
-                    this.getUserName()
-                    this.showLoginWindow()
-                    this.account = ''
-                    this.password = ''
-                    Message.success(response.data.msg)
-                })
         },
         // 注销
         logout(){
@@ -320,7 +265,7 @@ export default {
                     // 提示出错
                     Message.error(response.data.msg)
                 }
-                this.isLogin = false
+                this.$router.push({ name: 'Login' })
                 Message.success(response.data.msg)
             })
         },
@@ -356,7 +301,7 @@ export default {
             this.$axios.get(prefix.api + goodsApi.getGoods).then((response)=>{
                 if(!responseHandler(response.data, this)){
                     // 提示出错
-                    Message.error('您还未登录')
+                    Message.error(response.data.msg)
                     return
                 }
                 this.goods = response.data.data.rs
