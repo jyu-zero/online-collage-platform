@@ -4,7 +4,7 @@
       <header v-cloak>
         <h1>在线学院平台</h1>
         <!--下拉菜单-->
-        <div class="header-right"  v-if="isLogin" >
+        <div class="header-right" >
           <div class="new-msg">
             <i class="el-icon-message"></i>
             <span class="msg-num">996</span>
@@ -12,8 +12,8 @@
           <el-dropdown trigger="click"  >
                   <span class="el-dropdown-link " id='dropdown-btn'>
                       <div>
-                          <div class="user-name" >{{this.studentName}}</div>
-                          <div class="user-id" >{{this.studentId}}</div>
+                          <div class="user-name" >{{this.name}}</div>
+                          <div class="user-id" >{{this.account}}</div>
                       </div>
                       <i class="el-icon-arrow-down el-icon--right"></i>
                   </span>
@@ -95,7 +95,7 @@
             <!--主体右侧-->
             <div class="main-right">
                 <!--用户中心-->
-                <div class="user-info"  v-if="isLogin">
+                <div class="user-info">
                   <div id="num-msg">
                     <ul>
                       <li><p id="article-count">24</p>我的问题</li>
@@ -185,11 +185,6 @@ export default {
             // 页眉处的姓名学号
             name: '',
             account: '',
-            // 当前是否已登录
-            isLogin: false,
-            // 登录窗口开关变量
-            loginWindow: false,
-            dialogVisible: false,
             // 新闻数据
             news: [
                 {
@@ -250,12 +245,14 @@ export default {
                     // 提示出错
                     Message.error('您还未登录')
                     this.$router.push({ name: 'Login' })
-                    return
+                    return false
                 }
-                this.isLogin = true
                 // 更新姓名以及一卡通id
                 this.name = response.data.data.name
                 this.account = response.data.data.account
+                this.getGoods()
+                this.getNewsList()
+                this.getQuestion()
             })
         },
         // 注销
@@ -403,9 +400,6 @@ export default {
     created () {
         // 获取一卡通号和姓名
         this.getUserName()
-        this.getGoods()
-        this.getNewsList()
-        this.getQuestion()
     }
 }
 </script>
