@@ -49,7 +49,7 @@ export default {
             }
             this.$axios
                 .post(prefix.api + userApi.login, {
-                    accout: this.account,
+                    id: this.id,
                     password: this.password
                 })
                 .then((response) => {
