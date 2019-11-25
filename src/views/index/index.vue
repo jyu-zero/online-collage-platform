@@ -304,6 +304,7 @@ export default {
                     if(!responseHandler(response.data, this)){
                         // 提示出错
                         Message.error(response.data.msg)
+                        return;
                     }
                     this.getUserName()
                     this.showLoginWindow()
