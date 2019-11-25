@@ -17,9 +17,9 @@
                       </div>
                       <i class="el-icon-arrow-down el-icon--right"></i>
                   </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item icon="el-icon-user" ><span @click="goToUserCenter">个人中心</span></el-dropdown-item>
-              <el-dropdown-item icon="el-icon-close" ><span @click="logout">注销</span></el-dropdown-item>
+            <el-dropdown-menu slot="dropdown" class="header-dropdown">
+              <el-dropdown-item icon="el-icon-user" @click.native="goToUserCenter">个人中心</el-dropdown-item>
+              <el-dropdown-item icon="el-icon-close" @click.native="logout">注销</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
@@ -38,11 +38,11 @@
                       <h2>新闻中心</h2>
                       <span @click="goToNewsPage">查看更多</span>
                   </div>
-                  <dl class="news-list" @click="goToNewsPage">
-                      <dt class="news-item"
-                        v-for="(item,index) of news"
-                        :key="index"
-                        :data-index='index'>
+                  <ul class="news-list" @click="goToNewsPage">
+                      <li class="news-item"
+                        v-for="item of news"
+                        :key="item.news_id"
+                        :data-id='item.news_id'>
                           <span class="set-top-label" v-if="item.is_pinned===1">[置顶] </span>
                           <span class="news-title">{{item.news_title}}  </span>
                           <span class="news-date">({{item.created_at}})</span>
@@ -50,8 +50,8 @@
                               <font-awesome-icon icon="eye" />
                               {{item.views}}
                           </span>
-                      </dt>
-                  </dl>
+                      </li>
+                  </ul>
                 </div>
                 <!--在线问答-->
                 <div class="online-question">
@@ -504,6 +504,11 @@ header{
     display: flex;
     justify-content: center;
     align-items: center;
+    ul{
+      li{
+        width: 140px;
+      }
+    }
     .new-msg{
       margin-right: 30px;
       display: flex;
@@ -524,7 +529,11 @@ header{
     }
   }
 }
-
+.header-dropdown{
+  li{
+    width: 140px;
+  }
+}
 @left:65%;
 @right:100%-@left;
 @labelBackground: #eaedeb;

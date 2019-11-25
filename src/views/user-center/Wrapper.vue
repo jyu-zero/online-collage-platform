@@ -17,9 +17,9 @@
                       </div>
                       <i class="el-icon-arrow-down el-icon--right"></i>
                   </span>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item icon="el-icon-user" ><span @click="goToUserCenter">个人中心</span></el-dropdown-item>
-                <el-dropdown-item icon="el-icon-close" ><span @click="logout">注销</span></el-dropdown-item>
+              <el-dropdown-menu slot="dropdown" class="header-dropdown">
+                <el-dropdown-item icon="el-icon-user" @click.native="goToUserCenter">个人中心</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-close" @click.native="logout">注销</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </div>
@@ -209,6 +209,11 @@ export default {
             height:100%;
             overflow: auto;
         }
+    }
+}
+.header-dropdown{
+    li{
+        width: 140px;
     }
 }
 </style>

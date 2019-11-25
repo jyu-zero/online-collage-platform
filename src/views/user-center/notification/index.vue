@@ -135,7 +135,7 @@ export default {
             pageCount: 5,
             pageSize: 5,
             currentPage: 1,
-            total: 30,
+            total: 0,
             // 已读item会被记录在这里
             readArray: []
         }
