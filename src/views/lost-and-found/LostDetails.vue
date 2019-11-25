@@ -48,7 +48,7 @@
                                     </el-col>
                                 </el-row>
                                 <el-row class="contact-information">
-                                    <el-collapse v-model="activeNames" @change="handleChange">
+                                    <el-collapse >
                                         <el-collapse-item title="点击查看联系人信息" name="1">
                                             <el-row class="contact-information-contain">{{contactName}} {{contactPhone}}</el-row>
                                         </el-collapse-item>
