@@ -2,7 +2,7 @@
     <div class="home-page" >
       <!--头部-->
       <header v-cloak>
-        <h1>线上学院平台</h1>
+        <h1>在线学院平台</h1>
         <!--下拉菜单-->
         <div class="header-right"  v-if="isLogin" >
           <div class="new-msg">
@@ -17,9 +17,9 @@
                       </div>
                       <i class="el-icon-arrow-down el-icon--right"></i>
                   </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item icon="el-icon-user" ><span @click="goToUserCenter">个人中心</span></el-dropdown-item>
-              <el-dropdown-item icon="el-icon-close" ><span @click="logout">注销</span></el-dropdown-item>
+            <el-dropdown-menu slot="dropdown" class="header-dropdown">
+              <el-dropdown-item icon="el-icon-user" @click.native="goToUserCenter">个人中心</el-dropdown-item>
+              <el-dropdown-item icon="el-icon-close" @click.native="logout">注销</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
@@ -38,20 +38,20 @@
                       <h2>新闻中心</h2>
                       <span @click="goToNewsPage">查看更多</span>
                   </div>
-                  <dl class="news-list">
-                    <dt class="news-item"
-                        v-for="(item,index) of news"
-                        :key="index"
-                        @click="goToNewsPage(index)">
-                      <span class="set-top-label" v-if="item.is_pinned===1">[置顶] </span>
-                      <span class="news-title">{{item.news_title}}  </span>
-                      <span class="news-date">({{item.created_at}})</span>
-                      <span class="watch-times-count">
-                        <font-awesome-icon icon="eye" />
-                         {{item.viewCount}}
-                      </span>
-                    </dt>
-                  </dl>
+                  <ul class="news-list" @click="goToNewsPage">
+                      <li class="news-item"
+                        v-for="item of news"
+                        :key="item.news_id"
+                        :data-id='item.news_id'>
+                          <span class="set-top-label" v-if="item.is_pinned===1">[置顶] </span>
+                          <span class="news-title">{{item.news_title}}  </span>
+                          <span class="news-date">({{item.created_at}})</span>
+                          <span class="watch-times-count">
+                              <font-awesome-icon icon="eye" />
+                              {{item.views}}
+                          </span>
+                      </li>
+                  </ul>
                 </div>
                 <!--在线问答-->
                 <div class="online-question">
@@ -59,35 +59,37 @@
                       <h2>在线问答</h2>
                       <span @click="goToQuestionPage()">查看更多</span>
                   </div>
-                  <dl class="question-list">
-                    <dt class="question-item"
+                  <dl class="question-list"
+                  @click="goToQuestionPage">
+                      <dt class="question-item"
                         v-for="item of questions"
                         :key="item.questionId"
-                        @click="goToQuestionPage(item.questionId)">
-                      <div class="question-status">
-                        <span v-if="item.status===1">已解决</span>
-                        <span v-else>待解决</span>
-                      </div>
-                      <div class="question-info">
-                        <h3>{{item.title}}<span v-if="item.isPinned">置顶</span></h3>
-                        <div>
-                          <div>
-                            由
-                            <span class="quizzer"> {{item.name}} </span>
-                            提问
-                            <span class="question-time">{{item.time}}  </span>
-                            <font-awesome-icon icon="tag" />
-                            <span class="question-type">{{item.typeName}}</span>
+                        :data-id="item.questionId"
+                        >
+                          <div class="question-status">
+                              <span v-if="item.status===1">已解决</span>
+                              <span v-else>待解决</span>
                           </div>
-                          <div class="view-reply-count">
-                            <font-awesome-icon icon="eye" />
-                            <span class="count">{{item.viewCount}}</span>
-                            <font-awesome-icon icon="comment-dots" />
-                            <span class="count">{{item.solutionsNum}}</span>
+                          <div class="question-info">
+                              <h3>{{item.title}}<span v-if="item.isPinned">置顶</span></h3>
+                              <div>
+                                  <div>
+                                      由
+                                      <span class="quizzer"> {{item.name}} </span>
+                                      提问
+                                      <span class="question-time">{{item.time}}  </span>
+                                      <font-awesome-icon icon="tag" />
+                                      <span class="question-type">{{item.typeName}}</span>
+                                  </div>
+                                  <div class="view-reply-count">
+                                      <font-awesome-icon icon="eye" />
+                                      <span class="count">{{item.viewCount}}</span>
+                                      <font-awesome-icon icon="comment-dots" />
+                                      <span class="count">{{item.solutionsNum}}</span>
+                                  </div>
+                              </div>
                           </div>
-                        </div>
-                      </div>
-                    </dt>
+                      </dt>
                   </dl>
                 </div>
             </div>
@@ -137,7 +139,7 @@
                 <div class="source-share">
               <div class="container-header">
                 <h2>资料共享</h2>
-                <span @click="goToSourceShare()">查看更多</span>
+                <span @click="goToSourceShare">查看更多</span>
               </div>
               <dl class="document-list">
                 <dt class="document-item" v-for="item of documents" :key="item.id" >
@@ -218,7 +220,23 @@ export default {
             loginWindow: false,
             dialogVisible: false,
             // 新闻数据
-            news: [],
+            news: [
+                {
+                    'news_title': '啊哈哈哈',
+                    'views': 66,
+                    'created_at': '2019-06-08'
+                },
+                {
+                    'news_title': '啊哈哈哈',
+                    'views': 66,
+                    'created_at': '2019-06-08'
+                },
+                {
+                    'news_title': '啊哈哈哈',
+                    'views': 66,
+                    'created_at': '2019-06-08'
+                }
+            ],
             questions: [],
             goods: [],
             documents: [
@@ -315,7 +333,7 @@ export default {
                     Message.error(response.data.msg)
                     return
                 }
-                this.news = response.data.data.news
+                this.news = response.data.data
             })
         },
 
@@ -362,31 +380,43 @@ export default {
         goToUserCenter(){
             this.$router.push({ path: '/user-center/' })
         },
+        // 递归寻找dt元素
+        recursion(e){
+            // 不断往上爬直到获取dt，遇到body则返回null
+            if(e.tagName !== 'DT'){
+                if(e.tagName === 'BODY'){
+                    return null
+                }
+                return this.recursion(e.parentNode)
+            }
+            return e
+        },
         // 新闻中心跳转
-        goToNewsPage(newsId){
-            // 1.空则跳转至丢失页面
-            if (!newsId){
+        goToNewsPage(event){
+            let element = this.recursion(event.target)
+            // 1.空则跳转至新闻中心
+            if (!element){
                 this.$router.push({ name: 'NewsCenter' })
             }
-            // 2.id存在则跳转至详情页
+            // 2.element(dt)存在则跳转至详情页
             this.$router.push({ name: `NewsDetail`,
                 params: {
-                    newsId
+                    newsId: element.dataset.index
                 }
             })
         },
 
         // 在线问答跳转
-        goToQuestionPage(questionId){
-            // 1.id为undefined就跳转至在线问答主页
-            if (!questionId){
+        goToQuestionPage(event){
+            let element = this.recursion(event.target)
+            // 1.id为null就跳转至在线问答主页
+            if (!element){
                 this.$router.push({ name: 'Question' })
-                return
             }
-            // 2.id为undefined就跳转至在线问答详情页
+            // 2.element(dt)存在就跳转至在线问答详情页
             this.$router.push({ name: `QuestionSpecific`,
                 params: {
-                    questionId
+                    questionId: element.dataset.id
                 }
             })
         },
@@ -420,17 +450,8 @@ export default {
             }
         },
         // 资源共享跳转
-        goToSourceShare(fileId){
-            // 1.空则跳转至丢失页面
-            if (!fileId){
-                this.$router.push({ name: 'SourceShare' })
-            }
-            // 2.id存在则跳转至详情页
-            this.$router.push({ name: `NewsDetail`,
-                params: {
-                    fileId
-                }
-            })
+        goToSourceShare(){
+            this.$router.push({ name: 'SourceShare' })
         }
     },
     created () {
@@ -451,14 +472,15 @@ export default {
 .home-page{
   width: 100%;
   background: @pageBg;
-
+  min-width: 1200px;
 }
 header{
   z-index: 2;
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
+  min-width: 1200px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -482,6 +504,11 @@ header{
     display: flex;
     justify-content: center;
     align-items: center;
+    ul{
+      li{
+        width: 140px;
+      }
+    }
     .new-msg{
       margin-right: 30px;
       display: flex;
@@ -502,7 +529,11 @@ header{
     }
   }
 }
-
+.header-dropdown{
+  li{
+    width: 140px;
+  }
+}
 @left:65%;
 @right:100%-@left;
 @labelBackground: #eaedeb;
@@ -512,7 +543,8 @@ main{
   z-index: 1;
   height: 100%;
   /*宽度问题有必要探讨一下*/
-  max-width: 1400px;
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   margin: 0 auto;
   *{
