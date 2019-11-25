@@ -9,7 +9,7 @@
             <el-input class="el-input" placeholder="请输入内容" v-model="search" clearable></el-input>
         </div>
         <div class="lost-found-list">
-            <ul v-for="item of goods" :key="item.good_id">
+            <ul v-for="item of goods" :key="item.id">
                 <li>
                     <div class="lost-and-found-list-left">
                         <div class="lost-and-found-type">

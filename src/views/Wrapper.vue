@@ -4,6 +4,7 @@
         <header>
             <h1>在线学院平台</h1>
           <div class="header-right"  >
+            <div id="home-page-btn" @click="goToHomePage">主页</div>
             <div class="new-msg">
               <i class="el-icon-message"></i>
               <span class="msg-num">996</span>
@@ -16,9 +17,9 @@
                       </div>
                       <i class="el-icon-arrow-down el-icon--right"></i>
                   </span>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item icon="el-icon-user" ><span @click="goToUserCenter">个人中心</span></el-dropdown-item>
-                <el-dropdown-item icon="el-icon-close" ><span @click="logout">注销</span></el-dropdown-item>
+             <el-dropdown-menu slot="dropdown" class="header-dropdown">
+                <el-dropdown-item icon="el-icon-user" @click.native="goToUserCenter">个人中心</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-close" @click.native="logout">注销</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </div>
@@ -81,6 +82,7 @@ export default {
         }
     },
     methods: {
+
         // 注销
         logout(){
             // console.log('sss')
@@ -104,13 +106,16 @@ export default {
                 }
                 // 更新姓名以及一卡通id
                 this.studentName = response.data.data.name
-                this.studentId = response.data.data.student_id
+                this.studentId = response.data.data.account
             })
         },
         // 跳转至个人中心，相当于跳转通知栏页面
         goToUserCenter(){
-            console.log('跳转至个人中心')
             this.$router.push({ path: '/user-center/' })
+        },
+        // 跳转主页
+        goToHomePage(){
+            this.$router.push({ name: 'Index' })
         }
     },
     created() {
@@ -144,6 +149,10 @@ export default {
             display: flex;
             justify-content: center;
             align-items: center;
+            #home-page-btn{
+              margin-right: 20px;
+              cursor: pointer;
+            }
                 .new-msg{
                       margin-right: 30px;
                       display: flex;
@@ -183,6 +192,11 @@ export default {
             height:100%;
             overflow: auto;
         }
+    }
+}
+.header-dropdown{
+    li{
+        width: 140px;
     }
 }
 </style>
