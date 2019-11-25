@@ -3,13 +3,13 @@
     <div class="login">
         <h1 align="center">线上学院平台</h1>
             <div style="margin: 0;"></div>
-            <el-form :label-position="labelPosition" label-width="80px" :model="formLabelAlign">
+            <el-form :label-position="labelPosition" label-width="80px">
                 <!-- <font-awesome-icon icon="user-o"/> -->
                 <el-form-item label="账号：">
-                    <el-input v-model="formLabelAlign.id"></el-input>
+                    <el-input v-model="id"></el-input>
                 </el-form-item>
                 <el-form-item label="密码：">
-                    <el-input v-model="formLabelAlign.password" show-password></el-input>
+                    <el-input v-model="password" show-password></el-input>
                 </el-form-item>
                 <el-button type="primary" @click="login">登录</el-button>
             </el-form>
@@ -32,27 +32,25 @@ export default {
     data(){
         return{
             labelPosition: 'right',
-            formLabelAlign: {
-                id: '',
-                password: ''
-            }
+            id: '',
+            password: ''
         }
     },
     methods: {
         login() {
             // 登录验证
-            if(this.formLabelAlign.id.trim() === '') {
+            if(this.id.trim() === '') {
                 Message.error('请输入账号!')
                 return
             }
-            if(this.formLabelAlign.password.trim() === '') {
+            if(this.password.trim() === '') {
                 Message.error('请输入密码!')
                 return
             }
             this.$axios
                 .post(prefix.api + userApi.login, {
-                    id: this.formLabelAlign.id,
-                    password: this.formLabelAlign.password
+                    id: this.id,
+                    password: this.password
                 })
                 .then((response) => {
                     if(response.data.code !== '0000'){
