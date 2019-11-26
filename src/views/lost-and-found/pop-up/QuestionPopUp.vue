@@ -2,10 +2,10 @@
     <div class="question-pop-up">
         <el-row class="question-contain" v-for="(questionsItem,index) of questions " :key="index" >
             <el-row class="question">问题{{index+1}}. {{questionsItem.question}}</el-row>
-            <el-row class="select"><el-radio v-model="answer[index]" label="A">A. {{questionsItem.a}}</el-radio></el-row>
-            <el-row class="select"><el-radio v-model="answer[index]" label="B">B. {{questionsItem.b}}</el-radio></el-row>
-            <el-row class="select"><el-radio v-model="answer[index]" label="C">C. {{questionsItem.c}}</el-radio></el-row>
-            <el-row class="select"><el-radio v-model="answer[index]" label="D">D. {{questionsItem.d}}</el-radio></el-row>
+            <el-row class="select"><el-radio v-model="answer[index]" label="a">A. {{questionsItem.a}}</el-radio></el-row>
+            <el-row class="select"><el-radio v-model="answer[index]" label="b">B. {{questionsItem.b}}</el-radio></el-row>
+            <el-row class="select"><el-radio v-model="answer[index]" label="c">C. {{questionsItem.c}}</el-radio></el-row>
+            <el-row class="select"><el-radio v-model="answer[index]" label="d">D. {{questionsItem.d}}</el-radio></el-row>
         </el-row>
         <el-divider></el-divider>
 
@@ -74,9 +74,10 @@ export default {
             axios
                 .post(prefix.api + goodsApi.giveLostQuestion, {
                     good_id: 1,
-                    anwserOne: this.answer[0],
-                    anwserTwo: this.answer[1],
-                    anwserThree: this.answer[2]
+                    sort: 1,
+                    answerOne: this.answer[0],
+                    answerTwo: this.answer[1],
+                    answerThree: this.answer[2]
                 })
                 .then(response => {
                     this.name = response.data.data.rs[0].found_name
