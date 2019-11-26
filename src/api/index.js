@@ -6,6 +6,7 @@ import notification from './notification'
 import apiPrefix from './apiPrefix'
 import _responseHandler from './responseHandler'
 import question from './question'
+import news from './news'
 
 export const userApi = user
 
@@ -22,5 +23,7 @@ export const notificationApi = notification
 export const responseHandler = _responseHandler
 
 export const prefix = apiPrefix
+
+export const newsApi = news
 
 export const fileApi = file
