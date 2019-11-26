@@ -14,9 +14,13 @@
                             <i class = "el-icon-s-order"></i><span>{{questionType}}</span>
                         </div>
                     </el-col>
-                    <el-col :span = "8" class="question-title">
-                        <el-button type="danger" @click='delectQuestion(questionId)' style="margin: 0px 17px;">删除问题<i class="el-icon-delete-solid"></i></el-button>
-                        <el-button type="primary" @click="open">添加回答<i class="el-icon-edit"></i></el-button>
+                    <el-col :span = "8" class="question-title" style="
+                    padding-left: 5px;
+                    padding-right: 34px;
+                    display: flex;
+                    flex-direction: row-reverse;">
+                        <el-button type="danger" @click='delectQuestion(questionId)' style="margin: 6px 8px;">删除问题<i class="el-icon-delete-solid"></i></el-button>
+                        <el-button type="primary" @click="open" style="margin: 6px 8px;">添加回答<i class="el-icon-edit"></i></el-button>
                     </el-col>
                 </el-row>
             </el-card>
@@ -242,13 +246,18 @@ export default {
                             input: (html) =>{
                                 this.submitanswer = html
                             }
-                        } }, this.submitanswer)
+                        },
+                        ref: 'myEditor',
+                        refInFor: true
+                    }, this.submitanswer)
                 ]),
                 showCancelButton: true,
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 beforeClose: (action, instance, done) => {
                     if (action === 'confirm') {
+                        // console.log(JSON.stringify(this.$refs.myeditors[0].$refs))
+                        // this.$refs.myeditors.clearEditor()
                         instance.confirmButtonLoading = true
                         instance.confirmButtonText = '执行中...'
                         this.illegalKeyword.forEach((e) => {
@@ -256,7 +265,7 @@ export default {
                             let reg = new RegExp(param, 'gim') // re为/^\d+bl$/gim
                             this.submitanswer = this.submitanswer.replace(reg, '*')
                         })
-                        alert(this.submitanswer)
+                        this.$refs.myEditor[0].clear()
                         let content = this.submitanswer // 问题内容
                         let questionsId = this.questionId // 问题id
                         let anonymous = this.anonymous // 是否匿名
@@ -285,10 +294,8 @@ export default {
                     type: 'info',
                     message: 'action: ' + action
                 })
+                this.submitanswer = ''
             })
-            var editor1 = new E('#div4')
-            editor1.customConfig.uploadImgShowBase64 = true
-            editor1.create()
         }
     }
 }
