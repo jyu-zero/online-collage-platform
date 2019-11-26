@@ -14,7 +14,7 @@
                 <el-button type="primary" @click="login">登录</el-button>
             </el-form>
         </div>
-    
+
 </template>
 
 <script>
@@ -80,7 +80,7 @@ export default {
         margin:0 auto;
         padding: 30px;
         border: 1px solid rgb(110, 110, 110);
-        
+
     }
     .el-input{
         width:250px;

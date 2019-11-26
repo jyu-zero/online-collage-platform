@@ -110,8 +110,8 @@ export default {
             })
         },
         // 获取学生姓名卡号
-        getname(){
-            this.$axios.get(prefix.api + userApi.getname).then((response)=>{
+        getName(){
+            this.$axios.get(prefix.api + userApi.getStudentName).then((response)=>{
                 if(!responseHandler(response.data, this)){
                     // 提示出错
                     this.$router.push({ name: 'Index' })
