@@ -14,12 +14,12 @@
                     <i class="el-icon-document">{{scope.row.file_name}}</i>
                 </template>
                 </el-table-column>
-            <el-table-column :prop="document.create_at" label="上传时间" width="180">
+            <el-table-column :prop="document.create_at" label="上传时间" width="150">
                 <template slot-scope="scope">
                     {{scope.row.create_at}}
                 </template>
             </el-table-column>
-            <el-table-column :prop="document.file_right_id" label="可见范围" width="120">
+            <el-table-column :prop="document.file_right_id" label="可见范围" width="180">
                 <template slot-scope="scope">
                     {{scope.row.file_right_id}}
                 </template>
@@ -29,7 +29,7 @@
                 <el-tag>{{scope.row.tag_id}}</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column :prop="document.download_counts" label="下载次数" width="150">
+            <el-table-column :prop="document.download_counts" label="下载次数" width="120">
                 <template slot-scope="scope" style="font-size: 20px;">
                 <i class="el-icon-download">{{scope.row.download_counts}}</i>
                 </template>
@@ -46,31 +46,35 @@
         <div class="block">
             <el-pagination
                 layout="prev, pager, next"
-                :total="1000">
+                 @current-change="getMyFile"
+                :page-count="pageCount">
             </el-pagination>
+
         </div>
 
         <div class="mask" v-if="showModal"></div>
         <!-- 按下上传资料按钮的生成的面板 -->
         <div class="pop" v-if="showModal">
             <h1>上传资料</h1>
-            <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/">
+            <el-upload class="upload-demo" :action='UploadUrl()' :auto-upload = "false" :limit="1"
+            :on-change="handleSelectFile"
+            :on-exceed="handleExceed" >
                 <el-button size="small" type="primary">选择文件</el-button>
             </el-upload>
             <div>
                 <p>可见范围</p>
-                <el-select v-model="range" multiple>
-                    <el-option  v-for="item in rangesOption" :key="item.value" :label="item.label" :value="item.value"> </el-option>
+                <el-select v-model="setRange" multiple>
+                    <el-option  v-for="item in rangesOption" :key="item.id" :label="item.class" :value="item.id"> </el-option>
                 </el-select>
             </div>
             <div>
                 <p>分类</p>
                 <el-select v-model="setType" >
-                    <el-option  v-for="item in typesOption" :key="item.value"  :label="item.label" :value="item.value">
+                    <el-option  v-for="item in typesOption" :key="item.id"  :label="item.file_tag" :value="item.id">
                     </el-option>
                 </el-select>
             </div>
-                <el-button  @click="showModal=false" class="btn" type="primary">确认</el-button>
+                <el-button  class="btn" type="primary" @click="submitUpload">确认</el-button>
                 <el-button  @click="showModal=false" class="btn" type="primary">取消</el-button>
         </div>
     </el-main>
@@ -80,9 +84,7 @@
 
 <script>
 import { Select, Option, Button, Table, TableColumn, Tag, Icon, Upload, Container, Main, Message, Pagination } from'element-ui'
-import 'element-ui/lib/theme-chalk/index.css'
 import { prefix, responseHandler, fileApi } from '@/api'
-import axios from 'axios'
 export default {
     name: 'FileShare',
     components: {
@@ -101,78 +103,115 @@ export default {
     },
     data (){
         return {
-            typesOption: [{
-                value: '选项1',
-                label: '学习资料'
-            }, {
-                value: '选项2',
-                label: '通知文件'
-            }, {
-                value: '选项3',
-                label: '电影动画'
-            }, {
-                value: '选项4',
-                label: '游戏程序'
-            }, {
-                value: '选项5',
-                label: '工具程序'
-            }, {
-                value: '选项6',
-                label: '工具程序'
-            }, {
-                value: '选项7',
-                label: '源程序程序'
-            }],
             setType: '',
-            range: [],
-            rangesOption: [{
-                value: '选项1',
-                label: '全学院'
-            }, {
-                value: '选项2',
-                label: '1301'
-            }, {
-                value: '选项3',
-                label: '1302'
-            }],
+            setRange: [],
             showModal: false,
-            document: []
+            document: [],
+            typesOption: [],
+            rangesOption: [],
+            pageCount: 1,
+            fileList: [],
+            url: 'http://localhost/online-collage-platform-server/public/'
         }
     },
     created(){
-        this.$axios.post(prefix.api + fileApi.getAllFile).then(response => {
-            if(!responseHandler(response.data, this)){
-                Message.error(response.data.msg)
-            }
-            this.document = response.data.data
-        })
+        this.getMyFile()
+        this.getAllTag()
+        this.getFileRight()
     },
     methods: {
+        handleSelectFile(file){
+            this.fileList = file
+        },
         handleDownload(index, row) {
-            console.log(index, row)
+            // 完成下载接口
+            // console.log(this.document[index].id)
+            this.$axios.post(prefix.api + fileApi.download, {
+                fileId: this.document[index].id
+            }).then(response => {
+                // if(!responseHandler(response.data, this)){
+                //     Message.error(response.data.msg)
+                // }
+                console.log(response.data)
+                window.open(response.data)
+                this.getMyFile()
+            })
+        },
+        submitUpload(){
+            // 完成上传文件接口
+            let fd = new FormData()
+            console.log(this.fileList.raw)
+            if(this.fileList.length === 0){
+                Message.error('你好像还没选择文件')
+                return
+            }
+            if(this.fileList.raw.size / 1024 / 1024 > 8){
+                Message.error('上传文件大于8M')
+                return
+            }
+            if(this.setType === '' || this.setRange.length === 0){
+                Message.error('好像有什么没选')
+                return
+            }
+            fd.append('file', this.fileList.raw)
+            fd.append('type', this.setType)
+            fd.append('range', this.setRange.toString())
+            this.$axios.post(prefix.api + fileApi.upload, fd).then(response => {
+                if(!responseHandler(response.data, this)){
+                    Message.error('上传失败')
+                }
+                Message.success(response.data.msg)
+                this.getMyFile(this.pageCount)
+            })
+            this.showModal = false
+            this.setType = ''
+            this.setRange = []
+        },
+        UploadUrl(){
+            return '返回需要上传的地址'
+        },
+        getMyFile(page = 1){
+            this.$axios.post(prefix.api + fileApi.myFile, { page }).then(response => {
+                if(!responseHandler(response.data, this)){
+                    Message.error(response.data.msg)
+                }
+                this.document = response.data.data.data
+                this.pageCount = parseInt(response.data.data.pageCount)
+            })
+            // 已完成获取我的文件接口
+        },
+        getAllTag(){
+            this.$axios.post(prefix.api + fileApi.getAllTag).then(response => {
+                if(!responseHandler(response.data, this)){
+                    Message.error(response.data.msg)
+                }
+                this.typesOption = response.data.data
+            })
+            // 已完成获取所有标签接口
+        },
+        getFileRight(){
+            this.$axios.post(prefix.api + fileApi.getAllFileRight).then(response => {
+                if(!responseHandler(response.data, this)){
+                    Message.error(response.data.msg)
+                }
+                this.rangesOption = response.data.data
+            })
+            // 已完成获取文件权限接口
+        },
+        handleExceed(files, fileList){
+            Message.error(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`)
+            // 提示一次只能上传一个文件
         },
         handleDelete(index, row) {
-            // console.log(this.document[index].id)
+            // 已完成删除文件接口
             this.$axios.post(prefix.api + fileApi.deleteFile, {
                 fileId: this.document[index].id
             }).then(response => {
                 if(!responseHandler(response.data, this)){
                     Message.error(response.data.msg)
                 }
-                this.$axios.post(prefix.api + fileApi.getAllFile)
-            })
-        },
-        uploadFile(){
-            this.$axios.post(prefix.api + fileApi.upload, {
-                type: this.type,
-                range: this.range
-            }).then(response => {
-                if(!responseHandler(response.data, this)){
-                    Message.error(response.data.msg)
-                }
-                // this.$axios.post(prefix.api + fileApi.getAllFile)
-                this.type = ''
-                this.range = []
+                Message.success(response.data.msg)
+                this.getMyFile(this.pageCount)
             })
         }
     }

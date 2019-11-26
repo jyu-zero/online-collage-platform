@@ -10,6 +10,10 @@ export default {
     // 搜索文件
     'searchFile': '/file/search-file',
     // 删除文件
-    'deleteFile': '/file/delete-file'
+    'deleteFile': '/file/delete-file',
+    // 获取个人文件
+    'myFile': '/file/my-file',
+    // 下载
+    'download': '/file/download'
 
 }
