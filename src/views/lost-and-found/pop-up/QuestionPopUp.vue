@@ -1,7 +1,7 @@
 <template>
     <div class="question-pop-up">
         <el-row class="question-contain" v-for="(questionsItem,index) of questions " :key="index" >
-            <el-row class="question">1. {{questionsItem.question}}</el-row>
+            <el-row class="question">问题{{index+1}}. {{questionsItem.question}}</el-row>
             <el-row class="select"><el-radio v-model="answer[index]" label="A">A. {{questionsItem.a}}</el-radio></el-row>
             <el-row class="select"><el-radio v-model="answer[index]" label="B">B. {{questionsItem.b}}</el-radio></el-row>
             <el-row class="select"><el-radio v-model="answer[index]" label="C">C. {{questionsItem.c}}</el-radio></el-row>
