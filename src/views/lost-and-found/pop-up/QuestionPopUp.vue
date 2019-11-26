@@ -10,9 +10,9 @@
         <el-divider></el-divider>
 
         <el-row type="flex" justify="space-between">
-            <el-row>
-                <el-col>{{name}}</el-col>
-                <el-col>{{num}}</el-col>
+            <el-row >
+                <el-col :offset="8">{{name}}</el-col>
+                <el-col :offset="8">{{num}}</el-col>
             </el-row>
             <el-row><el-button type="success" @click="getInfomation">提交</el-button></el-row>
         </el-row>
@@ -64,6 +64,13 @@ export default {
             this.good_id = this.$route.params.sort
         },
         getInfomation() {
+            var answer = this.answer
+            for(var i = 0; i < 3; i++){
+                if(answer[i] === ''){
+                    this.name = '还有选项没有选择'
+                    return
+                }
+            }
             axios
                 .post(prefix.api + goodsApi.giveLostQuestion, {
                     good_id: 1,
