@@ -4,7 +4,7 @@
       <header v-cloak>
         <h1>在线学院平台</h1>
         <!--下拉菜单-->
-        <div class="header-right"  v-if="isLogin" >
+        <div class="header-right" v-if="isLogin" >
           <div class="new-msg">
             <i class="el-icon-message"></i>
             <span class="msg-num">996</span>
@@ -12,8 +12,8 @@
           <el-dropdown trigger="click"  >
                   <span class="el-dropdown-link " id='dropdown-btn'>
                       <div>
-                          <div class="user-name" >{{this.studentName}}</div>
-                          <div class="user-id" >{{this.studentId}}</div>
+                          <div class="user-name" >{{this.name}}</div>
+                          <div class="user-id" >{{this.account}}</div>
                       </div>
                       <i class="el-icon-arrow-down el-icon--right"></i>
                   </span>
@@ -23,9 +23,9 @@
             </el-dropdown-menu>
           </el-dropdown>
         </div>
-        <!--下拉菜单.结束-->
         <!--登录按钮-->
-        <el-button  id="go-to-login" type="info"  plain v-if="!isLogin" @click="showLoginWindow" >登录</el-button>
+        <el-button  id="go-to-login" type="info"  plain v-if="!isLogin" @click="goToLogin" >登录</el-button>
+        <!--下拉菜单.结束-->
       </header>
 
       <!--主体部分-->
@@ -97,7 +97,7 @@
             <!--主体右侧-->
             <div class="main-right">
                 <!--用户中心-->
-                <div class="user-info"  v-if="isLogin">
+                <div class="user-info">
                   <div id="num-msg">
                     <ul>
                       <li><p id="article-count">24</p>我的问题</li>
@@ -165,30 +165,6 @@
             </div>
 
         </main>
-        <!--登录窗口-->
-        <div id="login-container" v-if="loginWindow" >
-          <span id="cancel-btn"  @click="showLoginWindow">×</span>
-          <h2>登录窗口</h2>
-          <p>学号</p>
-          <el-input  v-model="account" placeholder="请输入学号" ></el-input>
-          <p>密码</p>
-          <el-input  type="password" v-model="password" placeholder="请输入密码"></el-input>
-          <p><el-button type="text" @click="dialogVisible = true">忘记密码？</el-button></p>
-          <div class="btn-container">
-          <el-button  id="login-btn" type="info" @click="login"  plain >登录</el-button>
-          </div>
-        </div>
-        <!--忘记密码的弹窗提示-->
-        <el-dialog
-        title="提示"
-        :visible.sync="dialogVisible"
-        width="30%"
-       >
-        <span>请带上学生证,并写一份保证书前往锡昌科技大楼116重置密码</span>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="dialogVisible = false" type="info" plain class="understand-btn">了解</el-button>
-        </span>
-      </el-dialog>
     </div>
 </template>
 
@@ -209,16 +185,10 @@ export default {
     data() {
         return {
             // 页眉处的姓名学号
-            studentName: '',
-            studentId: '',
-            // 临时登录的帐号密码
+            name: '',
             account: '',
-            password: '',
             // 当前是否已登录
             isLogin: false,
-            // 登录窗口开关变量
-            loginWindow: false,
-            dialogVisible: false,
             // 新闻数据
             news: [
                 {
@@ -277,40 +247,14 @@ export default {
             this.$axios.get(prefix.api + userApi.getStudentName).then((response)=>{
                 if(!responseHandler(response.data, this)){
                     // 提示出错
-                    Message.error('您还未登录')
-                    return
+                    Message.error('对不起，您还未登录')
+                    return false
                 }
                 this.isLogin = true
                 // 更新姓名以及一卡通id
-                this.studentName = response.data.data.name
-                this.studentId = response.data.data.account
+                this.name = response.data.data.name
+                this.account = response.data.data.account
             })
-        },
-        // 弹出登录框
-        showLoginWindow() {
-            this.loginWindow = !this.loginWindow
-            this.account = ''
-            this.password = ''
-        },
-        // 登录
-        login(){
-            if(!this.account || !this.password){
-                Message.error('帐号密码不能为空')
-                return
-            }
-            this.$axios
-                .post(prefix.api + userApi.login, { account: this.account, password: this.password })
-                .then((response)=>{
-                    if(!responseHandler(response.data, this)){
-                        // 提示出错
-                        Message.error(response.data.msg)
-                    }
-                    this.getUserName()
-                    this.showLoginWindow()
-                    this.account = ''
-                    this.password = ''
-                    Message.success(response.data.msg)
-                })
         },
         // 注销
         logout(){
@@ -319,12 +263,14 @@ export default {
                     // 提示出错
                     Message.error(response.data.msg)
                 }
-                this.isLogin = false
+                this.$router.push({ name: 'Login' })
                 Message.success(response.data.msg)
             })
         },
-
-        // TODO : 没给观看次数
+        // 跳转登录界面
+        goToLogin(){
+            this.$router.push({ name: 'Login' })
+        },
         // 获取新闻列表
         getNewsList(){
             this.$axios.get(prefix.api + newsApi.getNews).then((response)=>{
@@ -336,8 +282,6 @@ export default {
                 this.news = response.data.data
             })
         },
-
-        // TODO : 接口没给
         // 获取问题列表
         getQuestion(){
             this.$axios.get(prefix.api + questionApi.getQuestions).then((response)=>{
@@ -355,7 +299,7 @@ export default {
             this.$axios.get(prefix.api + goodsApi.getGoods).then((response)=>{
                 if(!responseHandler(response.data, this)){
                     // 提示出错
-                    Message.error('您还未登录')
+                    Message.error(response.data.msg)
                     return
                 }
                 this.goods = response.data.data.rs
@@ -378,6 +322,11 @@ export default {
         // 跳转部分
         // 个人中心跳转
         goToUserCenter(){
+            // auth
+            if (!this.isLogin){
+                Message.error('对不起，请先登录再进行操作')
+                return
+            }
             this.$router.push({ path: '/user-center/' })
         },
         // 递归寻找dt元素
