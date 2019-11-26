@@ -12,8 +12,8 @@
             <el-dropdown trigger="click"  >
                   <span class="el-dropdown-link " id='dropdown-btn'>
                       <div >
-                          <div class="user-name" >{{this.studentName}}</div>
-                          <div class="user-id" >{{this.studentId}}</div>
+                          <div class="user-name" >{{this.name}}</div>
+                          <div class="user-id" >{{this.account}}</div>
                       </div>
                       <i class="el-icon-arrow-down el-icon--right"></i>
                   </span>
@@ -63,8 +63,8 @@ export default {
     },
     data() {
         return {
-            studentName: 'aaa',
-            studentId: '111111',
+            name: 'aaa',
+            account: '111111',
             menus: [
                 {
                     title: '通知栏',
@@ -106,32 +106,30 @@ export default {
                     Message.error(response.data.msg)
                 }
                 Message.success(response.data.msg)
-                this.$router.push({ name: 'Login' })
+                this.$router.push({ name: 'Index' })
             })
         },
         // 获取学生姓名卡号
-        getStudentName(){
-            this.$axios.get(prefix.api + userApi.getStudentName).then((response)=>{
+        getname(){
+            this.$axios.get(prefix.api + userApi.getname).then((response)=>{
                 if(!responseHandler(response.data, this)){
                     // 提示出错
-                    Message.error('您还未登录')
-                    this.$router.push({ name: 'Login' })
+                    this.$router.push({ name: 'Index' })
                     return
                 }
                 // 更新姓名以及一卡通id
-                this.studentName = response.data.data.name
-                this.studentId = response.data.data.account
+                this.name = response.data.data.name
+                this.account = response.data.data.account
             })
         },
         // 跳转至个人中心，相当于跳转通知栏页面
         goToUserCenter(){
-            console.log('跳转至个人中心')
-            this.$router.push({ path: '/user-center/' })
+            this.$router.push({ name: 'Login' })
         }
     },
     created() {
         // 获取学生姓名卡号
-        this.getStudentName()
+        this.getname()
     }
 }
 </script>

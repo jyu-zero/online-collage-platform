@@ -4,7 +4,7 @@
       <header v-cloak>
         <h1>在线学院平台</h1>
         <!--下拉菜单-->
-        <div class="header-right" >
+        <div class="header-right" v-if="isLogin" >
           <div class="new-msg">
             <i class="el-icon-message"></i>
             <span class="msg-num">996</span>
@@ -23,6 +23,8 @@
             </el-dropdown-menu>
           </el-dropdown>
         </div>
+        <!--登录按钮-->
+        <el-button  id="go-to-login" type="info"  plain v-if="!isLogin" @click="goToLogin" >登录</el-button>
         <!--下拉菜单.结束-->
       </header>
 
@@ -185,6 +187,8 @@ export default {
             // 页眉处的姓名学号
             name: '',
             account: '',
+            // 当前是否已登录
+            isLogin: false,
             // 新闻数据
             news: [
                 {
@@ -243,16 +247,13 @@ export default {
             this.$axios.get(prefix.api + userApi.getStudentName).then((response)=>{
                 if(!responseHandler(response.data, this)){
                     // 提示出错
-                    Message.error('您还未登录')
-                    this.$router.push({ name: 'Login' })
+                    Message.error('对不起，您还未登录')
                     return false
                 }
+                this.isLogin = true
                 // 更新姓名以及一卡通id
                 this.name = response.data.data.name
                 this.account = response.data.data.account
-                this.getGoods()
-                this.getNewsList()
-                this.getQuestion()
             })
         },
         // 注销
@@ -266,8 +267,10 @@ export default {
                 Message.success(response.data.msg)
             })
         },
-
-        // TODO : 没给观看次数
+        // 跳转登录界面
+        goToLogin(){
+            this.$router.push({ name: 'Login' })
+        },
         // 获取新闻列表
         getNewsList(){
             this.$axios.get(prefix.api + newsApi.getNews).then((response)=>{
@@ -279,8 +282,6 @@ export default {
                 this.news = response.data.data
             })
         },
-
-        // TODO : 接口没给
         // 获取问题列表
         getQuestion(){
             this.$axios.get(prefix.api + questionApi.getQuestions).then((response)=>{
@@ -321,6 +322,11 @@ export default {
         // 跳转部分
         // 个人中心跳转
         goToUserCenter(){
+            // auth
+            if (!this.isLogin){
+                Message.error('对不起，请先登录再进行操作')
+                return
+            }
             this.$router.push({ path: '/user-center/' })
         },
         // 递归寻找dt元素
@@ -400,6 +406,9 @@ export default {
     created () {
         // 获取一卡通号和姓名
         this.getUserName()
+        this.getGoods()
+        this.getNewsList()
+        this.getQuestion()
     }
 }
 </script>
