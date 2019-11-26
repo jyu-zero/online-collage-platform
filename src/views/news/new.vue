@@ -78,6 +78,7 @@ export default {
     methods: {
         amINewViewer(){
             let newsThatIViewed = JSON.parse(localStorage.getItem('newsThatIViewed'))
+            // indexOf() : 返回字符中indexof（string）中字串string在父串中首次出现的位置
             // this.$route.params.newsId) == -1 时newsThatIViewed为null
             if(newsThatIViewed !== null && newsThatIViewed.indexOf(this.$route.params.newsId) >= 0){
                 return false
@@ -103,6 +104,7 @@ export default {
                 params: {
                     newsId: this.id,
                     isNewViewer: this.amINewViewer()
+                    // isAdd: this.
                 }
             }).then(response => {
                 // console.log(response.data)

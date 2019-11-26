@@ -92,19 +92,19 @@ export default {
         },
         // TODO
         goToDetailPage(id){
-            // console.log('跳转至新闻具体页面')
             this.$router.push({ name: 'NewsDetail',
                 params: {
                     newsId: id
                 } })
-            // 获取cookie并传给后端
-            var cookies = document.cookie
-            console.log(' 获取cookie')
-            console.log(cookies)
-            this.$axios.post(prefix.api + newsApi.getNewsList, {
-                params: {
-                    cookies
-                } })
+        },
+        amINewViewer(){
+            let newsThatIViewed = JSON.parse(localStorage.getItem('newsThatIViewed'))
+            if(newsThatIViewed !== null && newsThatIViewed.indexOf(this.$route.params.newsId) >= 0){
+                return false
+            }else{
+                localStorage.setItem('newsThatIViewed', JSON.stringify([this.$route.params.newsId]))
+            }
+            return true
         }
     }
 }
