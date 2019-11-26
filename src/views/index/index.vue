@@ -1,35 +1,35 @@
 <template>
     <div class="home-page" >
-        <!--头部-->
-        <header>
-            <h1>线上学院平台</h1>
-            <!--下拉菜单-->
-            <div class="header-right"  v-if="isLogin" >
-                <div class="new-msg">
-                    <i class="el-icon-message"></i>
-                    <span class="msg-num">996</span>
-                </div>
-                <el-dropdown trigger="click"  >
+      <!--头部-->
+      <header v-cloak>
+        <h1>在线学院平台</h1>
+        <!--下拉菜单-->
+        <div class="header-right" v-if="isLogin" >
+          <div class="new-msg">
+            <i class="el-icon-message"></i>
+            <span class="msg-num">996</span>
+          </div>
+          <el-dropdown trigger="click"  >
                   <span class="el-dropdown-link " id='dropdown-btn'>
-                      <div >
-                          <div class="user-name" >{{this.studentName}}</div>
-                          <div class="user-id" >{{this.studentId}}</div>
+                      <div>
+                          <div class="user-name" >{{this.name}}</div>
+                          <div class="user-id" >{{this.account}}</div>
                       </div>
                       <i class="el-icon-arrow-down el-icon--right"></i>
                   </span>
-                    <el-dropdown-menu slot="dropdown">
-                      <el-dropdown-item icon="el-icon-user" ><span @click="goToUserCenter">个人中心</span></el-dropdown-item>
-                      <el-dropdown-item icon="el-icon-close" ><span @click="logout">注销</span></el-dropdown-item>
-                    </el-dropdown-menu>
-                </el-dropdown>
-            </div>
-            <!--下拉菜单.结束-->
-            <!--登录按钮-->
-            <el-button  id="go-to-login" type="info"  plain v-if="!isLogin" @click="showLoginWindow" >登录</el-button>
-        </header>
+            <el-dropdown-menu slot="dropdown" class="header-dropdown">
+              <el-dropdown-item icon="el-icon-user" @click.native="goToUserCenter">个人中心</el-dropdown-item>
+              <el-dropdown-item icon="el-icon-close" @click.native="logout">注销</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </div>
+        <!--登录按钮-->
+        <el-button  id="go-to-login" type="info"  plain v-if="!isLogin" @click="goToLogin" >登录</el-button>
+        <!--下拉菜单.结束-->
+      </header>
 
-        <!--主体部分-->
-        <main>
+      <!--主体部分-->
+        <main v-cloak>
             <!--主体左侧-->
             <div class="main-left">
                 <!--新闻内容-->
@@ -38,50 +38,58 @@
                       <h2>新闻中心</h2>
                       <span @click="goToNewsPage">查看更多</span>
                   </div>
-                  <dl class="news-list">
-                    <dt class="news-item" v-for="item of news" :key="item.id" >
-                      <span class="set-top-label" v-if="item.setTop===1">[置顶] </span>
-                      <span class="news-title">{{item.title}}  </span>
-                      <span class="news-date">({{item.time}})</span>
-                      <span class="watch-times-count">
-                        <font-awesome-icon icon="eye" />
-                         {{item.viewCount}}
-                      </span>
-                    </dt>
-                  </dl>
+                  <ul class="news-list" @click="goToNewsPage">
+                      <li class="news-item"
+                        v-for="item of news"
+                        :key="item.news_id"
+                        :data-id='item.news_id'>
+                          <span class="set-top-label" v-if="item.is_pinned===1">[置顶] </span>
+                          <span class="news-title">{{item.news_title}}  </span>
+                          <span class="news-date">({{item.created_at}})</span>
+                          <span class="watch-times-count">
+                              <font-awesome-icon icon="eye" />
+                              {{item.views}}
+                          </span>
+                      </li>
+                  </ul>
                 </div>
                 <!--在线问答-->
                 <div class="online-question">
                   <div class="container-header">
                       <h2>在线问答</h2>
-                      <span @click="goToQuestionPage">查看更多</span>
+                      <span @click="goToQuestionPage()">查看更多</span>
                   </div>
-                  <dl class="question-list">
-                    <dt class="question-item" v-for="item of questions" :key="item.id" >
-                      <div class="question-status">
-                        <span v-if="item.solve">已解决</span>
-                        <span v-if="!item.solve">待解决</span>
-                      </div>
-                      <div class="question-info">
-                        <h3>{{item.content}}<span v-if="item.setTop">置顶</span></h3>
-                        <div>
-                          <div>
-                            由
-                            <span class="quizzer"> {{item.name}} </span>
-                            提问
-                            <span class="question-time">{{item.time}}  </span>
-                            <font-awesome-icon icon="tag" />
-                            <span class="question-type">{{item.type}}</span>
+                  <dl class="question-list"
+                  @click="goToQuestionPage">
+                      <dt class="question-item"
+                        v-for="item of questions"
+                        :key="item.questionId"
+                        :data-id="item.questionId"
+                        >
+                          <div class="question-status">
+                              <span v-if="item.status===1">已解决</span>
+                              <span v-else>待解决</span>
                           </div>
-                          <div class="view-reply-count">
-                            <font-awesome-icon icon="eye" />
-                            <span class="count">{{item.viewCount}}</span>
-                            <font-awesome-icon icon="comment-dots" />
-                            <span class="count">{{item.comment}}</span>
+                          <div class="question-info">
+                              <h3>{{item.title}}<span v-if="item.isPinned">置顶</span></h3>
+                              <div>
+                                  <div>
+                                      由
+                                      <span class="quizzer"> {{item.name}} </span>
+                                      提问
+                                      <span class="question-time">{{item.time}}  </span>
+                                      <font-awesome-icon icon="tag" />
+                                      <span class="question-type">{{item.typeName}}</span>
+                                  </div>
+                                  <div class="view-reply-count">
+                                      <font-awesome-icon icon="eye" />
+                                      <span class="count">{{item.viewCount}}</span>
+                                      <font-awesome-icon icon="comment-dots" />
+                                      <span class="count">{{item.solutionsNum}}</span>
+                                  </div>
+                              </div>
                           </div>
-                        </div>
-                      </div>
-                    </dt>
+                      </dt>
                   </dl>
                 </div>
             </div>
@@ -89,7 +97,7 @@
             <!--主体右侧-->
             <div class="main-right">
                 <!--用户中心-->
-                <div class="user-info"  v-if="isLogin">
+                <div class="user-info">
                   <div id="num-msg">
                     <ul>
                       <li><p id="article-count">24</p>我的问题</li>
@@ -97,21 +105,24 @@
                       <li><p id="reply-count">41</p>我的失物</li>
                     </ul>
                   </div>
-                  <div id="user-center" @click="goToUserCenter">个人中心</div>
+                  <div id="user-center" @click="goToUserCenter()">个人中心</div>
                 </div>
                 <!--失物招领-->
                 <div class="lost-and-found">
                   <div class="container-header">
                     <h2>失物招领</h2>
-                    <span @click="goToLostAndFound">查看更多</span>
+                    <span @click="goToLostAndFound()">查看更多</span>
                   </div>
                   <dl class="lost-item-list">
-                    <dt class="lost-item" v-for="item of goods" :key="item.good_id" >
+                    <dt class="lost-item"
+                        v-for="(item,index) of goods"
+                        :key="index"
+                        @click="goToLostAndFound(item.good_id,item.sort)">
                       <div class="item-status">
-                        <span v-if="!item.lost">认领</span>
-                        <span v-if="item.lost">遗失</span>
+                        <span v-if="item.sort">认领</span>
+                        <span v-if="!item.sort">遗失</span>
                         <h3 class="goods-name">{{item.name}}</h3>
-                        <span>{{item.hoster}}</span>
+                        <span v-if="item.host">学院托管</span>
                       </div>
                       <div class="lost-msg">
                         <span class="lost-place">
@@ -154,36 +165,12 @@
             </div>
 
         </main>
-
-        <div id="login-container" v-if="loginWindow" v-cloak>
-          <span id="cancel-btn"  @click="showLoginWindow">×</span>
-          <h2>登录窗口</h2>
-          <p>学号</p>
-          <el-input  v-model="account" placeholder="请输入学号" ></el-input>
-          <p>密码</p>
-          <el-input  type="password" v-model="password" placeholder="请输入密码"></el-input>
-          <p><el-button type="text" @click="dialogVisible = true">忘记密码？</el-button></p>
-          <div class="btn-container">
-          <el-button  id="login-btn" type="info" @click="login"  plain >登录</el-button>
-          </div>
-        </div>
-        <!--忘记密码的弹窗提示-->
-        <el-dialog
-        title="提示"
-        :visible.sync="dialogVisible"
-        width="30%"
-       >
-        <span>若忘记密码，请带上学生证前往锡昌科技大楼116重置密码</span>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="dialogVisible = false" type="info" plain class="understand-btn">了解</el-button>
-        </span>
-      </el-dialog>
     </div>
 </template>
 
 <script>
 import { Dropdown, DropdownMenu, DropdownItem, Button, Input, Message, Dialog } from 'element-ui'
-import { prefix, responseHandler, userApi, goodsApi } from '@/api'
+import { prefix, responseHandler, userApi, goodsApi, newsApi, questionApi } from '@/api'
 export default {
     name: 'HomePage',
     components: {
@@ -197,123 +184,31 @@ export default {
     },
     data() {
         return {
-            studentName: '',
-            studentId: '',
+            // 页眉处的姓名学号
+            name: '',
             account: '',
-            password: '',
             // 当前是否已登录
             isLogin: false,
-            // 登录窗口开关变量
-            loginWindow: false,
-            dialogVisible: false,
             // 新闻数据
             news: [
                 {
-                    id: 0,
-                    title: '身体棒棒',
-                    time: '2019-11-8',
-                    setTop: 1,
-                    viewCount: 22
+                    'news_title': '啊哈哈哈',
+                    'views': 66,
+                    'created_at': '2019-06-08'
                 },
                 {
-                    id: 1,
-                    title: '身体棒棒身体棒棒身体棒棒身体棒棒',
-                    time: '2019-11-8',
-                    setTop: 1,
-                    viewCount: 5
+                    'news_title': '啊哈哈哈',
+                    'views': 66,
+                    'created_at': '2019-06-08'
                 },
                 {
-                    id: 2,
-                    title: '身体棒棒身体棒棒身体棒棒身体棒棒身体棒棒',
-                    time: '2019-11-8',
-                    setTop: 1,
-                    viewCount: 3
+                    'news_title': '啊哈哈哈',
+                    'views': 66,
+                    'created_at': '2019-06-08'
                 }
             ],
-            questions: [
-                {
-                    id: 0,
-                    content: '怎么吃饭吃不胖',
-                    name: '张三',
-                    type: '生活帮助',
-                    time: '2019-6-8',
-                    setTop: false,
-                    solve: true,
-                    viewCount: 22,
-                    comment: 66
-                },
-                {
-                    id: 1,
-                    content: '不存在的，越吃越胖',
-                    name: '李四',
-                    type: '生活帮助',
-                    time: '2019-6-8',
-                    setTop: false,
-                    solve: true,
-                    viewCount: 0,
-                    comment: 7
-                },
-                {
-                    id: 2,
-                    content: '迈开腿管住嘴',
-                    name: '刘五',
-                    type: '生活帮助',
-                    time: '2019-6-8',
-                    setTop: true,
-                    solve: true,
-                    viewCount: 8,
-                    comment: 23
-                },
-                {
-                    id: 3,
-                    content: '不存在的',
-                    name: '张三',
-                    type: '生活帮助',
-                    time: '2019-6-8',
-                    setTop: false,
-                    solve: false,
-                    viewCount: 12,
-                    comment: 3
-                }
-            ],
-            goods: [
-                {
-                    id: 0,
-                    lost: true,
-                    name: '蓝色小水杯',
-                    // 是否学院托管
-                    trusteeship: false,
-                    place: '中区主球场',
-                    time: '2019-02-23'
-                },
-                {
-                    id: 1,
-                    lost: false,
-                    name: '卡西欧手表',
-                    // 是否学院托管
-                    trusteeship: true,
-                    place: '中区篮球场',
-                    time: '2019-06-04'
-                },
-                {
-                    id: 2,
-                    lost: false,
-                    name: '小米手机',
-                    // 是否学院托管
-                    trusteeship: true,
-                    place: '南区食堂',
-                    time: '2018-12-16'
-                },
-                {
-                    id: 3,
-                    lost: false,
-                    name: '一卡通171100220',
-                    // 是否学院托管
-                    trusteeship: false,
-                    place: '全校',
-                    time: '2019-06-11'
-                }
-            ],
+            questions: [],
+            goods: [],
             documents: [
                 {
                     id: 0,
@@ -352,92 +247,62 @@ export default {
             this.$axios.get(prefix.api + userApi.getStudentName).then((response)=>{
                 if(!responseHandler(response.data, this)){
                     // 提示出错
-                    Message.error('您还未登录')
-                    return
+                    Message.error('对不起，您还未登录')
+                    return false
                 }
                 this.isLogin = true
                 // 更新姓名以及一卡通id
-                this.studentName = response.data.data.name
-                this.studentId = response.data.data.student_id
-                // 获取失物招领内容
-                this.getGoods()
+                this.name = response.data.data.name
+                this.account = response.data.data.account
             })
-        },
-        // 弹出登录框
-        showLoginWindow() {
-            this.loginWindow = !this.loginWindow
-            this.account = ''
-            this.password = ''
-        },
-        // 登录
-        login(){
-            if(!this.account || !this.password){
-                Message.error('帐号密码不能为空')
-                return
-            }
-            this.$axios
-                .post(prefix.api + userApi.login, { account: this.account, password: this.password })
-                .then((response)=>{
-                    if(!responseHandler(response.data, this)){
-                        // 提示出错
-                        Message.error(response.data.msg)
-                    }
-                    this.getUserName()
-                    this.showLoginWindow()
-                    this.account = ''
-                    this.password = ''
-                    Message.success(response.data.msg)
-                })
         },
         // 注销
         logout(){
-            // console.log('sss')
             this.$axios.post(prefix.api + userApi.logout).then((response)=>{
                 if(!responseHandler(response.data, this)){
                     // 提示出错
                     Message.error(response.data.msg)
                 }
-                this.isLogin = false
+                this.$router.push({ name: 'Login' })
                 Message.success(response.data.msg)
             })
         },
-
-        // TODO : 接口没给
+        // 跳转登录界面
+        goToLogin(){
+            this.$router.push({ name: 'Login' })
+        },
         // 获取新闻列表
-        // getNews(){
-        //     this.$axios.get(prefix.api + newsApi.getNews).then((response)=>{
-        //         if(!responseHandler(response.data, this)){
-        //             // 提示出错
-        //             Message.error(response.data.msg)
-        //             return
-        //         }
-        //         this.news = response.data.data
-        //     })
-        // },
-
-        // TODO : 接口没给
+        getNewsList(){
+            this.$axios.get(prefix.api + newsApi.getNews).then((response)=>{
+                if(!responseHandler(response.data, this)){
+                    // 提示出错
+                    Message.error(response.data.msg)
+                    return
+                }
+                this.news = response.data.data
+            })
+        },
         // 获取问题列表
-        // getQuestions(){
-        //     this.$axios.get(prefix.api + questionsApi.getQusetion).then((response)=>{
-        //         if(!responseHandler(response.data, this)){
-        //             // 提示出错
-        //             Message.error(response.data.msg)
-        //             return
-        //         }
-        //         this.news = response.data.data
-        //     })
-        // },
+        getQuestion(){
+            this.$axios.get(prefix.api + questionApi.getQuestions).then((response)=>{
+                if(!responseHandler(response.data, this)){
+                    // 提示出错
+                    Message.error(response.data.msg)
+                    return
+                }
+                this.questions = response.data.data.information
+            })
+        },
 
         // 获取失物招领内容
         getGoods(){
             this.$axios.get(prefix.api + goodsApi.getGoods).then((response)=>{
                 if(!responseHandler(response.data, this)){
                     // 提示出错
-                    Message.error('您还未登录')
+                    Message.error(response.data.msg)
                     return
                 }
-                this.goods = response.data.data
-                console.log(response.data.data)
+                this.goods = response.data.data.rs
             })
         },
 
@@ -455,77 +320,127 @@ export default {
         // },
 
         // 跳转部分
-        // 跳转人中心页面
+        // 个人中心跳转
         goToUserCenter(){
-            console.log('跳转至个人中心')
+            // auth
+            if (!this.isLogin){
+                Message.error('对不起，请先登录再进行操作')
+                return
+            }
             this.$router.push({ path: '/user-center/' })
         },
-        // 跳转至新闻中心页面
-        goToNewsPage(){
-            console.log('跳转至新闻中心')
-            // this.$router.push({ name: 'NewPage' })
+        // 递归寻找dt元素
+        recursion(e){
+            // 不断往上爬直到获取dt，遇到body则返回null
+            if(e.tagName !== 'DT'){
+                if(e.tagName === 'BODY'){
+                    return null
+                }
+                return this.recursion(e.parentNode)
+            }
+            return e
         },
-        // 跳转至在线问答页面
-        goToQuestionPage(){
-            console.log('跳转至在线问答页面')
-            // this.$router.push({ name: 'NewPage' })
+        // 新闻中心跳转
+        goToNewsPage(event){
+            let element = this.recursion(event.target)
+            // 1.空则跳转至新闻中心
+            if (!element){
+                this.$router.push({ name: 'NewsCenter' })
+            }
+            // 2.element(dt)存在则跳转至详情页
+            this.$router.push({ name: `NewsDetail`,
+                params: {
+                    newsId: element.dataset.index
+                }
+            })
         },
-        // 跳转至失物招领页面
-        goToLostAndFound(){
-            console.log('跳转至失物招领页面')
-            this.$router.push({ name: 'LostAndFound' })
+
+        // 在线问答跳转
+        goToQuestionPage(event){
+            let element = this.recursion(event.target)
+            // 1.id为null就跳转至在线问答主页
+            if (!element){
+                this.$router.push({ name: 'Question' })
+            }
+            // 2.element(dt)存在就跳转至在线问答详情页
+            this.$router.push({ name: `QuestionSpecific`,
+                params: {
+                    questionId: element.dataset.id
+                }
+            })
         },
-        // 跳转至资源共享页面
+
+        // 失物招领跳转
+        goToLostAndFound(goodsId, sort){
+            // 判断sort的值
+            // 1则跳转至认领页面
+            // 2则跳转至失物招领主页
+            // undefined则跳转至丢失页面
+            switch (sort) {
+                case 0:
+                    this.$router.push({ name: `LostDetails`,
+                        params: {
+                            good_id: goodsId,
+                            sort
+                        }
+                    })
+                    break
+                case 1:
+                    this.$router.push({ name: `FoundDetails`,
+                        params: {
+                            good_id: goodsId,
+                            sort
+                        }
+                    })
+                    break
+                case undefined:
+                    this.$router.push({ name: `LostAndFound` })
+                    break
+            }
+        },
+        // 资源共享跳转
         goToSourceShare(){
-            console.log('跳转至资源共享页面')
-            // this.$router.push({ name: 'SourceShare' })
+            this.$router.push({ name: 'SourceShare' })
         }
     },
     created () {
         // 获取一卡通号和姓名
-        this.$axios.get(prefix.api + userApi.getStudentName).then((response)=>{
-            if(!responseHandler(response.data, this)){
-                // 提示出错
-                Message.error('您还未登录')
-                return
-            }
-            this.isLogin = true
-            // 更新姓名以及一卡通id
-            this.studentName = response.data.data.name
-            this.studentId = response.data.data.student_id
-            // 获取失物招领内容
-            this.getGoods()
-        })
+        this.getUserName()
+        this.getGoods()
+        this.getNewsList()
+        this.getQuestion()
     }
 }
 </script>
 
 <style lang='less' scoped>
-@PageHeaderBg: #5fd9cd;
-@pageBg : #B8f4ff;
-@listHeaderBg: #B8FFB8;
-@itemBg: #fff;
-*{
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
-}
+@pageBg : #fff;
+@listHeaderBg: #5e91fa;
+@itemBg: #f8f8ff;
+
 .home-page{
-    width: 100%;
-    background: @pageBg;
+  width: 100%;
+  background: @pageBg;
+  min-width: 1200px;
 }
 header{
-  height: 60px;
+  z-index: 2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-width: 1200px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height:60px;
   padding: 0 20px;
-  background: @PageHeaderBg;
+  background:#5e91fa;
+  color:#fff;
+
   h1{
-    margin: 0;
-    font-size: 30px;
-    font-weight: 600;
-    color: #fff;
+    margin:0;
+    font-size:20px;
   }
   #go-to-login{
     position: absolute;
@@ -538,6 +453,11 @@ header{
     display: flex;
     justify-content: center;
     align-items: center;
+    ul{
+      li{
+        width: 140px;
+      }
+    }
     .new-msg{
       margin-right: 30px;
       display: flex;
@@ -548,25 +468,39 @@ header{
       }
     }
     #dropdown-btn{
-      width: 100px;
       display: flex;
       flex-wrap: nowrap;
       align-items: center;
-      span{
+      div{
+        color: #fff;
         text-align: center;
       }
     }
+  }
+}
+.header-dropdown{
+  li{
+    width: 140px;
   }
 }
 @left:65%;
 @right:100%-@left;
 @labelBackground: #eaedeb;
 main{
+  position: relative;
+  top: 60px;
+  z-index: 1;
   height: 100%;
   /*宽度问题有必要探讨一下*/
-  max-width: 1400px;
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   margin: 0 auto;
+  *{
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+  }
   .main-left{
     margin: 25px;
     height: 100%;
@@ -669,7 +603,6 @@ main{
           padding: 15px 0;
           box-sizing: border-box;
           flex-direction: column;
-          box-sizing: border-box;
           &:nth-child(n+2){
             border-top: 1px solid gray;
 
@@ -742,7 +675,7 @@ main{
       margin-bottom: 20px;
       padding: 15px;
       box-sizing: border-box;
-      background: #fff;
+      background: @itemBg;
       #num-msg {
         padding: 20px 0;
         ul{
@@ -765,7 +698,7 @@ main{
         text-align: center;
         border-radius: 8px;
         border: 1px solid black;
-
+        background: #a8bfff;
       }
     }
   }
@@ -775,6 +708,7 @@ main{
   padding: 5px 5px ;
 }
 #login-container{
+  z-index: 3;
   position: absolute;
   height: 400px;
   width: 400px;

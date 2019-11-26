@@ -1,13 +1,93 @@
 <template>
-    <div></div>
+<!-- 登录页 -->
+    <div class="login">
+        <h1 align="center">线上学院平台</h1>
+            <div style="margin: 0;"></div>
+            <el-form :label-position="labelPosition" label-width="80px">
+                <!-- <font-awesome-icon icon="user-o"/> -->
+                <el-form-item label="账号：">
+                    <el-input v-model="account"></el-input>
+                </el-form-item>
+                <el-form-item label="密码：">
+                    <el-input v-model="password" show-password></el-input>
+                </el-form-item>
+                <el-button type="primary" @click="login">登录</el-button>
+            </el-form>
+        </div>
+    
 </template>
 
 <script>
+import { prefix, userApi } from '@/api'
+import { Form, FormItem, Button, Input, Message } from 'element-ui'
 export default {
-    name: 'Login'
+    name: 'Login',
+    components: {
+        [Form.name]: Form,
+        [FormItem.name]: FormItem,
+        [Button.name]: Button,
+        [Input.name]: Input,
+        [Message.name]: Message
+    },
+    data(){
+        return{
+            labelPosition: 'right',
+            account: '',
+            password: ''
+        }
+    },
+    methods: {
+        login() {
+            // 登录验证
+            if(this.account.trim() === '') {
+                Message.error('请输入账号!')
+                return
+            }
+            if(this.password.trim() === '') {
+                Message.error('请输入密码!')
+                return
+            }
+            this.$axios
+                .post(prefix.api + userApi.login, {
+                    account: this.account,
+                    password: this.password
+                })
+                .then((response) => {
+                    if(response.data.code !== '0000'){
+                        // 帐号密码不正确则报错
+                        Message.error(response.data.msg)
+                    }
+                    // 登录成功则跳转
+                    this.$router.push({ name: 'Index' })
+                })
+        }
+    }
 }
 </script>
 
-<style>
+<style lang="less" scoped>
+.login{
+    height:100%;
+    display: flex;
+    flex-direction: column;
+    background: url('~@/assets/img/background.jpg') no-repeat;
+    background-size: 100%;
+    h1{
+        margin: 60px;
+    }
+    .el-form{
+        margin:0 auto;
+        padding: 30px;
+        border: 1px solid rgb(110, 110, 110);
+        
+    }
+    .el-input{
+        width:250px;
+    }
+    .el-button{
+        margin: 10px 30px;
+        width: 300px;
+    }
+}
 
 </style>

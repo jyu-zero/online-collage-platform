@@ -3,8 +3,8 @@
     <!-- 我的失物招领[开始] -->
     <div class="my-lost-and-found">
         <div class="my-lost-and-found-handle">
-            <LostAndFoundDialog :typeStyle="'warning'" list>我丢东西了</LostAndFoundDialog>
-            <LostAndFoundDialog :typeStyle="'warning'" list>我捡到东西了</LostAndFoundDialog>
+            <LostAndFoundDialog :buttonTitle="'我丢东西了'" :typeStyle="'warning'" list :prompt="'我丢东西了'">我丢东西了</LostAndFoundDialog>
+            <LostAndFoundDialog :buttonTitle="'我捡到东西了'" :typeStyle="'warning'" list :prompt="'我捡到东西了'">我捡到东西了</LostAndFoundDialog>
         </div>
         <!-- 正在进行 -->
         <div class="my-lost-and-found-do">
@@ -42,9 +42,10 @@
                             <el-button type="text" title="点击查看详情和图片" v-if="item.sort==1" @click="goToFoundDetails">查看详情</el-button>
                         </div>
                         <div class="list-button">
-                            <LostAndFoundDialog list>编辑</LostAndFoundDialog>
-                            <LostAndFoundDialog v-if="item.sort==0" :typeStyle="'primary'" list>未找回</LostAndFoundDialog>
-                            <LostAndFoundDialog v-if="item.sort==1" :typeStyle="'primary'" list>未归还失主</LostAndFoundDialog>
+                            <LostAndFoundDialog list :buttonTitle="'点击重新编辑失物信息'" v-if="item.sort==0" :sort="0">编辑</LostAndFoundDialog>
+                            <LostAndFoundDialog list :buttonTitle="'点击重新编辑招领信息'" v-if="item.sort==1" :sort="1">编辑</LostAndFoundDialog>
+                            <LostAndFoundDialog :buttonTitle="'点击设置失物状态'" v-if="item.sort==0" :typeStyle="'primary'" list :prompt="'设置失物状态'">未找回</LostAndFoundDialog>
+                            <LostAndFoundDialog :buttonTitle="'点击设置招领状态'" v-if="item.sort==1" :typeStyle="'primary'" list :prompt="'确认认领'">未归还失主</LostAndFoundDialog>
                         </div>
                     </li>
                 </ul>
@@ -54,8 +55,8 @@
                         <div class="block">
                             <el-pagination
                             @size-change="handleSizeChange"
-                            @current-change="handleCurrentChange"
-                            :current-page.sync="currentPage3"
+                            @current-change="getMyLostAndFoundList"
+                            :current-page.sync="page"
                             :page-size="100"
                             layout="prev, pager, next, jumper"
                             :total="500">
@@ -107,8 +108,8 @@
                         <div class="block">
                             <el-pagination
                             @size-change="handleSizeChange"
-                            @current-change="handleCurrentChange"
-                            :current-page.sync="currentPage3"
+                            @current-change="getMyLostAndFoundList"
+                            :current-page.sync="page"
                             :page-size="100"
                             layout="prev, pager, next, jumper"
                             :total="500">
@@ -143,9 +144,17 @@ export default {
     },
     data(){
         return{
+            // 改变按钮组件type的属性
             typeStyle: '',
+            // 弹窗的标题提示
+            prompt: '',
+            // 传给子组件用于判断是失物还是招领模块
+            sort: 0,
             dialogVisible: false,
-            currentPage3: 5,
+            // 动态改变按钮的提示,多此一步是为了解决弹窗中出现title冒泡的问题
+            buttonTitle: '',
+            page: 1,
+            // currentPage3: 5,
             studentName: '',
             studentId: '',
             account: '',
@@ -158,7 +167,6 @@ export default {
             goods: [
                 {
                     id: 0,
-                    // lost: true,
                     // 0代表进行,1代表完成
                     status: 0,
                     // 0丢失,1认领
@@ -267,19 +275,25 @@ export default {
                 // }
 
                 // this.goods = response.data.data
-                this.status = response.data.data.status
-                this.sort = response.data.data.sort
-                this.title = response.data.data.title
-                this.hoster = response.data.data.hoster
-                this.place = response.data.data.place
-                this.time = response.data.data.time
+                // this.status = response.data.data.status
+                // this.sort = response.data.data.sort
+                // this.title = response.data.data.title
+                // this.hoster = response.data.data.hoster
+                // this.place = response.data.data.place
+                // this.time = response.data.data.time
                 // console.log(response.data.data)
             })
         },
         // 跳转至失物详情页
         goToLostDetails(){
             console.log('跳转至失物详情页')
-            this.$router.push({ name: 'LostDetails' })
+            this.$router.push({
+                name: 'LostDetails',
+                params: {
+                    good_id: 1,
+                    sort: 0
+                }
+            })
         },
         // 跳转至招领详情页
         goToFoundDetails(){
@@ -297,9 +311,22 @@ export default {
         handleSizeChange(val) {
             // console.log(`每页 ${val} 条`);
         },
-        handleCurrentChange(val) {
-            // console.log(`当前页: ${val}`);
+        // handleCurrentChange(val) {
+        //     // console.log(`当前页: ${val}`);
+        // }
+        getMyLostAndFoundList(page = 1){
+            this.$axios.get(prefix.api + goodsApi.getGoods, {
+                params: {
+                    page
+                }
+            })
+                .then(response => {
+                    if(!responseHandler.handle(response.data, this)) { return }
+                    this.questionList = response.data.data.questions
+                    this.pageCount = response.data.data.pageCount
+                })
         }
+        
     }
 }
 </script>
@@ -409,6 +436,7 @@ export default {
                     .list-button{
                         display: flex;
                         height: 80px;
+                        align-items: center;
                         line-height: 80px;
                     }
                 }

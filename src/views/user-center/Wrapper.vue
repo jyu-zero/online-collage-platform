@@ -3,7 +3,8 @@
         <!-- 顶部导航栏 -->
         <header>
             <h1>个人中心</h1>
-          <div class="header-right"  >
+          <div class="header-right">
+            <div id="home-page-btn" @click="goToHomePage">主页</div>
             <div class="new-msg">
               <i class="el-icon-message"></i>
               <span class="msg-num">996</span>
@@ -11,14 +12,14 @@
             <el-dropdown trigger="click"  >
                   <span class="el-dropdown-link " id='dropdown-btn'>
                       <div >
-                          <div class="user-name" >{{this.studentName}}</div>
-                          <div class="user-id" >{{this.studentId}}</div>
+                          <div class="user-name" >{{this.name}}</div>
+                          <div class="user-id" >{{this.account}}</div>
                       </div>
                       <i class="el-icon-arrow-down el-icon--right"></i>
                   </span>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item icon="el-icon-user" ><span @click="goToUserCenter">个人中心</span></el-dropdown-item>
-                <el-dropdown-item icon="el-icon-close" ><span @click="logout">注销</span></el-dropdown-item>
+              <el-dropdown-menu slot="dropdown" class="header-dropdown">
+                <el-dropdown-item icon="el-icon-user" @click.native="goToUserCenter">个人中心</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-close" @click.native="logout">注销</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </div>
@@ -62,8 +63,8 @@ export default {
     },
     data() {
         return {
-            studentName: 'aaa',
-            studentId: '111111',
+            name: 'aaa',
+            account: '111111',
             menus: [
                 {
                     title: '通知栏',
@@ -93,6 +94,9 @@ export default {
         goToMenu(menuItem) {
             this.$router.push({ name: menuItem.routeName })
         },
+        goToHomePage(){
+            this.$router.push({ name: 'Index' })
+        },
         // 注销
         logout(){
             // console.log('sss')
@@ -102,33 +106,30 @@ export default {
                     Message.error(response.data.msg)
                 }
                 Message.success(response.data.msg)
-                this.$router.push({ name: 'HomePage' })
+                this.$router.push({ name: 'Index' })
             })
         },
         // 获取学生姓名卡号
-        // getStudentName(){
-        //     // this.$axios.get(prefix.api + userApi.getStudentName).then((response)=>{
-        //     //     if(!responseHandler(response.data, this)){
-        //     //         // 提示出错
-        //     //         Message.error('您还未登录')
-        //     //         this.$router.push({ name: 'HomePage' })
-        //     //         return
-        //     //     }
-        //     //     // 更新姓名以及一卡通id
-        //     //     this.studentName = response.data.data.name
-        //     //     this.studentId = response.data.data.student_id
-        //     })
-        // }
+        getname(){
+            this.$axios.get(prefix.api + userApi.getname).then((response)=>{
+                if(!responseHandler(response.data, this)){
+                    // 提示出错
+                    this.$router.push({ name: 'Index' })
+                    return
+                }
+                // 更新姓名以及一卡通id
+                this.name = response.data.data.name
+                this.account = response.data.data.account
+            })
+        },
         // 跳转至个人中心，相当于跳转通知栏页面
         goToUserCenter(){
-            console.log('跳转至个人中心')
-            this.$router.push({ path: '/user-center/' })
+            this.$router.push({ name: 'Login' })
         }
     },
     created() {
         // 获取学生姓名卡号
-
-        // this.getStudentName()
+        this.getname()
     }
 }
 </script>
@@ -157,17 +158,27 @@ export default {
             display: flex;
             justify-content: center;
             align-items: center;
+                #home-page-btn{
+                  margin-right: 20px;
+                  cursor: pointer;
+                }
                 .new-msg{
                       margin-right: 30px;
                       display: flex;
                       align-items: center;
+                      &:hover{
+                        cursor: pointer;
+                      }
                       i{
                         margin-right: 10px;
-                        font-size: 35px;
+                        font-size: 30px;
                       }
                 }
                 #dropdown-btn{
-                      width: 100px;
+                      -webkit-user-select:none;
+                      -moz-user-select:none;
+                      -ms-user-select:none;
+                      user-select:none;
                       display: flex;
                       flex-wrap: nowrap;
                       align-items: center;
@@ -196,6 +207,11 @@ export default {
             height:100%;
             overflow: auto;
         }
+    }
+}
+.header-dropdown{
+    li{
+        width: 140px;
     }
 }
 </style>
