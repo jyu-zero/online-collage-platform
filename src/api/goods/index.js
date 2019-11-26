@@ -3,7 +3,7 @@ export default {
     // 主页获取失物招领物品的接口
     'getGoods': '/goods/display',
     // 发布失物信息接口
-    'addLost': '/goods/add-lost',
+    'addLost': '/goods/add-lose',
     // 发布招领信息接口
     'addFound': '/goods/found-lost',
     // 失物详情页获取接口

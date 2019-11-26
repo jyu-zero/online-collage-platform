@@ -41,6 +41,7 @@
                     <el-date-picker
                     v-model="inputTime"
                     type="date"
+                    :editable="false"
                     placeholder="选择日期">
                     </el-date-picker>
                 </span>
@@ -55,9 +56,10 @@
                     multiple
                     :limit="3"
                     :on-exceed="handleExceed"
-                    :file-list="fileList">
+                    :file-list="fileList"
+                    :on-change="inputPictureChange"
+                    >
                     <el-button size="small" type="primary">选择图片</el-button>
-                    <!-- <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div> -->
                     </el-upload>
                 </span>
                 <!-- 遗失者姓名 -->
@@ -109,6 +111,7 @@
                     <el-date-picker
                     v-model="inputTime"
                     type="date"
+                    :editable="false"
                     placeholder="选择日期">
                     </el-date-picker>
                 </span>
@@ -123,9 +126,10 @@
                     multiple
                     :limit="3"
                     :on-exceed="handleExceed"
-                    :file-list="fileList">
+                    :file-list="fileList"
+                    :on-change="inputPictureChange"
+                    >
                     <el-button size="small" type="primary">选择图片</el-button>
-                    <!-- <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div> -->
                     </el-upload>
                 </span>
                 <!-- 拾到人姓名 -->
@@ -245,7 +249,7 @@
 
 <script>
 import { Button, Dialog, Input, Upload, MessageBox, Radio, Message, Select, Option, DatePicker } from 'element-ui'
-import { prefix, goodsApi } from '@/api'
+import { prefix, goodsApi, responseHandler } from '@/api'
 export default {
     components: {
         name: 'LostAndFoundDialog',
@@ -272,6 +276,7 @@ export default {
             inputPlace: '',
             // 时间
             inputTime: '',
+            // 图片
             // 发布者名字
             inputUserName: '',
             // 发布者联系方式
@@ -366,13 +371,21 @@ export default {
                 })
                 .catch(_ => {})
         },
-        // 删除上传图片
+        // 删除上传图片 TODO:添加上传成功或失败的message
         handleRemove(file, fileList) {
-            console.log(file, fileList)
+            // console.log(file, fileList)
         },
-        // 浏览图片原图
+        // 点击文件列表中已上传的文件时的钩子(还不知道有什么用,先留着)
         handlePreview(file) {
-            console.log(file)
+            // console.log(file)
+        },
+        // 获取图片时对图片进行数据转换,便于之后的上传
+        inputPictureChange(file){
+            // console.log(file)
+            let pictureData = new FormData()
+            pictureData.append('file', file.raw)
+            // console.log(pictureData.get('file'))
+            return pictureData
         },
         // 限制图上传数量
         handleExceed(files, fileList) {
@@ -384,7 +397,34 @@ export default {
         },
         // 确定失物发布
         lostSubmit() {
-            MessageBox.confirm('', '确定发布吗?', {
+            if(this.inputTitle.trim() === ''){
+                Message.error('标题不能为空')
+                return
+            }
+            if(this.inputName.trim() === ''){
+                Message.error('物品名称不能为空')
+                return
+            }
+            if(this.inputPlace.trim() === ''){
+                Message.error('遗失地点不能为空')
+                return
+            }
+            if(this.inputTime === ''){
+                Message.error('遗失时间不能为空')
+                return
+            }
+            if(this.inputUserName.trim() === ''){
+                Message.error('姓名不能为空')
+                return
+            }
+            if(this.inputTelephone.trim() === ''){
+                Message.error('联系方式不能为空')
+                return
+            }else if(!(/^1[3456789]\d{9}$/.test(this.inputTelephone.trim()))){
+                Message.error('联系方式的格式不对,请输入正确的手机长号')
+                return
+            }
+            MessageBox.confirm('确定发布吗?', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
@@ -395,17 +435,22 @@ export default {
                     name: this.inputName,
                     place: this.inputPlace,
                     time: this.inputTime,
+                    image: this.pictureData,
                     contact_name: this.inputUserName,
                     contact_num: this.inputTelephone
-                })
-                    .then(response => {
-                        console.log(response.data)
+                }).then(response => {
+                    console.log(response.data)
+                    if(!responseHandler(response.data, this)){
+                        // 提示出错
+                        Message.error('发布失败,请重新发布一次')
+                        return
+                    }
+                    Message({
+                        type: 'success',
+                        message: '发布成功!'
                     })
-                Message({
-                    type: 'success',
-                    message: '发布成功!'
+                    this.dialogVisible = false
                 })
-                this.dialogVisible = false
             }).catch(() => {
                 Message({
                     type: 'info',

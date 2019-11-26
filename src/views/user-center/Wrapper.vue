@@ -129,7 +129,7 @@ export default {
     },
     created() {
         // 获取学生姓名卡号
-        this.getname()
+        // this.getname()
     }
 }
 </script>

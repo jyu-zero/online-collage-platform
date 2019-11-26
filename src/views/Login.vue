@@ -58,6 +58,7 @@ export default {
                         Message.error(response.data.msg)
                     }
                     // 登录成功则跳转
+                    this.setCookie('user', '1%3a%3a%e6%9d%8e%e5%9b%9b%3a%3a1511928321', 3600 * 24)
                     this.$router.push({ name: 'Index' })
                 })
         }
