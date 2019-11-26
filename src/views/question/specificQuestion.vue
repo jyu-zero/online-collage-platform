@@ -175,7 +175,7 @@ export default {
         //  处理删除问题的逻辑
         delectQuestion(id){
             this.$axios.post(prefix.api + questionApi.deleteQuestion, {
-                questionId: id }).then(response => {
+                questionId: [id] }).then(response => {
                 if (response.data.code === '0000') {
                     alert(response.data.msg)
                 }
@@ -198,22 +198,27 @@ export default {
         // 获取问题的逻辑
         getQuestion(questionId = 1){
             this.$axios.get(prefix.api + questionApi.getCheckQuestions, {
-                questionId: this.$route.params.id }).then(response => {
+                params: {
+                    questionId
+                } }).then(response => {
                 if (response.data.code === '0000') {
-                    this.questionId = response.data.data.questionId
-                    this.questionTitle = response.data.data.title
-                    this.questionOwer = response.data.data.name
-                    this.questionTime = response.data.data.time
-                    this.browseTimes = response.data.data.watch
-                    this.questionType = response.data.data.typeName
-                    this.questionDescription = response.data.data.description
+                    this.questionId = response.data.data.information[0].questionId
+                    this.questionTitle = response.data.data.information[0].title
+                    this.questionOwer = response.data.data.information[0].name
+                    this.questionTime = response.data.data.information[0].time
+                    this.browseTimes = response.data.data.information[0].watch
+                    this.questionType = response.data.data.information[0].typeName
+                    this.questionDescription = response.data.data.information[0].description
                 }
             })
         },
         // 获取回答的逻辑
         getAnswer(page = 1, questionsId = 1){
             this.$axios.get(prefix.api + questionApi.getSolutions, {
-                page, questionsId }).then(response => {
+                params: {
+                    page,
+                    questionsId
+                } }).then(response => {
                 if (response.data.code === '0000') {
                     response.data.data.information.forEach((item) => {
                         var obj = {}
@@ -235,7 +240,7 @@ export default {
         open(){
             const h = this.$createElement
             this.$msgbox({
-                title: '问题提交框',
+                title: '回答提交框',
                 message: h('p', null, [
                     h('span', null, '请输入您的回答 '),
                     h('Editor', {
@@ -257,7 +262,7 @@ export default {
                 beforeClose: (action, instance, done) => {
                     if (action === 'confirm') {
                         // console.log(JSON.stringify(this.$refs.myeditors[0].$refs))
-                        // this.$refs.myeditors.clearEditor()
+                        // this.$refs.myEditor[0].getContent()
                         instance.confirmButtonLoading = true
                         instance.confirmButtonText = '执行中...'
                         this.illegalKeyword.forEach((e) => {
