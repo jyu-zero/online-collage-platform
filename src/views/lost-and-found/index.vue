@@ -6,7 +6,7 @@
             <el-button type="primary" title="点击去我的失物招领" @click="goToUserCenterLostAndFound">我的失物招领</el-button>
             <LostAndFoundDialog :buttonTitle="'点击发布失物信息'" :typeStyle="'warning'" head :prompt="'我丢东西了'">我丢东西了</LostAndFoundDialog>
             <LostAndFoundDialog :buttonTitle="'点击发布招领信息'" :typeStyle="'warning'" head :prompt="'我捡到东西了'">我捡到东西了</LostAndFoundDialog>
-            <el-input class="el-input" placeholder="请输入内容" v-model="search" clearable></el-input>
+            <el-input class="el-input" placeholder="请输入内容" v-model="search" clearable @keyup.enter.native="getSearchContent"></el-input>
         </div>
         <div class="lost-found-list">
             <ul v-for="item of goods" :key="item.id">
@@ -38,9 +38,7 @@
                     <div class="to-details">
                         <el-button title="点击查看详情和图片" type="primary" v-if="item.sort==0" @click="goToLostDetails">查看详情</el-button>
                         <el-button title="点击查看详情和图片" type="primary" v-if="item.sort==1" @click="goToFoundDetails">查看详情</el-button>
-                        <!-- :buttonTitle="'点击设置失物状态'" -->
                         <LostAndFoundDialog :typeStyle="'primary'" :disabled="'disabled'" v-if="item.status==0&&item.sort==0" list :prompt="'未完成'">未完成</LostAndFoundDialog>
-                        <!-- :buttonTitle="'点击设置招领状态'" -->
                         <LostAndFoundDialog :typeStyle="'primary'" :disabled="'disabled'" v-if="item.status==0&&item.sort==1" list :prompt="'未完成'">未完成</LostAndFoundDialog>
                         <LostAndFoundDialog :typeStyle="'warning'" :disabled="'disabled'" v-if="item.status==1" list>已完成</LostAndFoundDialog>
                     </div>
@@ -52,11 +50,11 @@
                     <div class="block">
                         <el-pagination
                         @size-change="handleSizeChange"
-                        @current-change="getMyLostAndFoundList"
+                        @current-change="handleCurrentChange"
                         :current-page.sync="pageCount"
-                        :page-size="40"
+                        :page-size="5"
                         layout="prev, pager, next, jumper"
-                        :total="500">
+                        :total="100">
                         </el-pagination>
                     </div>
                 </template>
@@ -108,90 +106,6 @@ export default {
             //         trusteeship: false,
             //         place: '中区主球场',
             //         time: '2019-02-23'
-            //     },
-            //     {
-            //         id: 1,
-            //         // 0代表进行,1代表完成
-            //         status: 0,
-            //         // 0丢失,1认领
-            //         sort: 1,
-            //         name: '卡西欧手表',
-            //         // 是否学院托管
-            //         trusteeship: true,
-            //         place: '中区篮球场',
-            //         time: '2019-06-04'
-            //     },
-            //     {
-            //         id: 2,
-            //         // 0代表进行,1代表完成
-            //         status: 0,
-            //         // 0丢失,1认领
-            //         sort: 0,
-            //         name: '小米手机',
-            //         // 是否学院托管
-            //         trusteeship: true,
-            //         place: '南区食堂',
-            //         time: '2018-12-16'
-            //     },
-            //     {
-            //         id: 3,
-            //         // 0代表进行,1代表完成
-            //         status: 0,
-            //         // 0丢失,1认领
-            //         sort: 0,
-            //         name: '一卡通171100220',
-            //         // 是否学院托管
-            //         trusteeship: false,
-            //         place: '全校',
-            //         time: '2019-06-11'
-            //     },
-            //     {
-            //         id: 3,
-            //         // 0代表进行,1代表完成
-            //         status: 0,
-            //         // 0丢失,1认领
-            //         sort: 1,
-            //         name: '一卡通171100220',
-            //         // 是否学院托管
-            //         trusteeship: false,
-            //         place: '全校',
-            //         time: '2019-06-11'
-            //     },
-            //     {
-            //         id: 3,
-            //         // 0代表进行,1代表完成
-            //         status: 0,
-            //         // 0丢失,1认领
-            //         sort: 1,
-            //         name: '一卡通171100220',
-            //         // 是否学院托管
-            //         trusteeship: false,
-            //         place: '全校',
-            //         time: '2019-06-11'
-            //     },
-            //     {
-            //         id: 3,
-            //         // 0代表进行,1代表完成
-            //         status: 1,
-            //         // 0丢失,1认领
-            //         sort: 1,
-            //         name: '一卡通171100220',
-            //         // 是否学院托管
-            //         trusteeship: false,
-            //         place: '全校',
-            //         time: '2019-06-11'
-            //     },
-            //     {
-            //         id: 3,
-            //         // 0代表进行,1代表完成
-            //         status: 1,
-            //         // 0丢失,1认领
-            //         sort: 1,
-            //         name: '一卡通171100220',
-            //         // 是否学院托管
-            //         trusteeship: false,
-            //         place: '全校',
-            //         time: '2019-06-11'
             //     }
             ]
         }
@@ -215,6 +129,10 @@ export default {
                 this.pageCount = response.data.data.totalpage
             })
         },
+        // 获取失物招领搜索内容
+        getSearchContent(){
+            this.getGoods()
+        },
         // 跳转至我的失物招领页面
         goToUserCenterLostAndFound(){
             // console.log('跳转至我的失物招领页面')
@@ -233,20 +151,21 @@ export default {
         handleSizeChange(val) {
             // console.log(`每页 ${val} 条`);
         },
-        // handleCurrentChange(val) {
-        //     // console.log(`当前页: ${val}`);
-        // }
-        getMyLostAndFoundList(page = 1) {
-            this.$axios.get(prefix.api + goodsApi.getGoods, {
-                params: {
-                    page
-                }
-            }).then(response => {
-                // if(!responseHandler.handle(response.data, this)) { return }
-                this.questionList = response.data.data.questions
-                this.pageCount = response.data.data.pageCount
-            })
+        handleCurrentChange(val) {
+            // console.log(`当前页: ${val}`);
+            this.getGoods()
         }
+        // getMyLostAndFoundList(page = 1) {
+        //     this.$axios.get(prefix.api + goodsApi.getGoods, {
+        //         params: {
+        //             page
+        //         }
+        //     }).then(response => {
+        //         // if(!responseHandler.handle(response.data, this)) { return }
+        //         this.questionList = response.data.data.questions
+        //         this.pageCount = response.data.data.pageCount
+        //     })
+        // }
     }
 }
 </script>

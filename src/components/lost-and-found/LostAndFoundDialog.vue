@@ -38,11 +38,11 @@
                 </span>
                 <!-- 遗失时间 -->
                 <span>遗失的时间
-                    <el-input
-                    placeholder="请输入内容"
+                    <el-date-picker
                     v-model="inputTime"
-                    clearable>
-                    </el-input>
+                    type="date"
+                    placeholder="选择日期">
+                    </el-date-picker>
                 </span>
                 <!-- 遗失物品图片 -->
                 <span>遗失物品图片
@@ -106,11 +106,11 @@
                 </span>
                 <!-- 拾到时间 -->
                 <span>拾到的时间
-                    <el-input
-                    placeholder="请输入内容"
+                    <el-date-picker
                     v-model="inputTime"
-                    clearable>
-                    </el-input>
+                    type="date"
+                    placeholder="选择日期">
+                    </el-date-picker>
                 </span>
                 <!-- 拾到物品图片 -->
                 <span>拾到物品图片
@@ -244,7 +244,7 @@
 </template>
 
 <script>
-import { Button, Dialog, Input, Upload, MessageBox, Radio, Message, Select, Option } from 'element-ui'
+import { Button, Dialog, Input, Upload, MessageBox, Radio, Message, Select, Option, DatePicker } from 'element-ui'
 import { prefix, goodsApi } from '@/api'
 export default {
     components: {
@@ -257,7 +257,8 @@ export default {
         [Radio.name]: Radio,
         [Message.name]: Message,
         [Select.name]: Select,
-        [Option.name]: Option
+        [Option.name]: Option,
+        [DatePicker.name]: DatePicker
     },
     data() {
         return {
@@ -575,6 +576,15 @@ ul,li {
         .el-dialog__title{
             font-weight: 600;
             font-size: 24px;
+        }
+        .el-dialog__body{
+            div{
+                :nth-child(4){
+                    .el-date-editor{
+                        display: flex;
+                    }
+                }
+            }
         }
     }
     .found{
