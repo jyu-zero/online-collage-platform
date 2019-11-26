@@ -4,12 +4,12 @@
         <div class="lost-found-head-list">
             <h2>失物招领</h2>
             <el-button type="primary" title="点击去我的失物招领" @click="goToUserCenterLostAndFound">我的失物招领</el-button>
-            <LostAndFoundDialog title="点击发布失物信息" :typeStyle="'warning'" head>我丢东西了</LostAndFoundDialog>
-            <LostAndFoundDialog title="点击发布招领信息" :typeStyle="'warning'" head>我找到东西了</LostAndFoundDialog>
-            <el-input class="el-input" placeholder="请输入内容" v-model="input" clearable></el-input>
+            <LostAndFoundDialog :buttonTitle="'点击发布失物信息'" :typeStyle="'warning'" head :prompt="'我丢东西了'">我丢东西了</LostAndFoundDialog>
+            <LostAndFoundDialog :buttonTitle="'点击发布招领信息'" :typeStyle="'warning'" head :prompt="'我捡到东西了'">我捡到东西了</LostAndFoundDialog>
+            <el-input class="el-input" placeholder="请输入内容" v-model="search" clearable></el-input>
         </div>
         <div class="lost-found-list">
-            <ul v-for="item of goods" :key="item.good_id">
+            <ul v-for="item of goods" :key="item.id">
                 <li>
                     <div class="lost-and-found-list-left">
                         <div class="lost-and-found-type">
@@ -18,7 +18,7 @@
                         </div>
                         <div class="top">
                             <div class="goods-name">
-                                <p><span>{{item.name}}</span></p>
+                                <p><span>{{item.title}}</span></p>
                             </div>
                             <div class="goods-condition">
                                 <p v-if="!item.trusteeship"><span>学院托管</span></p>
@@ -38,10 +38,13 @@
                     <div class="to-details">
                         <el-button title="点击查看详情和图片" type="primary" v-if="item.sort==0" @click="goToLostDetails">查看详情</el-button>
                         <el-button title="点击查看详情和图片" type="primary" v-if="item.sort==1" @click="goToFoundDetails">查看详情</el-button>
-                        <LostAndFoundDialog title="" :typeStyle="'primary'" v-if="item.status==0" list>未完成</LostAndFoundDialog>
-                        <LostAndFoundDialog title="" :typeStyle="'warning'" :disabled="'disabled'" v-if="item.status==1" list>已完成</LostAndFoundDialog>
+                        <!-- :buttonTitle="'点击设置失物状态'" -->
+                        <LostAndFoundDialog :typeStyle="'primary'" :disabled="'disabled'" v-if="item.status==0&&item.sort==0" list :prompt="'未完成'">未完成</LostAndFoundDialog>
+                        <!-- :buttonTitle="'点击设置招领状态'" -->
+                        <LostAndFoundDialog :typeStyle="'primary'" :disabled="'disabled'" v-if="item.status==0&&item.sort==1" list :prompt="'未完成'">未完成</LostAndFoundDialog>
+                        <LostAndFoundDialog :typeStyle="'warning'" :disabled="'disabled'" v-if="item.status==1" list>已完成</LostAndFoundDialog>
                     </div>
-                </li>
+               </li>
             </ul>
             <!-- 分页 -->
             <div class="list-pagination">
@@ -49,9 +52,9 @@
                     <div class="block">
                         <el-pagination
                         @size-change="handleSizeChange"
-                        @current-change="handleCurrentChange"
-                        :current-page.sync="currentPage3"
-                        :page-size="100"
+                        @current-change="getMyLostAndFoundList"
+                        :current-page.sync="pageCount"
+                        :page-size="40"
                         layout="prev, pager, next, jumper"
                         :total="500">
                         </el-pagination>
@@ -64,7 +67,7 @@
 </template>
 
 <script>
-import { Button, Message, Pagination, Input } from 'element-ui'
+import { Button, Message, Pagination, Input, MessageBox } from 'element-ui'
 import LostAndFoundDialog from '../../components/lost-and-found/LostAndFoundDialog'
 import { prefix, goodsApi } from '@/api'
 export default {
@@ -74,151 +77,175 @@ export default {
         [Message.name]: Message,
         [Pagination.name]: Pagination,
         [Input.name]: Input,
+        [MessageBox.name]: MessageBox,
         LostAndFoundDialog
     },
     data() {
         return {
-            // 改变按钮组件type的属性
+
+            // 动态改变按钮组件type的属性
             typeStyle: '',
-            // 改变按钮组件的类型
+            // 动态改变按钮组件的类型
             disabled: '',
-            currentPage3: 5,
-            input: '',
+            // 弹窗的标题提示
+            prompt: '',
+            // 动态改变按钮的提示,多此一步是为了解决弹窗中出现title冒泡的问题
+            buttonTitle: '',
+            // currentPage3: 5,
+            pageCount: 1,
+            search: '',
             // 我的失物招领数据
             goods: [
-                {
-                    id: 0,
-                    // lost: true,
-                    // 0代表进行,1代表完成,主页面不显示已经完成的列表
-                    status: 1,
-                    // 0丢失,1认领
-                    sort: 0,
-                    name: '蓝色小水杯',
-                    // 是否学院托管
-                    trusteeship: false,
-                    place: '中区主球场',
-                    time: '2019-02-23'
-                },
-                {
-                    id: 1,
-                    // 0代表进行,1代表完成
-                    status: 0,
-                    // 0丢失,1认领
-                    sort: 1,
-                    name: '卡西欧手表',
-                    // 是否学院托管
-                    trusteeship: true,
-                    place: '中区篮球场',
-                    time: '2019-06-04'
-                },
-                {
-                    id: 2,
-                    // 0代表进行,1代表完成
-                    status: 0,
-                    // 0丢失,1认领
-                    sort: 0,
-                    name: '小米手机',
-                    // 是否学院托管
-                    trusteeship: true,
-                    place: '南区食堂',
-                    time: '2018-12-16'
-                },
-                {
-                    id: 3,
-                    // 0代表进行,1代表完成
-                    status: 0,
-                    // 0丢失,1认领
-                    sort: 0,
-                    name: '一卡通171100220',
-                    // 是否学院托管
-                    trusteeship: false,
-                    place: '全校',
-                    time: '2019-06-11'
-                },
-                {
-                    id: 3,
-                    // 0代表进行,1代表完成
-                    status: 0,
-                    // 0丢失,1认领
-                    sort: 1,
-                    name: '一卡通171100220',
-                    // 是否学院托管
-                    trusteeship: false,
-                    place: '全校',
-                    time: '2019-06-11'
-                },
-                {
-                    id: 3,
-                    // 0代表进行,1代表完成
-                    status: 0,
-                    // 0丢失,1认领
-                    sort: 1,
-                    name: '一卡通171100220',
-                    // 是否学院托管
-                    trusteeship: false,
-                    place: '全校',
-                    time: '2019-06-11'
-                },
-                {
-                    id: 3,
-                    // 0代表进行,1代表完成
-                    status: 1,
-                    // 0丢失,1认领
-                    sort: 1,
-                    name: '一卡通171100220',
-                    // 是否学院托管
-                    trusteeship: false,
-                    place: '全校',
-                    time: '2019-06-11'
-                },
-                {
-                    id: 3,
-                    // 0代表进行,1代表完成
-                    status: 1,
-                    // 0丢失,1认领
-                    sort: 1,
-                    name: '一卡通171100220',
-                    // 是否学院托管
-                    trusteeship: false,
-                    place: '全校',
-                    time: '2019-06-11'
-                }
+            //     {
+            //         id: 0,
+            //         // lost: true,
+            //         // 0代表进行,1代表完成,主页面不显示已经完成的列表
+            //         status: 1,
+            //         // 0丢失,1认领
+            //         sort: 0,
+            //         title: '蓝色小水杯',
+            //         // 是否学院托管
+            //         trusteeship: false,
+            //         place: '中区主球场',
+            //         time: '2019-02-23'
+            //     },
+            //     {
+            //         id: 1,
+            //         // 0代表进行,1代表完成
+            //         status: 0,
+            //         // 0丢失,1认领
+            //         sort: 1,
+            //         name: '卡西欧手表',
+            //         // 是否学院托管
+            //         trusteeship: true,
+            //         place: '中区篮球场',
+            //         time: '2019-06-04'
+            //     },
+            //     {
+            //         id: 2,
+            //         // 0代表进行,1代表完成
+            //         status: 0,
+            //         // 0丢失,1认领
+            //         sort: 0,
+            //         name: '小米手机',
+            //         // 是否学院托管
+            //         trusteeship: true,
+            //         place: '南区食堂',
+            //         time: '2018-12-16'
+            //     },
+            //     {
+            //         id: 3,
+            //         // 0代表进行,1代表完成
+            //         status: 0,
+            //         // 0丢失,1认领
+            //         sort: 0,
+            //         name: '一卡通171100220',
+            //         // 是否学院托管
+            //         trusteeship: false,
+            //         place: '全校',
+            //         time: '2019-06-11'
+            //     },
+            //     {
+            //         id: 3,
+            //         // 0代表进行,1代表完成
+            //         status: 0,
+            //         // 0丢失,1认领
+            //         sort: 1,
+            //         name: '一卡通171100220',
+            //         // 是否学院托管
+            //         trusteeship: false,
+            //         place: '全校',
+            //         time: '2019-06-11'
+            //     },
+            //     {
+            //         id: 3,
+            //         // 0代表进行,1代表完成
+            //         status: 0,
+            //         // 0丢失,1认领
+            //         sort: 1,
+            //         name: '一卡通171100220',
+            //         // 是否学院托管
+            //         trusteeship: false,
+            //         place: '全校',
+            //         time: '2019-06-11'
+            //     },
+            //     {
+            //         id: 3,
+            //         // 0代表进行,1代表完成
+            //         status: 1,
+            //         // 0丢失,1认领
+            //         sort: 1,
+            //         name: '一卡通171100220',
+            //         // 是否学院托管
+            //         trusteeship: false,
+            //         place: '全校',
+            //         time: '2019-06-11'
+            //     },
+            //     {
+            //         id: 3,
+            //         // 0代表进行,1代表完成
+            //         status: 1,
+            //         // 0丢失,1认领
+            //         sort: 1,
+            //         name: '一卡通171100220',
+            //         // 是否学院托管
+            //         trusteeship: false,
+            //         place: '全校',
+            //         time: '2019-06-11'
+            //     }
             ]
         }
+    },
+    created () {
+        this.getGoods()
     },
     methods: {
         // 获取失物招领内容
         getGoods(){
-            this.$axios.get(prefix.api + goodsApi.getGoods).then((response)=>{
+            this.$axios.get(prefix.api + goodsApi.getGoods, {
+                page: this.page,
+                search: this.search
+            }).then((response)=>{
                 // if(!responseHandler(response.data, this)){
                 //     // 提示出错
                 //     Message.error('您还未登录')
                 //     return
                 // }
-                this.goods = response.data.data
-                console.log(response.data.data)
+                this.goods = response.data.data.rs
+                this.pageCount = response.data.data.totalpage
             })
         },
         // 跳转至我的失物招领页面
         goToUserCenterLostAndFound(){
-            console.log('跳转至我的失物招领页面')
+            // console.log('跳转至我的失物招领页面')
             this.$router.push({ name: 'UserCenterLostAndFound' })
         },
         // 跳转至失物详情页
         goToLostDetails(){
-            console.log('跳转至失物详情页')
+            // console.log('跳转至失物详情页')
             this.$router.push({ name: 'LostDetails' })
         },
         // 跳转至招领详情页
         goToFoundDetails(){
-            console.log('跳转至招领详情页')
+            // console.log('跳转至招领详情页')
             this.$router.push({ name: 'FoundDetails' })
         },
         handleSizeChange(val) {
             // console.log(`每页 ${val} 条`);
         },
-        handleCurrentChange(val) {
-            // console.log(`当前页: ${val}`);
+        // handleCurrentChange(val) {
+        //     // console.log(`当前页: ${val}`);
+        // }
+        getMyLostAndFoundList(page = 1) {
+            this.$axios.get(prefix.api + goodsApi.getGoods, {
+                params: {
+                    page
+                }
+            }).then(response => {
+                // if(!responseHandler.handle(response.data, this)) { return }
+                this.questionList = response.data.data.questions
+                this.pageCount = response.data.data.pageCount
+            })
         }
     }
 }
@@ -259,7 +286,7 @@ p {
 .lost-found-page {
     // height: 100%;
     display: flex;
-    margin: auto;
+    margin: 0 auto;
     flex-direction: column;
     box-sizing: border-box;
     // background-color: pink;
