@@ -16,7 +16,7 @@
 
                 <!-- 发起新问题按钮 -->
                 <el-col :span="4" :offset="6">
-                    <div class="grid-content bg-purple">
+                    <div class="grid-content bg-purple right-align">
                         <el-button type="primary" @click.native="newQuestion">发起新问题</el-button>
                     </div>
                 </el-col>
@@ -44,19 +44,22 @@
                 <el-row :gutter="20">
                     <el-col :span="14">
                         <div class="grid-content bg-purple left-align">
-                            <el-radio v-model="radio" :label="questionItem.questionId">
-                                <span>{{questionItem.title}}</span>
-                            </el-radio>
-                            <p class="description">提问人{{questionItem.name}} {{questionItem.time}}
-                                <i class="el-icon-s-promotion">{{questionItem.typeName}}</i>
-                                <i class="el-icon-view">{{questionItem.views}}</i>
-                                <i class="el-icon-chat-dot-round">{{questionItem.solutionsNum}}</i>
-                            </p>
+                            <div class="question-title">
+                                <el-button type="text" disabled>{{questionItem.status}}</el-button>
+                                <h2>{{questionItem.title}}</h2>
+                            </div>
+                            <div class="description">
+                                <p>提问人{{questionItem.name}} {{questionItem.time}}</p>
+                                <div class="comment">
+                                    <i class="el-icon-s-promotion">{{questionItem.typeName}}</i>
+                                    <i class="el-icon-view">{{questionItem.views}}</i>
+                                    <i class="el-icon-chat-dot-round">{{questionItem.solutionsNum}}</i>
+                                </div>
+                            </div>
                         </div>
                     </el-col>
                     <el-col :span="4" :offset="6">
                         <div class="grid-content bg-purple right-align">
-                            <el-button type="text" disabled>{{questionItem.status}}</el-button>
                             <el-button @click="goToSpecificQuestion(questionItem.questionId)">查看</el-button>
                         </div>
                     </el-col>
@@ -80,7 +83,7 @@
 
 <script>
 import { prefix, responseHandler, questionApi } from '@/api'
-import { Button, Message, Breadcrumb, Row, Col, Input, BreadcrumbItem, Radio, Pagination } from 'element-ui'
+import { Button, Message, Breadcrumb, Row, Col, Input, BreadcrumbItem, Pagination } from 'element-ui'
 export default {
     name: 'Question',
     components: {
@@ -91,14 +94,25 @@ export default {
         [Col.name]: Col,
         [Input.name]: Input,
         [BreadcrumbItem.name]: BreadcrumbItem,
-        [Radio.name]: Radio,
         [Pagination.name]: Pagination
     },
     data(){
         return {
-            questionList: [], // 问题列表
+            // 问题列表
+            questionList: [
+                {
+                    'questionId': 50,
+                    'name': 'zhangs',
+                    'title': '这是问题的标题sdgsdgshsfhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhdagsd',
+                    'description': '描述',
+                    'status': '已解决',
+                    'time': '2019-11-15',
+                    'typeName': '类型名',
+                    'views': 20,
+                    'solutionsNum': 11
+                }
+            ],
             pageCount: 1, // 总的页数
-            radio: 1, // 获取所要查看的问题id
             searchContent: '', // 搜索的问题内容
             page: 1
         }
@@ -168,7 +182,7 @@ export default {
 }
 </script>
 
-<style lang='less'>
+<style lang='less' scoped>
     *{
         box-sizing: border-box;
     }
@@ -184,6 +198,10 @@ export default {
                 font-size: 24px;
                 margin: 0;
             }
+
+            .right-align{
+                text-align: right;
+            }
         }
 
         main{
@@ -191,10 +209,10 @@ export default {
 
             .question-box{
                 width: 100%;
-                height: 100px;
+                height: 120px;
                 border: 1px solid rgb(49, 49, 49);
                 border-top: 0;
-                padding: 20px 40px;
+                padding: 30px 40px;
                 box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 
                 &:first-child {
@@ -211,24 +229,43 @@ export default {
                     .left-align{
                         text-align: left;
 
-                        .el-radio{
-                            font-size: 18px;
+                        .question-title{
                             width: 100%;
-                            margin-right: 0;
-                            overflow: hidden;
-                            text-overflow:ellipsis;
-                            white-space: nowrap;
+                            display: flex;
+                            align-content: center;
+                            padding: 0 0 15px;
 
-                            .el-radio__label{
-                                font-size: 18px;
+                            .is-disabled{
+                                margin-right: 8px;
+                                padding: 0;
                             }
+
+                            h2{
+                                display: inline;
+                                font-size: 18px;
+                                margin: 0;
+                                overflow: hidden;
+                                text-overflow:ellipsis;
+                                white-space: nowrap;
+                            }
+
                         }
-                        
+
                         .description{
-                            width:100%;
-                            line-height:100%;
-                            margin: 8px 0 0;
-                            font-size: 14px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+
+                            p{
+                                margin: 0;
+                            }
+
+                            .comment{
+                                width: 40%;
+                                display: flex;
+                                justify-content: space-between;
+                            }
+                            
                         }
 
                         i{

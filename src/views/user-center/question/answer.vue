@@ -1,68 +1,70 @@
 <template>
     <div class="question">
-        <h1 class="questioin-status">待解决</h1>
-            <!-- 待解决问题列表 -->
-            <div class="wait-for-solve-container">
-                <div class="question-box" v-for="questionItem of waitToSolveQuestionList" :key="questionItem.questionId">
-                    <el-row :gutter="20">
-                        <el-col :span="6">
-                            <div class="grid-content bg-purple left-align">
-                                <el-checkbox @change="checkId(questionItem.questionId)">{{questionItem.title}}</el-checkbox>
-                                <p class="time-container">{{questionItem.time}}</p>
-                            </div>
-                        </el-col>
-                        <el-col :span="18">
-                            <div class="grid-content bg-purple right-align">
-                                <i class="el-icon-s-promotion">{{questionItem.typeName}}</i>
-                                <i class="el-icon-view">{{questionItem.views}}</i>
-                                <i class="el-icon-chat-dot-round">{{questionItem.solutionsNum}}</i>
-                                <el-button @click.native="goToSpecificQuestion(questionItem.questionId)">查看</el-button>
-                            </div>
-                        </el-col>
-                    </el-row>
-                </div>
+        <h1 class="questioin-status" v-if="wait">待解决</h1>
+        <!-- 待解决问题列表 -->
+        <div class="wait-for-solve-container">
+            <div class="question-box" v-for="questionItem of waitToSolveQuestionList" :key="questionItem.questionId">
+                <el-row :gutter="20">
+                    <el-col :span="6">
+                        <div class="grid-content bg-purple left-align">
+                            <el-checkbox @change="checkId(questionItem.questionId)">{{questionItem.title}}</el-checkbox>
+                            <p class="time-container">{{questionItem.time}}</p>
+                        </div>
+                    </el-col>
+                    <el-col :span="18">
+                        <div class="grid-content bg-purple right-align">
+                            <i class="el-icon-s-promotion">{{questionItem.typeName}}</i>
+                            <i class="el-icon-view">{{questionItem.views}}</i>
+                            <i class="el-icon-chat-dot-round">{{questionItem.solutionsNum}}</i>
+                            <el-button @click.native="goToSpecificQuestion(questionItem.questionId)">查看</el-button>
+                        </div>
+                    </el-col>
+                </el-row>
             </div>
-            <!-- 待解决问题列表 [完]-->
-            <!-- 分页 -->
-            <el-pagination
-                background
-                layout="prev, pager, next"
-                @current-change="handleWaitToSolveQuestionChange"
-                :page-count="waitToSolvePageCount">
-            </el-pagination>
-            <!-- 分页 [完] -->
+        </div>
+        <!-- 待解决问题列表 [完]-->
+        <!-- 分页 -->
+        <el-pagination
+            background
+            layout="prev, pager, next"
+            @current-change="handleWaitToSolveQuestionChange"
+            :page-count="waitToSolvePageCount"
+            v-if="wait">
+        </el-pagination>
+        <!-- 分页 [完] -->
 
-            <h1 class="questioin-status">已解决</h1>
-            <!-- 已解决问题列表 -->
-            <div class="solved-container">
-                <div class="question-box" v-for="questionItem of solvedQuestionList" :key="questionItem.questionId">
-                    <el-row :gutter="20">
-                        <el-col :span="6">
-                            <div class="grid-content bg-purple left-align">
-                                <el-checkbox @change="checkId(questionItem.questionId)">{{questionItem.title}}</el-checkbox>
-                                <p class="time-container">{{questionItem.time}}</p>
-                            </div>
-                        </el-col>
-                        <el-col :span="18">
-                            <div class="grid-content bg-purple right-align">
-                                <i class="el-icon-s-promotion">{{questionItem.typeName}}</i>
-                                <i class="el-icon-view">{{questionItem.views}}</i>
-                                <i class="el-icon-chat-dot-round">{{questionItem.solutionsNum}}</i>
-                                <el-button @click.native="goToSpecificQuestion(questionItem.questionId)">查看</el-button>
-                            </div>
-                        </el-col>
-                    </el-row>
-                </div>
+        <h1 class="questioin-status" v-if="solved">已解决</h1>
+        <!-- 已解决问题列表 -->
+        <div class="solved-container">
+            <div class="question-box" v-for="questionItem of solvedQuestionList" :key="questionItem.questionId">
+                <el-row :gutter="20">
+                    <el-col :span="6">
+                        <div class="grid-content bg-purple left-align">
+                            <el-checkbox @change="checkId(questionItem.questionId)">{{questionItem.title}}</el-checkbox>
+                            <p class="time-container">{{questionItem.time}}</p>
+                        </div>
+                    </el-col>
+                    <el-col :span="18">
+                        <div class="grid-content bg-purple right-align">
+                            <i class="el-icon-s-promotion">{{questionItem.typeName}}</i>
+                            <i class="el-icon-view">{{questionItem.views}}</i>
+                            <i class="el-icon-chat-dot-round">{{questionItem.solutionsNum}}</i>
+                            <el-button @click.native="goToSpecificQuestion(questionItem.questionId)">查看</el-button>
+                        </div>
+                    </el-col>
+                </el-row>
             </div>
-            <!-- 已解决问题列表 [完]-->
-            <!-- 分页 -->
-            <el-pagination
-                background
-                layout="prev, pager, next"
-                @current-change="handleSolvedQuestionChange"
-                :page-count="solvedPageCount">
-            </el-pagination>
-            <!-- 分页 [完] -->
+        </div>
+        <!-- 已解决问题列表 [完]-->
+        <!-- 分页 -->
+        <el-pagination
+            background
+            layout="prev, pager, next"
+            @current-change="handleSolvedQuestionChange"
+            :page-count="solvedPageCount"
+            v-if="solved">
+        </el-pagination>
+        <!-- 分页 [完] -->
     </div>
 </template>
 
@@ -88,19 +90,29 @@ export default {
             // 获取用户选择要进行查看的问题的id,只能是一条
             checkQuestionId: [],
             // 待解决问题列表的页数
-            waitToSolvePageCount: 5,
+            waitToSolvePageCount: 0,
             // 已解决问题列表的页数
-            solvedPageCount: 5,
+            solvedPageCount: 0,
             // 记录当前待解决问题所在页数
             waitToSolvePage: 1,
             // 记录当前已解决问题所在页数
-            solvedPage: 1
+            solvedPage: 1,
+            // 待解决列表是否存在数据
+            wait: false,
+            // 已解决列表是否存在数据
+            solved: false
         }
     },
     created(){
         // 获取当前页面的待解决和已解决问题
         this.getWaitToSolveQuestion()
         this.getSolvedQuestion()
+        if(this.waitToSolvePageCount >= 1){
+            this.wait = true
+        }
+        if(this.solvedPageCount >= 1){
+            this.solved = true
+        }
     },
     methods: {
         // 将选择的问题id传给 checkQuestionId

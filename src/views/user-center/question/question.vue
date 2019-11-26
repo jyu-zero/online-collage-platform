@@ -1,7 +1,7 @@
 <template>
     <div class="question">
         <el-row :gutter="20">
-            <el-col :span="6"><div class="grid-content bg-purple"><h1 class="questioin-status">待解决</h1></div></el-col>
+            <el-col :span="6"><div class="grid-content bg-purple"><h1 class="questioin-status" v-if="wait">待解决</h1></div></el-col>
             <el-col :span="6" :offset="12"><div class="grid-content bg-purple right">
                 <el-button type="primary" @click="newQuestion">发起新问题</el-button>
             </div></el-col>
@@ -33,11 +33,12 @@
             background
             layout="prev, pager, next"
             @current-change="handleWaitToSolveQuestionChange"
-            :page-count="waitToSolvePageCount">
+            :page-count="waitToSolvePageCount"
+            v-if="wait">
         </el-pagination>
         <!-- 分页 [完] -->
 
-        <h1 class="questioin-status">已解决</h1>
+        <h1 class="questioin-status" v-if="solved">已解决</h1>
         <!-- 已解决问题列表 -->
         <div class="solved-container">
             <div class="question-box" v-for="questionItem of solvedQuestionList" :key="questionItem.questionId">
@@ -65,7 +66,8 @@
             background
             layout="prev, pager, next"
             @current-change="handleSolvedQuestionChange"
-            :page-count="solvedPageCount">
+            :page-count="solvedPageCount"
+            v-if="solved">
         </el-pagination>
         <!-- 分页 [完] -->
     </div>
@@ -93,19 +95,30 @@ export default {
             // 获取用户选择要进行查看的问题的id,只能是一条
             checkQuestionId: [],
             // 待解决问题列表的页数
-            waitToSolvePageCount: 5,
+            waitToSolvePageCount: 0,
             // 已解决问题列表的页数
-            solvedPageCount: 5,
+            solvedPageCount: 0,
             // 记录当前待解决问题所在页数
             waitToSolvePage: 1,
             // 记录当前已解决问题所在页数
-            solvedPage: 1
+            solvedPage: 1,
+            // 待解决列表是否存在数据
+            wait: false,
+            // 已解决列表是否存在数据
+            solved: false
         }
     },
     created(){
         // 获取当前页面的待解决和已解决问题
         this.getWaitToSolveQuestion()
         this.getSolvedQuestion()
+
+        if(this.waitToSolvePageCount >= 1){
+            this.wait = true
+        }
+        if(this.solvedPageCount >= 1){
+            this.solved = true
+        }
     },
     methods: {
         newQuestion(){
@@ -197,6 +210,7 @@ export default {
 
         .right{
             text-align: right;
+            margin: 16px 0;
         }
 
         .question-box{
