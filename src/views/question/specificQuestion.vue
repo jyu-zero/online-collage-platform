@@ -3,7 +3,7 @@
             <el-breadcrumb separator = "/">
             <el-card>
                 <el-row class = "question-description" :gutter = "10">
-                    <el-col :span = "16">
+                    <el-col :span = "12">
                         <div class = "grid-content bg-purple-dark">
                             <h1 class = "question-title">{{questionTitle}}</h1>
                         </div>
@@ -14,16 +14,14 @@
                             <i class = "el-icon-s-order"></i><span>{{questionType}}</span>
                         </div>
                     </el-col>
-                    <el-col :span = "8" class="question-title" style="
-                    padding-left: 5px;
-                    padding-right: 34px;
+                    <el-col :span = "12" class="question-title" style="
                     display: flex;
                     flex-direction: row-reverse;">
+                        <el-checkbox v-model="anonymous" label="是否匿名" border style="margin: 6px 8px;">是否匿名</el-checkbox>
                         <el-button type="danger" @click='delectQuestion(questionId)' style="margin: 6px 8px;">删除问题<i class="el-icon-delete-solid"></i></el-button>
                         <el-button type="primary" @click="open" style="margin: 6px 8px;">添加回答<i class="el-icon-edit"></i></el-button>
                     </el-col>
                 </el-row>
-            </el-card>
                 <el-row>
                     <el-col :span = "24">
                         <div class = "grid-content bg-purple-dark description">
@@ -31,6 +29,7 @@
                         </div>
                     </el-col>
                 </el-row>
+            </el-card>
             </el-breadcrumb>
             <el-row>
                 <el-col :span = "24">
@@ -100,7 +99,7 @@ import E from 'wangeditor'
 import Vue from 'vue'
 import Editor from '@/components/question/Editor.vue'
 import { prefix, responseHandler, questionApi } from '@/api'
-import { Breadcrumb, Card, Button, Message, MessageBox, Pagination, Avatar, Badge, Col, Row } from 'element-ui'
+import { Breadcrumb, checkbox, Card, Button, Message, MessageBox, Pagination, Avatar, Badge, Col, Row } from 'element-ui'
 Vue.prototype.$msgbox = MessageBox
 Vue.prototype.$alert = MessageBox.alert
 Vue.prototype.$confirm = MessageBox.confirm
@@ -110,6 +109,7 @@ export default {
     name: 'QuestionSpecific',
     components: {
         [Breadcrumb.name]: Breadcrumb,
+        [checkbox.name]: checkbox,
         [Card.name]: Card,
         [Button.name]: Button,
         [Message.name]: Message,
@@ -127,7 +127,7 @@ export default {
             currentpage: 1, // 当前页数
             submitanswer: '',
             illegalKeyword: [],
-            anonymous: true,
+            anonymous: false, // 是否匿名
             questionId: this.$route.params.id,
             questionTitle: '如何进行？',
             questionOwer: 'XXXX',
@@ -143,14 +143,26 @@ export default {
         this.getAnswer()// 进入页面时预设我们问题相关回答的资料
     },
     methods: {
+        // 封装的处理放回数据提示的方法
+        responsemesg(response){
+            if (response.data.code === '0000') {
+                this.$message({
+                    type: 'success',
+                    message: response.data.msg
+                })
+            }else {
+                this.$message({
+                    type: 'error',
+                    message: response.data.msg
+                })
+            }
+        },
         // 处理点踩的逻辑
         dislike(solutionId, index){
             this.answers[index].pointTimes--
             this.$axios.post(prefix.api + questionApi.dislikes, {
                 solutionId }).then(response =>{
-                if (response.data.code === '0000') {
-                    alert(response.data.msg)
-                }
+                this.responsemesg(response)// 返回值处理
             })
         },
         // 处理点赞的逻辑
@@ -158,27 +170,21 @@ export default {
             this.answers[index].pointTimes++
             this.$axios.post(prefix.api + questionApi.likes, {
                 solutionId }).then(response => {
-                if (response.data.code === '0000') {
-                    alert(response.data.msg)
-                }
+                this.responsemesg(response)// 返回值处理
             })
         },
         // 处理采纳为最佳的逻辑
         adoptAsBest(solutionId){
             this.$axios.post(prefix.api + questionApi.adoptAsBest, {
                 solutionId }).then(response => {
-                if (response.data.code === '0000') {
-                    alert(response.data.msg)
-                }
+                this.responsemesg(response)// 返回值处理
             })
         },
         //  处理删除问题的逻辑
         delectQuestion(id){
             this.$axios.post(prefix.api + questionApi.deleteQuestion, {
                 questionId: [id] }).then(response => {
-                if (response.data.code === '0000') {
-                    alert(response.data.msg)
-                }
+                this.responsemesg(response)// 返回值处理
             })
         },
         catchData(value){
@@ -201,6 +207,7 @@ export default {
                 params: {
                     questionId
                 } }).then(response => {
+                this.responsemesg(response)// 返回值处理
                 if (response.data.code === '0000') {
                     this.questionId = response.data.data.information[0].questionId
                     this.questionTitle = response.data.data.information[0].title
@@ -239,10 +246,13 @@ export default {
         },
         open(){
             const h = this.$createElement
+            
             this.$msgbox({
                 title: '回答提交框',
                 message: h('p', null, [
-                    h('span', null, '请输入您的回答 '),
+                    h('div', null, [
+                        h('span', null, '请输入你的回答')
+                    ]),
                     h('Editor', {
                         props: {
                             catchData: this.submitanswer
@@ -256,18 +266,18 @@ export default {
                         refInFor: true
                     }, this.submitanswer)
                 ]),
+                showClose: true,
                 showCancelButton: true,
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
+                distinguishCancelAndClose: true,
                 beforeClose: (action, instance, done) => {
                     if (action === 'confirm') {
-                        // console.log(JSON.stringify(this.$refs.myeditors[0].$refs))
-                        // this.$refs.myEditor[0].getContent()
                         instance.confirmButtonLoading = true
                         instance.confirmButtonText = '执行中...'
                         this.illegalKeyword.forEach((e) => {
                             let param = e
-                            let reg = new RegExp(param, 'gim') // re为/^\d+bl$/gim
+                            let reg = new RegExp(param, 'gim') // reg为/^\d+bl$/gim
                             this.submitanswer = this.submitanswer.replace(reg, '*')
                         })
                         this.$refs.myEditor[0].clear()
@@ -276,13 +286,7 @@ export default {
                         let anonymous = this.anonymous // 是否匿名
                         this.$axios.post(prefix.api + questionApi.publishAnswer, {
                             content, questionsId, anonymous }).then(response => {
-                            if (response.data.code === '0000') {
-                                this.$message({
-                                    message: response.data.msg,
-                                    type: 'success'
-                                })
-                                this.submitanswer = ''
-                            }
+                            this.responsemesg(response)// 返回值处理
                         })
                         setTimeout(() => {
                             setTimeout(() => {
@@ -371,16 +375,15 @@ export default {
     margin: 10px 0;
     padding: 10px;
 }
-
+.wrapper-body >div{
+    width: 100%;
+    padding: 20px 10%;
+}
 </style>
 
 <style lang="less">
 #app{
     height: auto;
-}
-.wrapper-body >div{
-    width: 100%;
-    padding: 20px 10%;
 }
 .el-message-box  {
     width: 50% !important;
