@@ -16,10 +16,10 @@
             <div class="checkbox-container" >
                 <input type="checkbox" v-model="checkModel" class="check_box tui-checkbox"  :value="notification.id">
             </div>
-            <span class="notification-title" :class="{'alreadyRead' :readArray.indexOf(notification.id)>0}" v-if="notification.type===0" @click="clickTitle(notification.id)">{{notification.title}}--</span>
-            <span class="notification-title" :class="{'alreadyRead' :readArray.indexOf(notification.id)>0}" v-if="notification.type===1" @click="clickTitle(notification.id)">{{notification.title}}--</span>
-            <span class="notification-title" :class="{'alreadyRead' :readArray.indexOf(notification.id)>0}" v-if="notification.type===2" @click="clickTitle(notification.id)">{{notification.title}}--</span>
-            <span class="check" @click="checkDetail($event,notification.type,notification.id)">查看</span>
+            <div class="notification-title" :class="{'alreadyRead' :readArray.indexOf(notification.id)>0}" v-if="notification.type===0" @click="clickTitle(notification.id)">{{notification.title}}--</div>
+            <div class="notification-title" :class="{'alreadyRead' :readArray.indexOf(notification.id)>0}" v-if="notification.type===1" @click="clickTitle(notification.id)">{{notification.title}}--</div>
+            <div class="notification-title" :class="{'alreadyRead' :readArray.indexOf(notification.id)>0}" v-if="notification.type===2" @click="clickTitle(notification.id)">{{notification.name}}在<span>{{notification.title}}</span>中回复了您</div>
+            <div class="check" @click="checkDetail($event,notification.type,notification.id)">查看</div>
           </div>
           <div class="content-container hidden" v-if="notification.type===0">
               <p>
@@ -36,12 +36,12 @@
             :current-page="currentPage"
             layout="prev, pager, next"
             :total="total"
-            @prev-click="changePage('prev')"
-            @next-click="changePage('next')"
-            @current-change="changePage()">
+            @prev-click="prevPage()"
+            @next-click="nextPage()"
+            @current-change="getNotifications">
             </el-pagination>
       </div>
-      
+
     </main>
     <div id="send-notification-container-bg" v-if="showSendWindow" @click.self="toggle">
         <div id="send-notification-container">
@@ -98,36 +98,7 @@ export default {
             inputTitle: '',
             inputContent: '',
             // 用于存储id的数组
-            notifications: [
-                {
-                    'id': 9,
-                    'title': '上课通知',
-                    'content': '这个周末补课哈',
-                    'type': 0
-                },
-                {
-                    'id': 5,
-                    'title': '上课通知',
-                    'content': '这个周末补课哈',
-                    'type': 0
-                },
-                {
-                    'id': 22,
-                    'title': '上课通知',
-                    'content': '这个周末补课哈',
-                    'type': 0
-                },
-                {
-                    'id': 44,
-                    'title': '问答',
-                    'type': 2
-                },
-                {
-                    'id': 32,
-                    'title': '新闻',
-                    'type': 1
-                }
-            ],
+            notifications: [],
             checked: false,
             checkModel: [],
             checkedNames: '',
@@ -142,11 +113,11 @@ export default {
     },
     methods: {
         // 获取通知栏数据
-        getNotifications(page = 1){
+        getNotifications(currentPage = 1){
             this.$axios.get(prefix.api + notificationApi.getNotifications, {
                 params: {
-                    page,
-                    pageSize: 1
+                    currentPage,
+                    pageSize: 6
                 }
             }).then((response)=>{
                 if(!responseHandler(response.data, this)){
@@ -171,15 +142,13 @@ export default {
         // ------------------------------上半部分的<按钮功能>--------------
         // 发送通知
         sendNotification(){
-            this.$axios.get(prefix.api + notificationApi.getNotifications, {
-                params: {
-                    title: this.inputTitle,
-                    content: this.inputContent
-                }
+            this.$axios.post(prefix.api + notificationApi.sendNotification, {
+                title: this.inputTitle,
+                content: this.inputContent
             }).then((response)=>{
                 if(!responseHandler(response.data, this)){
                     // 提示出错
-                    Message.error('服务器裂开了')
+                    Message.error('发送过程中发生了位置的问题')
                     return
                 }
                 // 关闭窗口
@@ -252,17 +221,12 @@ export default {
         },
         // ------------------------------下半部分的<换页功能>--------------
         // 换页
-        changePage(val){
-            switch(val){
-                case 'prev':
-                    this.getNotifications(--this.currentPage)
-                    break
-                case 'next':
-                    this.getNotifications(++this.currentPage)
-                    break
-                default:
-                    this.getNotifications(this.currentPage)
-            }
+        prevPage(){
+            --this.currentPage
+            console.log(this.currentPage)
+        },
+        nextPage(){
+            ++this.currentPage
         },
         // 跳转新闻页
         goToNewsPage(newsId){
@@ -383,6 +347,10 @@ export default {
                     margin-right: 15px;
                     height: 100%;
                     line-height: 100%;
+                    span{
+                      color: #427fff;
+                      margin: 0 10px;
+                    }
                 }
                 .check{
                     height: 100%;
