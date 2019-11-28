@@ -18,8 +18,8 @@
                     display: flex;
                     flex-direction: row-reverse;">
                         <el-checkbox v-model="anonymous" label="是否匿名" border style="margin: 6px 8px;">是否匿名</el-checkbox>
-                        <el-button type="danger" @click='delectQuestion(questionId)' style="margin: 6px 8px;">删除问题<i class="el-icon-delete-solid"></i></el-button>
-                        <el-button type="primary" @click="open" style="margin: 6px 8px;">添加回答<i class="el-icon-edit"></i></el-button>
+                        <el-button type="danger" v-if="isQuestioner" @click='delectQuestion(questionId)' style="margin: 6px 8px;">删除问题<i class="el-icon-delete-solid"></i></el-button>
+                        <el-button type="primary" @click="publishAnswer" style="margin: 6px 8px;">添加回答<i class="el-icon-edit"></i></el-button>
                     </el-col>
                 </el-row>
                 <el-row>
@@ -49,7 +49,7 @@
                     </el-row>
                 </el-col>
                 <el-row class = "answer-contant">
-                    <el-col :span = "24" class = "description">{{item.content}}</el-col>
+                    <el-col :span = "24" class = "description" v-html="item.content">{{item.content}}</el-col>
                 </el-row>
                 <el-row class = "answer-buttom" :gutter = "20">
                     <el-col :span = "3">
@@ -77,7 +77,7 @@
                         background
                         layout = " prev, pager, next"
                         :current-page = "currentpage"
-                        :total = "100"
+                        :total = allPage
                         :page-size = 3>
                         </el-pagination>
                     </div>
@@ -123,7 +123,8 @@ export default {
     },
     data(){
         return {
-            allPage: '100', // 总页数
+            isQuestioner: false,
+            allPage: 100, // 总页数
             currentpage: 1, // 当前页数
             submitanswer: '',
             illegalKeyword: [],
@@ -159,18 +160,22 @@ export default {
         },
         // 处理点踩的逻辑
         dislike(solutionId, index){
-            this.answers[index].pointTimes--
             this.$axios.post(prefix.api + questionApi.dislikes, {
                 solutionId }).then(response =>{
                 this.responsemesg(response)// 返回值处理
+                if(response.data.code === '0000'){
+                    this.answers[index].pointTimes--
+                }
             })
         },
         // 处理点赞的逻辑
         like(solutionId, index){
-            this.answers[index].pointTimes++
             this.$axios.post(prefix.api + questionApi.likes, {
                 solutionId }).then(response => {
                 this.responsemesg(response)// 返回值处理
+                if(response.data.code === '0000'){
+                    this.answers[index].pointTimes++
+                }
             })
         },
         // 处理采纳为最佳的逻辑
@@ -182,9 +187,26 @@ export default {
         },
         //  处理删除问题的逻辑
         delectQuestion(id){
-            this.$axios.post(prefix.api + questionApi.deleteQuestion, {
-                questionId: [id] }).then(response => {
-                this.responsemesg(response)// 返回值处理
+            this.$confirm('此操作将永久删除该问题, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                // 删除问题的具体逻辑
+                let questionId = [id] // 后台要接收一个存放需要删除的问题的id
+                this.$axios.post(prefix.api + questionApi.deleteQuestion, {
+                    questionId }).then(response => {
+                    this.responsemesg(response)// 返回值处理
+                    if(response.data.code === '0000'){
+                        this.$router.push({ path: `/question` })
+                    }
+                })
+                // 删除问题完
+            }).catch(() => {
+                this.$message({
+                    type: 'error',
+                    message: '已取消删除该问题'
+                })
             })
         },
         catchData(value){
@@ -202,10 +224,10 @@ export default {
             this.getAnswer(this.currentpage, this.questionId)
         },
         // 获取问题的逻辑
-        getQuestion(questionId = 1){
+        getQuestion(questionsId = 1){
             this.$axios.get(prefix.api + questionApi.getCheckQuestions, {
                 params: {
-                    questionId
+                    questionsId
                 } }).then(response => {
                 this.responsemesg(response)// 返回值处理
                 if (response.data.code === '0000') {
@@ -216,11 +238,13 @@ export default {
                     this.browseTimes = response.data.data.information[0].watch
                     this.questionType = response.data.data.information[0].typeName
                     this.questionDescription = response.data.data.information[0].description
+                    this.isQuestioner = response.data.data.information[0].isSelf
                 }
             })
         },
         // 获取回答的逻辑
         getAnswer(page = 1, questionsId = 1){
+            let that = this // 以防后面获取不到this
             this.$axios.get(prefix.api + questionApi.getSolutions, {
                 params: {
                     page,
@@ -236,7 +260,7 @@ export default {
                         obj.answer = item.userName
                         this.answers.push(obj)
                     })
-                    this.allpage = response.data.data.pageCount
+                    that.allPage = response.data.data.pageCount
                 }
             })
         },
@@ -244,7 +268,7 @@ export default {
         getEditor(html){
             this.submitanswer = html
         },
-        open(){
+        publishAnswer(){
             const h = this.$createElement
             
             this.$msgbox({
@@ -280,12 +304,11 @@ export default {
                             let reg = new RegExp(param, 'gim') // reg为/^\d+bl$/gim
                             this.submitanswer = this.submitanswer.replace(reg, '*')
                         })
-                        this.$refs.myEditor[0].clear()
                         let content = this.submitanswer // 问题内容
-                        let questionsId = this.questionId // 问题id
+                        let questionId = this.questionId // 问题id
                         let anonymous = this.anonymous // 是否匿名
                         this.$axios.post(prefix.api + questionApi.publishAnswer, {
-                            content, questionsId, anonymous }).then(response => {
+                            content, questionId, anonymous }).then(response => {
                             this.responsemesg(response)// 返回值处理
                         })
                         setTimeout(() => {
@@ -293,17 +316,13 @@ export default {
                                 instance.confirmButtonLoading = false
                                 done()
                             }, 300)
-                        }, 3000)
+                        }, 1000)
                     } else {
                         done()
                     }
+                    this.$refs.myEditor[0].clear()
+                    this.submitanswer = ''
                 }
-            }).then(action => {
-                this.$message({
-                    type: 'info',
-                    message: 'action: ' + action
-                })
-                this.submitanswer = ''
             })
         }
     }
