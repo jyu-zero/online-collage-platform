@@ -17,9 +17,9 @@ export default {
     // 个人中心编辑信息
     'submitChange': '/goods/submit-change',
     // 失物详情页获取接口
-    'getLostDetails': '/goods/lost-detail',
+    'getLostDetails': '/goods/good-detail',
     // 招领详情页获取接口
-    'getFoundDetails': '/goods/found-detail',
+    'getFoundDetails': '/goods/good-detail',
     // 获取问题
     'getLostQuestion': '/goods/get-questions',
     // 获取联系人信息

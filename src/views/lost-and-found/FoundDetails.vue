@@ -99,7 +99,7 @@ export default {
         this.getRouterData()
         axios
             .post(prefix.api + goodsApi.getFoundDetails, {
-                good_id: this.id,
+                good_id: this.good_id,
                 sort: this.sort
             })
             .then(response => {
@@ -115,8 +115,8 @@ export default {
     methods: {
         // 获取物品的id和类别
         getRouterData() {
-            this.good_id = this.$route.params.good_id
-            this.good_id = this.$route.params.sort
+            this.good_id = this.$route.query.good_id
+            this.sort = this.$route.query.sort
         },
         // 招领详情页弹出问题窗口
         questionPopUp() {

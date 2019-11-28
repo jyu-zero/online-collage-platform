@@ -209,6 +209,7 @@
                                     :key="item.value"
                                     :label="item.answer"
                                     :value="item.value"
+                                    value-key="item.value"
                                     >
                                     </el-option>
                                 </el-select>

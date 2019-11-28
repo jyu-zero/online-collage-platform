@@ -129,7 +129,7 @@
 import { Row, Button, Pagination, Dialog, Message, MessageBox } from 'element-ui'
 import LostAndFoundDialog from '../../../components/lost-and-found/LostAndFoundDialog'
 // responseHandler, userApi,
-import { prefix, responseHandler, goodsApi } from '@/api'
+import { prefix, goodsApi } from '@/api'
 export default {
     name: 'UserCenterLostAndFound',
     components: {
@@ -217,14 +217,14 @@ export default {
         // 跳转至失物详情页
         goToLostDetails(goodId, sort){
             // 这里的good_id和sort获取不到
-            this.$router.push({ name: 'LostDetails', params: { good_id: goodId, sort: sort } })
+            this.$router.push({ name: 'LostDetails', query: { good_id: goodId, sort: sort } })
             console.log(goodId)
             console.log(sort)
         },
         // 跳转至招领详情页
         goToFoundDetails(goodId, sort){
             // 这里的good_id和sort获取不到
-            this.$router.push({ name: 'FoundDetails', params: { good_id: goodId, sort: sort } })
+            this.$router.push({ name: 'FoundDetails', query: { good_id: goodId, sort: sort } })
             console.log(goodId)
             console.log(sort)
         },

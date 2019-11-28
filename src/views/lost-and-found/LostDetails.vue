@@ -112,8 +112,8 @@ export default {
     },
     methods: {
         getRouterData() {
-            this.good_id = this.$route.params.good_id
-            this.good_id = this.$route.params.sort
+            this.good_id = this.$route.query.good_id
+            this.sort = this.$route.query.sort
         }
     }
 }

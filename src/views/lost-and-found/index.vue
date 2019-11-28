@@ -141,15 +141,11 @@ export default {
         },
         // 跳转至失物详情页
         goToLostDetails(goodId, sort){
-            this.$router.push({ name: 'LostDetails', params: { good_id: goodId, sort: sort } })
-            console.log(goodId)
-            console.log(sort)
+            this.$router.push({ name: 'LostDetails', query: { good_id: goodId, sort: sort } })
         },
         // 跳转至招领详情页
         goToFoundDetails(goodId, sort){
-            this.$router.push({ name: 'FoundDetails', params: { good_id: goodId, sort: sort } })
-            console.log(goodId)
-            console.log(sort)
+            this.$router.push({ name: 'FoundDetails', query: { good_id: goodId, sort: sort } })
         },
         handleSizeChange(val) {
             // console.log(`每页 ${val} 条`);
