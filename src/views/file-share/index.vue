@@ -48,7 +48,7 @@
 
             <el-col :span="4" v-for="item in typesOption" :key="item.id" >
               <div class="grid-content ">
-                <el-link href="#" value="item.id">{{item.file_tag}}</el-link>
+                <el-link  value="item.id" @click="getSpecificTagFile(item.id)">{{item.file_tag}}</el-link>
               </div>
             </el-col>
 
@@ -169,6 +169,7 @@ export default {
             document: [],
             pageCount: 1,
             fileList: [],
+            currentPage: 1,
             url: 'http://localhost/online-collage-platform-server/public/'
         }
     },
@@ -181,11 +182,22 @@ export default {
         handleSelectFile(file){
             this.fileList = file
         },
+        getSpecificTagFile(id, page = 1){
+            this.$axios.post(prefix.api + fileApi.getSpecificTagFile, { page, tagId: id }).then(response => {
+                if(!responseHandler(response.data, this)){
+                    Message.error(response.data.msg)
+                }
+                this.currentPage = page
+                this.document = response.data.data.data
+                this.pageCount = parseInt(response.data.data.pageCount)
+            })
+        },
         getAllFile(page = 1){
             this.$axios.post(prefix.api + fileApi.getAllFile, { page }).then(response => {
                 if(!responseHandler(response.data, this)){
                     Message.error(response.data.msg)
                 }
+                this.currentPage = page
                 this.document = response.data.data.data
                 this.pageCount = parseInt(response.data.data.pageCount)
             })
@@ -211,7 +223,6 @@ export default {
         },
         handleDownload(index, row) {
             // 完成下载接口
-            // console.log(this.document[index].id)
             this.$axios.post(prefix.api + fileApi.download, {
                 fileId: this.document[index].id
             }).then(response => {
@@ -220,7 +231,7 @@ export default {
                 // }
                 console.log(response.data)
                 window.open(response.data)
-                this.getMyFile()
+                // this.getAllFile()
             })
         },
         submitUpload(){
@@ -247,7 +258,7 @@ export default {
                     Message.error('上传失败')
                 }
                 Message.success(response.data.msg)
-                this.getAllFile(this.pageCount)
+                this.getAllFile(this.currentPage)
             })
             this.showModal = false
             this.setType = ''

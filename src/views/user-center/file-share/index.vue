@@ -111,6 +111,7 @@ export default {
             rangesOption: [],
             pageCount: 1,
             fileList: [],
+            currentPage: 1,
             url: 'http://localhost/online-collage-platform-server/public/'
         }
     },
@@ -125,7 +126,6 @@ export default {
         },
         handleDownload(index, row) {
             // 完成下载接口
-            // console.log(this.document[index].id)
             this.$axios.post(prefix.api + fileApi.download, {
                 fileId: this.document[index].id
             }).then(response => {
@@ -134,7 +134,6 @@ export default {
                 // }
                 console.log(response.data)
                 window.open(response.data)
-                this.getMyFile()
             })
         },
         submitUpload(){
@@ -161,7 +160,7 @@ export default {
                     Message.error('上传失败')
                 }
                 Message.success(response.data.msg)
-                this.getMyFile(this.pageCount)
+                this.getMyFile(this.currentPage)
             })
             this.showModal = false
             this.setType = ''
@@ -175,6 +174,7 @@ export default {
                 if(!responseHandler(response.data, this)){
                     Message.error(response.data.msg)
                 }
+                this.currentPage = page
                 this.document = response.data.data.data
                 this.pageCount = parseInt(response.data.data.pageCount)
             })
@@ -211,7 +211,7 @@ export default {
                     Message.error(response.data.msg)
                 }
                 Message.success(response.data.msg)
-                this.getMyFile(this.pageCount)
+                this.getMyFile(this.currentPage)
             })
         }
     }

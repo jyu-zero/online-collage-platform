@@ -14,6 +14,8 @@ export default {
     // 获取个人文件
     'myFile': '/file/my-file',
     // 下载
-    'download': '/file/download'
+    'download': '/file/download',
+    // 下载
+    'getSpecificTagFile': '/file/get-specific-tag-file'
 
 }
