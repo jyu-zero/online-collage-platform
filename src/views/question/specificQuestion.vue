@@ -141,7 +141,7 @@ export default {
     },
     mounted(){
         this.getQuestion(this.questionId)// 进入页面时预设我们页面的问题资料
-        this.getAnswer()// 进入页面时预设我们问题相关回答的资料
+        this.getAnswer(this.questionId)// 进入页面时预设我们问题相关回答的资料
     },
     methods: {
         // 封装的处理放回数据提示的方法
@@ -243,7 +243,7 @@ export default {
             })
         },
         // 获取回答的逻辑
-        getAnswer(page = 1, questionsId = 1){
+        getAnswer(questionsId = 1, page = 1){
             let that = this // 以防后面获取不到this
             this.$axios.get(prefix.api + questionApi.getSolutions, {
                 params: {
@@ -252,17 +252,21 @@ export default {
                 } }).then(response => {
                 if (response.data.code === '0000') {
                     response.data.data.information.forEach((item) => {
-                        var obj = {}
-                        obj.solutionId = item.solutionId
-                        obj.content = item.contentPath
-                        obj.pointTimes = item.likeNum
-                        obj.phone = item.userContact
-                        obj.answer = item.userName
-                        this.answers.push(obj)
+                        this.answers.push(this.addAnswer(item))
                     })
                     that.allPage = response.data.data.pageCount
                 }
             })
+        },
+        // 封装将后端数据整合添加回答的数据
+        addAnswer(item){
+            let obj = {}
+            obj.solutionId = item.solutionId
+            obj.content = item.contentPath
+            obj.pointTimes = item.likeNum
+            obj.phone = item.userContact
+            obj.answer = item.userName
+            return obj
         },
         // 获取回答框里的内容
         getEditor(html){
@@ -270,7 +274,6 @@ export default {
         },
         publishAnswer(){
             const h = this.$createElement
-            
             this.$msgbox({
                 title: '回答提交框',
                 message: h('p', null, [
@@ -305,11 +308,17 @@ export default {
                             this.submitanswer = this.submitanswer.replace(reg, '*')
                         })
                         let content = this.submitanswer // 问题内容
+                        console.log(content)
                         let questionId = this.questionId // 问题id
                         let anonymous = this.anonymous // 是否匿名
                         this.$axios.post(prefix.api + questionApi.publishAnswer, {
                             content, questionId, anonymous }).then(response => {
                             this.responsemesg(response)// 返回值处理
+                            if(response.data.code === '0000'){
+                                response.data.data.information.forEach((item) => {
+                                    this.$set(this.answers, 0, this.addAnswer(item))// vue的set函数可以解决添加数据不能及时渲染的问题
+                                })
+                            }
                         })
                         setTimeout(() => {
                             setTimeout(() => {
