@@ -55,11 +55,11 @@
                         <div class="block">
                             <el-pagination
                             @size-change="handleSizeChange"
-                            @current-change="getMyLostAndFoundList"
+                            @current-change="getDoingList"
                             :current-page.sync="currentPage"
                             :page-size="4"
                             layout="prev, pager, next, jumper"
-                            :page-count="pageCount">
+                            :page-count="doingPage">
                             </el-pagination>
                         </div>
                     </template>
@@ -108,11 +108,11 @@
                         <div class="block">
                             <el-pagination
                             @size-change="handleSizeChange"
-                            @current-change="getMyLostAndFoundList"
+                            @current-change="getDoneList"
                             :current-page.sync="currentPage"
                             :page-size="4"
                             layout="prev, pager, next, jumper"
-                            :page-count="pageCount">
+                            :page-count="donePage">
                             </el-pagination>
                         </div>
                     </template>
@@ -156,7 +156,10 @@ export default {
             dialogVisible: false,
             // 动态改变按钮的提示,多此一步是为了解决弹窗中出现title冒泡的问题
             buttonTitle: '',
-            pageCount: 1,
+            // 进行页数
+            doingPage: 1,
+            // 完成页数
+            donePage: 1,
             // 当前页数
             currentPage: 1,
             studentName: '',
@@ -173,14 +176,16 @@ export default {
     // account为学号user_id
     props: ['account'],
     created () {
-        this.getGoods()
+        this.getDoingGoods()
+        this.getDoneGoods()
     },
     methods: {
-        // 获取失物招领内容
-        getGoods(){
+        // 获取失物招领进行内容
+        getDoingGoods(){
             this.$axios.get(prefix.api + goodsApi.getGoods, {
                 user_id: this.account,
-                page: this.currentPage
+                page: this.currentPage,
+                status: 0
             }).then((response)=>{
                 // if(!responseHandler(response.data, this)){
                 //     // 提示出错
@@ -188,7 +193,18 @@ export default {
                 //     return
                 // }
                 this.goods = response.data.data.rs
-                this.pageCount = response.data.data.totalpage
+                this.doingPage = response.data.data.doingPage
+            })
+        },
+        // 获取失物招领进行内容
+        getDoneGoods(){
+            this.$axios.get(prefix.api + goodsApi.getGoods, {
+                user_id: this.account,
+                page: this.currentPage,
+                status: 1
+            }).then((response)=>{
+                this.goods = response.data.data.rs
+                this.donePage = response.data.data.donePage
             })
         },
         // 跳转至失物详情页
@@ -197,7 +213,7 @@ export default {
             this.$router.push({
                 name: 'LostDetails',
                 params: {
-                    good_id: 1,
+                    good_id: 0,
                     sort: 0
                 }
             })
@@ -221,20 +237,37 @@ export default {
         // handleCurrentChange(val) {
         //     console.log(`当前页: ${val}`)
         // },
-        getMyLostAndFoundList(){
-            this.$axios.get(prefix.api + goodsApi.getGoods, {
-                params: {
-                    page: this.currentPage
-                }
-            }).then(response => {
-                console.log(response.data)
-                if(!responseHandler(response.data, this)) {
-                    Message.error('获取失败,请重新刷新页面')
-                    return false
-                }
-                this.goods = response.data.data.rs
-                this.pageCount = response.data.data.totalpage
-            })
+        getDoingList(){
+            // this.$axios.get(prefix.api + goodsApi.getGoods, {
+            //     params: {
+            //         page: this.currentPage
+            //     }
+            // }).then(response => {
+            //     console.log(response.data)
+            //     if(!responseHandler(response.data, this)) {
+            //         Message.error('获取失败,请重新刷新页面')
+            //         return false
+            //     }
+            //     this.goods = response.data.data.rs
+            //     this.pageCount = response.data.data.totalpage
+            // })
+            this.getDoingGoods()
+        },
+        getDoneList(){
+            // this.$axios.get(prefix.api + goodsApi.getGoods, {
+            //     params: {
+            //         page: this.currentPage
+            //     }
+            // }).then(response => {
+            //     console.log(response.data)
+            //     if(!responseHandler(response.data, this)) {
+            //         Message.error('获取失败,请重新刷新页面')
+            //         return false
+            //     }
+            //     this.goods = response.data.data.rs
+            //     this.pageCount = response.data.data.totalpage
+            // })
+            this.getDoneGoods()
         }
     }
 }

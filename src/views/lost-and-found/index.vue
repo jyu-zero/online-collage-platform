@@ -80,7 +80,6 @@ export default {
     },
     data() {
         return {
-
             // 动态改变按钮组件type的属性
             typeStyle: '',
             // 动态改变按钮组件的类型
@@ -114,6 +113,8 @@ export default {
                 // }
                 this.goods = response.data.data.rs
                 this.pageCount = response.data.data.totalpage
+                this.good_id = response.data.data.rs.good_id
+                this.sort = response.data.data.rs.sort
             })
         },
         // 获取失物招领搜索内容
@@ -125,7 +126,7 @@ export default {
             }).then(response => {
                 console.log(response.data)
                 if(!responseHandler(response.data, this)) {
-                    Message.error('获取失败,请重新刷新页面')
+                    Message.error('搜索失败,请重新搜索')
                     return false
                 }
                 this.goods = response.data.data.rs
@@ -140,31 +141,37 @@ export default {
         },
         // 跳转至失物详情页
         goToLostDetails(){
-            this.$axios.post(prefix.api + goodsApi.getLostDetails, {
-                good_id: this.acconut,
-                sort: this.sort
-            }).then(response => {
-                console.log(response.data)
-                if(!responseHandler(response.data, this)) {
-                    Message.error('查看详情失败,请重新查看')
-                    return false
-                }
-                this.$router.push({ name: 'LostDetails' })
-            })
+            // this.$axios.post(prefix.api + goodsApi.getLostDetails, {
+            //     good_id: this.acconut,
+            //     sort: this.sort
+            // }).then(response => {
+            //     console.log(response.data)
+            //     if(!responseHandler(response.data, this)) {
+            //         Message.error('查看详情失败,请重新查看')
+            //         return false
+            //     }
+            //     this.$router.push({ name: 'LostDetails' })
+            // })
+            this.$router.push({ name: 'LostDetails', params: { good_id: this.good_id, sort: this.sort } })
+            console.log(this.good_id)
+            console.log(this.sort)
         },
         // 跳转至招领详情页
         goToFoundDetails(){
-            this.$axios.post(prefix.api + goodsApi.getFoundDetails, {
-                good_id: this.good_id,
-                sort: this.sort
-            }).then(response => {
-                console.log(response.data)
-                if(!responseHandler(response.data, this)) {
-                    Message.error('查看详情失败,请重新查看')
-                    return false
-                }
-                this.$router.push({ name: 'FoundDetails' })
-            })
+            // this.$axios.post(prefix.api + goodsApi.getFoundDetails, {
+            //     good_id: this.good_id,
+            //     sort: this.sort
+            // }).then(response => {
+            //     console.log(response.data)
+            //     if(!responseHandler(response.data, this)) {
+            //         Message.error('查看详情失败,请重新查看')
+            //         return false
+            //     }
+            //     this.$router.push({ name: 'FoundDetails' })
+            // })
+            this.$router.push({ name: 'FoundDetails', params: { good_id: this.good_id, sort: this.sort } })
+            console.log(this.good_id)
+            console.log(this.sort)
         },
         handleSizeChange(val) {
             // console.log(`每页 ${val} 条`);

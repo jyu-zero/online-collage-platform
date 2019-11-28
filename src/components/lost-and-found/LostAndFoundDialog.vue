@@ -42,6 +42,7 @@
                     v-model="inputTime"
                     type="datetime"
                     :editable="false"
+                    value-format="yyyy-MM-dd HH:mm:ss"
                     placeholder="选择时间">
                     </el-date-picker>
                 </span>
@@ -55,6 +56,7 @@
                     :on-preview="handlePreview"
                     :on-remove="handleRemove"
                     :before-remove="beforeRemove"
+                    :before-upload="beforeAvatarUpload"
                     multiple
                     :limit="3"
                     :on-exceed="handleExceed"
@@ -113,6 +115,7 @@
                     v-model="inputTime"
                     type="datetime"
                     :editable="false"
+                    value-format="yyyy-MM-dd HH:mm:ss"
                     placeholder="选择时间">
                     </el-date-picker>
                 </span>
@@ -126,6 +129,7 @@
                     :on-preview="handlePreview"
                     :on-remove="handleRemove"
                     :before-remove="beforeRemove"
+                    :before-upload="beforeAvatarUpload"
                     multiple
                     :limit="3"
                     :on-exceed="handleExceed"
@@ -279,6 +283,7 @@ export default {
             // 时间
             inputTime: '',
             // 图片
+
             // 发布者名字
             inputUserName: '',
             // 发布者联系方式
@@ -400,6 +405,14 @@ export default {
         handlePreview(file) {
             // console.log(file)
         },
+        // 限制上传图片的大小
+        beforeAvatarUpload(file){
+            const isLt10M = file.size / 1024 / 1024 < 10
+            if(!isLt10M){
+                Message.error('上传的图片大小不能超过10MB,请重新上传')
+            }
+            return isLt10M
+        },
         // 限制图上传数量
         handleExceed(files, fileList) {
             MessageBox.message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`)
@@ -448,10 +461,11 @@ export default {
                 lostData.append('place', this.inputPlace)
                 lostData.append('time', this.inputTime)
                 for(let file of this.fileList){
-                    lostData.append('image[]', file.raw)
+                    lostData.append('image', file.raw)
                 }
                 lostData.append('contact_name', this.inputUserName)
                 lostData.append('contact_num', this.inputTelephone)
+                console.log(lostData.get('time'))
                 this.$axios.post(prefix.api + goodsApi.addLost, lostData).then(response => {
                     console.log(response.data)
                     // 发布失败提示
@@ -516,7 +530,7 @@ export default {
                 foundData.append('place', this.inputPlace)
                 foundData.append('time', this.inputTime)
                 for(let file of this.fileList){
-                    foundData.append('image[]', file.raw)
+                    foundData.append('image', file.raw)
                 }
                 foundData.append('contact_name', this.inputUserName)
                 foundData.append('contact_num', this.inputTelephone)
@@ -588,7 +602,7 @@ export default {
                 lostData.append('place', this.inputPlace)
                 lostData.append('time', this.inputTime)
                 for(let file of this.fileList){
-                    lostData.append('image[]', file.raw)
+                    lostData.append('image', file.raw)
                 }
                 lostData.append('contact_name', this.inputUserName)
                 lostData.append('contact_num', this.inputTelephone)
@@ -658,7 +672,7 @@ export default {
                 foundData.append('place', this.inputPlace)
                 foundData.append('time', this.inputTime)
                 for(let file of this.fileList){
-                    foundData.append('image[]', file.raw)
+                    foundData.append('image', file.raw)
                 }
                 foundData.append('contact_name', this.inputUserName)
                 foundData.append('contact_num', this.inputTelephone)
@@ -696,7 +710,6 @@ export default {
                 type: 'warning'
             }).then(() => {
                 this.$axios.post(prefix.api + goodsApi.setRecovered, {
-                    // 这里的good_id获取不到,为空
                     good_id: this.good_id
                 }).then(response => {
                     console.log(response.data)
@@ -726,9 +739,8 @@ export default {
                 type: 'warning'
             }).then(() => {
                 this.$axios.post(prefix.api + goodsApi.setAbandon, {
-                    // 这里要发送的数据还是获取不到,为空
                     good_id: this.good_id,
-                    sort: this.sort,
+                    sort: this.sorts,
                     user_id: this.user_id
                 }).then(response => {
                     console.log(response.data)
@@ -760,7 +772,7 @@ export default {
                 this.$axios.post(prefix.api + goodsApi.setDelete, {
                     // 这里要发送的数据还是获取不到,为空
                     good_id: this.good_id,
-                    sort: this.sort,
+                    sort: this.sorts,
                     user_id: this.user_id
                 }).then(response => {
                     console.log(response.data)
@@ -884,7 +896,7 @@ ul,li {
                         height: 35px;
                     }
                     .el-input__suffix{
-                        margin-right: 26px;
+                        margin-right: 10px;
                     }
                 }
                 :nth-child(5){
