@@ -36,8 +36,8 @@
                         </div>
                     </div>
                     <div class="to-details">
-                        <el-button title="点击查看详情和图片" type="primary" v-if="item.sort==0" @click="goToLostDetails">查看详情</el-button>
-                        <el-button title="点击查看详情和图片" type="primary" v-if="item.sort==1" @click="goToFoundDetails">查看详情</el-button>
+                        <el-button title="点击查看详情和图片" type="primary" v-if="item.sort==0" @click="goToLostDetails(item.good_id,item.sort)">查看详情</el-button>
+                        <el-button title="点击查看详情和图片" type="primary" v-if="item.sort==1" @click="goToFoundDetails(item.good_id,item.sort)">查看详情</el-button>
                         <LostAndFoundDialog :typeStyle="'primary'" :disabled="'disabled'" v-if="item.status==0&&item.sort==0" list :prompt="'未完成'">未完成</LostAndFoundDialog>
                         <LostAndFoundDialog :typeStyle="'primary'" :disabled="'disabled'" v-if="item.status==0&&item.sort==1" list :prompt="'未完成'">未完成</LostAndFoundDialog>
                         <LostAndFoundDialog :typeStyle="'warning'" :disabled="'disabled'" v-if="item.status==1" list>已完成</LostAndFoundDialog>
@@ -140,38 +140,16 @@ export default {
             this.$router.push({ name: 'UserCenterLostAndFound' })
         },
         // 跳转至失物详情页
-        goToLostDetails(){
-            // this.$axios.post(prefix.api + goodsApi.getLostDetails, {
-            //     good_id: this.acconut,
-            //     sort: this.sort
-            // }).then(response => {
-            //     console.log(response.data)
-            //     if(!responseHandler(response.data, this)) {
-            //         Message.error('查看详情失败,请重新查看')
-            //         return false
-            //     }
-            //     this.$router.push({ name: 'LostDetails' })
-            // })
-            this.$router.push({ name: 'LostDetails', params: { good_id: this.good_id, sort: this.sort } })
-            console.log(this.good_id)
-            console.log(this.sort)
+        goToLostDetails(goodId, sort){
+            this.$router.push({ name: 'LostDetails', params: { good_id: goodId, sort: sort } })
+            console.log(goodId)
+            console.log(sort)
         },
         // 跳转至招领详情页
-        goToFoundDetails(){
-            // this.$axios.post(prefix.api + goodsApi.getFoundDetails, {
-            //     good_id: this.good_id,
-            //     sort: this.sort
-            // }).then(response => {
-            //     console.log(response.data)
-            //     if(!responseHandler(response.data, this)) {
-            //         Message.error('查看详情失败,请重新查看')
-            //         return false
-            //     }
-            //     this.$router.push({ name: 'FoundDetails' })
-            // })
-            this.$router.push({ name: 'FoundDetails', params: { good_id: this.good_id, sort: this.sort } })
-            console.log(this.good_id)
-            console.log(this.sort)
+        goToFoundDetails(goodId, sort){
+            this.$router.push({ name: 'FoundDetails', params: { good_id: goodId, sort: sort } })
+            console.log(goodId)
+            console.log(sort)
         },
         handleSizeChange(val) {
             // console.log(`每页 ${val} 条`);

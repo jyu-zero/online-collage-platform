@@ -158,7 +158,6 @@
                 <div class="question-list">
                     <h3>设置三个物品校验问题</h3>
                     <span>仅有回答全部正确的人才能取得您的联系方式</span>
-                    <!-- question.goods_id这个东西怎么获取 -->
                     <ul class="check-questions">
                         <li v-for="(question,index) of questionAndAnswers" :key="index">
                             <span>问题{{index+1}}

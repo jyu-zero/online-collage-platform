@@ -3,7 +3,6 @@
     <div class="my-lost-and-found">
         <div class="my-lost-and-found-handle">
             <LostAndFoundDialog :buttonTitle="'我丢东西了'" :typeStyle="'warning'" list :prompt="'我丢东西了'">我丢东西了</LostAndFoundDialog>
-            <!-- @submit="handleSubmit" -->
             <LostAndFoundDialog :buttonTitle="'我捡到东西了'" :typeStyle="'warning'" list :prompt="'我捡到东西了'">我捡到东西了</LostAndFoundDialog>
         </div>
         <!-- 正在进行 -->
@@ -38,8 +37,8 @@
                             </div>
                         </div>
                         <div class="to-details">
-                            <el-button type="text" title="点击查看详情和图片" v-if="itemDoing.sort==0" @click="goToLostDetails">查看详情</el-button>
-                            <el-button type="text" title="点击查看详情和图片" v-if="itemDoing.sort==1" @click="goToFoundDetails">查看详情</el-button>
+                            <el-button type="text" title="点击查看详情和图片" v-if="itemDoing.sort==0" @click="goToLostDetails(itemDoing.good_id,itemDoing.sort)">查看详情</el-button>
+                            <el-button type="text" title="点击查看详情和图片" v-if="itemDoing.sort==1" @click="goToFoundDetails(itemDoing.good_id,itemDoing.sort)">查看详情</el-button>
                         </div>
                         <div class="list-button">
                             <LostAndFoundDialog list :buttonTitle="'点击重新编辑失物信息'" v-if="itemDoing.sort==0" :sort="0">编辑</LostAndFoundDialog>
@@ -97,8 +96,8 @@
                             </div>
                         </div>
                         <div class="to-details">
-                            <el-button type="text" title="点击查看详情和图片" v-if="itemDone.sort==0" @click="goToLostDetails">查看详情</el-button>
-                            <el-button type="text" title="点击查看详情和图片" v-if="itemDone.sort==1" @click="goToFoundDetails">查看详情</el-button>
+                            <el-button type="text" title="点击查看详情和图片" v-if="itemDone.sort==0" @click="goToLostDetails(itemDone.good_id,itemDone.sort)">查看详情</el-button>
+                            <el-button type="text" title="点击查看详情和图片" v-if="itemDone.sort==1" @click="goToFoundDetails(itemDone.good_id,itemDone.sort)">查看详情</el-button>
                         </div>
                     </li>
                 </ul>
@@ -183,9 +182,11 @@ export default {
         // 获取失物招领进行内容
         getDoingGoods(){
             this.$axios.get(prefix.api + goodsApi.getGoods, {
-                user_id: this.account,
-                page: this.currentPage,
-                status: 0
+                params: {
+                    user_id: this.account,
+                    page: this.currentPage,
+                    status: 0
+                }
             }).then((response)=>{
                 // if(!responseHandler(response.data, this)){
                 //     // 提示出错
@@ -193,35 +194,39 @@ export default {
                 //     return
                 // }
                 this.goods = response.data.data.rs
-                this.doingPage = response.data.data.doingPage
+                this.doingPage = response.data.data.totalPage
+                this.goods_id = response.data.data.rs.good_id
+                this.sort = response.data.data.rs.sort
             })
         },
-        // 获取失物招领进行内容
+        // 获取失物招领完成内容
         getDoneGoods(){
             this.$axios.get(prefix.api + goodsApi.getGoods, {
-                user_id: this.account,
-                page: this.currentPage,
-                status: 1
+                params: {
+                    user_id: this.account,
+                    page: this.currentPage,
+                    status: 1
+                }
             }).then((response)=>{
                 this.goods = response.data.data.rs
-                this.donePage = response.data.data.donePage
+                this.donePage = response.data.data.totalPage
+                this.goods_id = response.data.data.rs.good_id
+                this.sort = response.data.data.rs.sort
             })
         },
         // 跳转至失物详情页
-        goToLostDetails(){
-            console.log('跳转至失物详情页')
-            this.$router.push({
-                name: 'LostDetails',
-                params: {
-                    good_id: 0,
-                    sort: 0
-                }
-            })
+        goToLostDetails(goodId, sort){
+            // 这里的good_id和sort获取不到
+            this.$router.push({ name: 'LostDetails', params: { good_id: goodId, sort: sort } })
+            console.log(goodId)
+            console.log(sort)
         },
         // 跳转至招领详情页
-        goToFoundDetails(){
-            console.log('跳转至招领详情页')
-            this.$router.push({ name: 'FoundDetails' })
+        goToFoundDetails(goodId, sort){
+            // 这里的good_id和sort获取不到
+            this.$router.push({ name: 'FoundDetails', params: { good_id: goodId, sort: sort } })
+            console.log(goodId)
+            console.log(sort)
         },
         // 关闭element对话框
         handleClose(done) {
