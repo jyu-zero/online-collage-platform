@@ -3,9 +3,19 @@ export default {
     // 主页获取失物招领物品的接口
     'getGoods': '/goods/display',
     // 发布失物信息接口
-    'addLost': '/goods/add-lose',
+    'addLost': '/goods/add-lost',
     // 发布招领信息接口
-    'addFound': '/goods/found-lost',
+    'addFound': '/goods/add-pick',
+    // 个人中心设置状态为已找回接口
+    'setRecovered': '/goods/recovered',
+    // 个人中心设置状态为放弃接口
+    'setAbandon': '/goods/goods-give-up',
+    // 个人中心设置状态为删除接口
+    'setDelete': '/goods/goods-delete',
+    // 个人中心设置状态为已认领接口
+    'setClaim': '/goods/claimed',
+    // 个人中心编辑信息
+    'submitChange': '/goods/submit-change',
     // 失物详情页获取接口
     'getLostDetails': '/goods/lost-detail',
     // 招领详情页获取接口

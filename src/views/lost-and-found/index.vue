@@ -9,7 +9,7 @@
             <el-input class="el-input" placeholder="请输入内容" v-model="search" clearable @keyup.enter.native="getSearchContent"></el-input>
         </div>
         <div class="lost-found-list">
-            <ul v-for="item of goods" :key="item.id">
+            <ul v-for="item of goods" :key="item.good_id">
                 <li>
                     <div class="lost-and-found-list-left">
                         <div class="lost-and-found-type">
@@ -21,8 +21,8 @@
                                 <p><span>{{item.title}}</span></p>
                             </div>
                             <div class="goods-condition">
-                                <p v-if="!item.trusteeship"><span>学院托管</span></p>
-                                <p v-if="item.trusteeship"><span>请联系我</span></p>
+                                <p v-if="item.host==0"><span>学院托管</span></p>
+                                <p v-if="item.host==1"><span>请联系我</span></p>
                             </div>
                         </div>
                         <div class="bottom">
@@ -50,11 +50,11 @@
                     <div class="block">
                         <el-pagination
                         @size-change="handleSizeChange"
-                        @current-change="handleCurrentChange"
-                        :current-page.sync="pageCount"
-                        :page-size="5"
+                        @current-change="getMyLostAndFoundList"
+                        :current-page.sync="currentPage"
+                        :page-size="10"
                         layout="prev, pager, next, jumper"
-                        :total="100">
+                        :page-count="pageCount">
                         </el-pagination>
                     </div>
                 </template>
@@ -67,7 +67,7 @@
 <script>
 import { Button, Message, Pagination, Input, MessageBox } from 'element-ui'
 import LostAndFoundDialog from '../../components/lost-and-found/LostAndFoundDialog'
-import { prefix, goodsApi } from '@/api'
+import { prefix, goodsApi, responseHandler } from '@/api'
 export default {
     name: 'Lost-Found',
     components: {
@@ -89,27 +89,14 @@ export default {
             prompt: '',
             // 动态改变按钮的提示,多此一步是为了解决弹窗中出现title冒泡的问题
             buttonTitle: '',
-            // currentPage3: 5,
+            currentPage: 1,
             pageCount: 1,
             search: '',
             // 我的失物招领数据
-            goods: [
-            //     {
-            //         id: 0,
-            //         // lost: true,
-            //         // 0代表进行,1代表完成,主页面不显示已经完成的列表
-            //         status: 1,
-            //         // 0丢失,1认领
-            //         sort: 0,
-            //         title: '蓝色小水杯',
-            //         // 是否学院托管
-            //         trusteeship: false,
-            //         place: '中区主球场',
-            //         time: '2019-02-23'
-            //     }
-            ]
+            goods: []
         }
     },
+    props: ['acconut'],
     created () {
         this.getGoods()
     },
@@ -131,7 +118,20 @@ export default {
         },
         // 获取失物招领搜索内容
         getSearchContent(){
-            this.getGoods()
+            this.$axios.get(prefix.api + goodsApi.getGoods, {
+                params: {
+                    search: this.search
+                }
+            }).then(response => {
+                console.log(response.data)
+                if(!responseHandler(response.data, this)) {
+                    Message.error('获取失败,请重新刷新页面')
+                    return false
+                }
+                this.goods = response.data.data.rs
+                this.pageCount = response.data.data.totalpage
+                this.sort = response.data.data.sort
+            })
         },
         // 跳转至我的失物招领页面
         goToUserCenterLostAndFound(){
@@ -140,13 +140,31 @@ export default {
         },
         // 跳转至失物详情页
         goToLostDetails(){
-            // console.log('跳转至失物详情页')
-            this.$router.push({ name: 'LostDetails' })
+            this.$axios.post(prefix.api + goodsApi.getLostDetails, {
+                good_id: this.acconut,
+                sort: this.sort
+            }).then(response => {
+                console.log(response.data)
+                if(!responseHandler(response.data, this)) {
+                    Message.error('查看详情失败,请重新查看')
+                    return false
+                }
+                this.$router.push({ name: 'LostDetails' })
+            })
         },
         // 跳转至招领详情页
         goToFoundDetails(){
-            // console.log('跳转至招领详情页')
-            this.$router.push({ name: 'FoundDetails' })
+            this.$axios.post(prefix.api + goodsApi.getFoundDetails, {
+                good_id: this.good_id,
+                sort: this.sort
+            }).then(response => {
+                console.log(response.data)
+                if(!responseHandler(response.data, this)) {
+                    Message.error('查看详情失败,请重新查看')
+                    return false
+                }
+                this.$router.push({ name: 'FoundDetails' })
+            })
         },
         handleSizeChange(val) {
             // console.log(`每页 ${val} 条`);
@@ -154,18 +172,22 @@ export default {
         handleCurrentChange(val) {
             // console.log(`当前页: ${val}`);
             this.getGoods()
+        },
+        getMyLostAndFoundList(){
+            this.$axios.get(prefix.api + goodsApi.getGoods, {
+                params: {
+                    page: this.currentPage
+                }
+            }).then(response => {
+                console.log(response.data)
+                if(!responseHandler(response.data, this)) {
+                    Message.error('获取失败,请重新刷新页面')
+                    return false
+                }
+                this.goods = response.data.data.rs
+                this.pageCount = response.data.data.totalpage
+            })
         }
-        // getMyLostAndFoundList(page = 1) {
-        //     this.$axios.get(prefix.api + goodsApi.getGoods, {
-        //         params: {
-        //             page
-        //         }
-        //     }).then(response => {
-        //         // if(!responseHandler.handle(response.data, this)) { return }
-        //         this.questionList = response.data.data.questions
-        //         this.pageCount = response.data.data.pageCount
-        //     })
-        // }
     }
 }
 </script>

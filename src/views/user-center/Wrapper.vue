@@ -37,10 +37,9 @@
                 </el-menu-item>
             </el-menu>
             <main>
-                <router-view/>
+                <router-view :account="account"></router-view>
             </main>
         </div>
-
     </div>
 </template>
 

@@ -1,51 +1,51 @@
 <template>
-
     <!-- 我的失物招领[开始] -->
     <div class="my-lost-and-found">
         <div class="my-lost-and-found-handle">
             <LostAndFoundDialog :buttonTitle="'我丢东西了'" :typeStyle="'warning'" list :prompt="'我丢东西了'">我丢东西了</LostAndFoundDialog>
+            <!-- @submit="handleSubmit" -->
             <LostAndFoundDialog :buttonTitle="'我捡到东西了'" :typeStyle="'warning'" list :prompt="'我捡到东西了'">我捡到东西了</LostAndFoundDialog>
         </div>
         <!-- 正在进行 -->
         <div class="my-lost-and-found-do">
             <h2>正在进行</h2>
             <div class="lost-and-found-list">
-                <ul v-for="item of goods" :key="item.good_id">
+                <ul v-for="itemDoing of goods" :key="itemDoing.good_id">
                     <!-- 进行与完成的列表最多放4列 -->
-                    <li v-if="item.status==0">
+                    <li v-if="itemDoing.status==0">
                         <div class="lost-and-found-list-left">
                             <div class="lost-and-found-type">
-                                <p v-if="item.sort==0"><span>我丢失的</span></p>
-                                <p v-if="item.sort==1"><span>我捡到的</span></p>
+                                <p v-if="itemDoing.sort==0"><span>我丢失的</span></p>
+                                <p v-if="itemDoing.sort==1"><span>我捡到的</span></p>
                             </div>
                             <div class="top">
                                 <div class="goods-title">
-                                    <p><span>{{item.title}}</span></p>
+                                    <p><span>{{itemDoing.title}}</span></p>
                                 </div>
                                 <div class="goods-condition">
-                                    <p v-if="!item.hoster"><span>学院托管</span></p>
-                                    <p v-if="item.hoster"><span>请联系我</span></p>
+                                    <p v-if="itemDoing.host==1"><span>学院托管</span></p>
+                                    <p v-if="itemDoing.host==0"><span>请联系我</span></p>
                                 </div>
                             </div>
                             <div class="bottom">
                                 <div class="lost-and-found-time">
-                                    <p><span>于 {{item.time}} 在</span></p>
+                                    <p><span>于 {{itemDoing.time}} 在</span></p>
                                 </div>
                                 <div class="lost-and-found-place">
-                                    <p v-if="item.sort==0"><span>{{item.place}} 丢失</span></p>
-                                    <p v-if="item.sort==1"><span>{{item.place}} 捡到</span></p>
+                                    <p v-if="itemDoing.sort==0"><span>{{itemDoing.place}} 丢失</span></p>
+                                    <p v-if="itemDoing.sort==1"><span>{{itemDoing.place}} 捡到</span></p>
                                 </div>
                             </div>
                         </div>
                         <div class="to-details">
-                            <el-button type="text" title="点击查看详情和图片" v-if="item.sort==0" @click="goToLostDetails">查看详情</el-button>
-                            <el-button type="text" title="点击查看详情和图片" v-if="item.sort==1" @click="goToFoundDetails">查看详情</el-button>
+                            <el-button type="text" title="点击查看详情和图片" v-if="itemDoing.sort==0" @click="goToLostDetails">查看详情</el-button>
+                            <el-button type="text" title="点击查看详情和图片" v-if="itemDoing.sort==1" @click="goToFoundDetails">查看详情</el-button>
                         </div>
                         <div class="list-button">
-                            <LostAndFoundDialog list :buttonTitle="'点击重新编辑失物信息'" v-if="item.sort==0" :sort="0">编辑</LostAndFoundDialog>
-                            <LostAndFoundDialog list :buttonTitle="'点击重新编辑招领信息'" v-if="item.sort==1" :sort="1">编辑</LostAndFoundDialog>
-                            <LostAndFoundDialog :buttonTitle="'点击设置失物状态'" v-if="item.sort==0" :typeStyle="'primary'" list :prompt="'设置失物状态'">未找回</LostAndFoundDialog>
-                            <LostAndFoundDialog :buttonTitle="'点击设置招领状态'" v-if="item.sort==1" :typeStyle="'primary'" list :prompt="'确认认领'">未归还失主</LostAndFoundDialog>
+                            <LostAndFoundDialog list :buttonTitle="'点击重新编辑失物信息'" v-if="itemDoing.sort==0" :sort="0">编辑</LostAndFoundDialog>
+                            <LostAndFoundDialog list :buttonTitle="'点击重新编辑招领信息'" v-if="itemDoing.sort==1" :sort="1">编辑</LostAndFoundDialog>
+                            <LostAndFoundDialog :buttonTitle="'点击设置失物状态'" v-if="itemDoing.sort==0" :typeStyle="'primary'" list :prompt="'设置失物状态'" :good_id="itemDoing.good_id" :user_id="user_id" :sorts="itemDoing.sort">未找回</LostAndFoundDialog>
+                            <LostAndFoundDialog :buttonTitle="'点击设置招领状态'" v-if="itemDoing.sort==1" :typeStyle="'primary'" list :prompt="'确认认领'" :good_id="itemDoing.good_id">未归还失主</LostAndFoundDialog>
                         </div>
                     </li>
                 </ul>
@@ -56,10 +56,10 @@
                             <el-pagination
                             @size-change="handleSizeChange"
                             @current-change="getMyLostAndFoundList"
-                            :current-page.sync="page"
-                            :page-size="100"
+                            :current-page.sync="currentPage"
+                            :page-size="4"
                             layout="prev, pager, next, jumper"
-                            :total="500">
+                            :page-count="pageCount">
                             </el-pagination>
                         </div>
                     </template>
@@ -70,35 +70,35 @@
         <div class="my-lost-and-found-do">
             <h2>已经完成</h2>
             <div class="lost-and-found-list">
-                <ul v-for="item of goods" :key="item.good_id">
-                    <li v-if="item.status==1">
+                <ul v-for="itemDone of goods" :key="itemDone.good_id">
+                    <li v-if="itemDone.status==1">
                         <div class="lost-and-found-list-left">
                             <div class="lost-and-found-type">
-                                <p v-if="item.sort==0"><span>我丢失的</span></p>
-                                <p v-if="item.sort==1"><span>我捡到的</span></p>
+                                <p v-if="itemDone.sort==0"><span>我丢失的</span></p>
+                                <p v-if="itemDone.sort==1"><span>我捡到的</span></p>
                             </div>
                             <div class="top">
                                 <div class="goods-title">
-                                    <p><span>{{item.title}}</span></p>
+                                    <p><span>{{itemDone.title}}</span></p>
                                 </div>
                                 <div class="goods-condition">
-                                    <p v-if="!item.hoster"><span>学院托管</span></p>
-                                    <p v-if="item.hoster"><span>请联系我</span></p>
+                                    <p v-if="!itemDone.hoster"><span>学院托管</span></p>
+                                    <p v-if="itemDone.hoster"><span>请联系我</span></p>
                                 </div>
                             </div>
                             <div class="bottom">
                                 <div class="lost-and-found-time">
-                                    <p><span>于 {{item.time}} 在</span></p>
+                                    <p><span>于 {{itemDone.time}} 在</span></p>
                                 </div>
                                 <div class="lost-and-found-place">
-                                    <p v-if="item.sort==0"><span>{{item.place}} 丢失</span></p>
-                                    <p v-if="item.sort==1"><span>{{item.place}} 捡到</span></p>
+                                    <p v-if="itemDone.sort==0"><span>{{itemDone.place}} 丢失</span></p>
+                                    <p v-if="itemDone.sort==1"><span>{{itemDone.place}} 捡到</span></p>
                                 </div>
                             </div>
                         </div>
                         <div class="to-details">
-                            <el-button type="text" title="点击查看详情和图片" v-if="item.sort==0" @click="goToLostDetails">查看详情</el-button>
-                            <el-button type="text" title="点击查看详情和图片" v-if="item.sort==1" @click="goToFoundDetails">查看详情</el-button>
+                            <el-button type="text" title="点击查看详情和图片" v-if="itemDone.sort==0" @click="goToLostDetails">查看详情</el-button>
+                            <el-button type="text" title="点击查看详情和图片" v-if="itemDone.sort==1" @click="goToFoundDetails">查看详情</el-button>
                         </div>
                     </li>
                 </ul>
@@ -109,10 +109,10 @@
                             <el-pagination
                             @size-change="handleSizeChange"
                             @current-change="getMyLostAndFoundList"
-                            :current-page.sync="page"
-                            :page-size="100"
+                            :current-page.sync="currentPage"
+                            :page-size="4"
                             layout="prev, pager, next, jumper"
-                            :total="500">
+                            :page-count="pageCount">
                             </el-pagination>
                         </div>
                     </template>
@@ -127,9 +127,8 @@
 </template>
 
 <script>
-import { Row, Button, Pagination, Dialog, Message } from 'element-ui'
+import { Row, Button, Pagination, Dialog, Message, MessageBox } from 'element-ui'
 import LostAndFoundDialog from '../../../components/lost-and-found/LostAndFoundDialog'
-import $axios from 'axios'
 // responseHandler, userApi,
 import { prefix, responseHandler, goodsApi } from '@/api'
 export default {
@@ -140,148 +139,56 @@ export default {
         [Pagination.name]: Pagination,
         [Dialog.name]: Dialog,
         [Message.name]: Message,
+        [MessageBox.name]: MessageBox,
         LostAndFoundDialog
     },
     data(){
         return{
+            user_id: this.account,
             // 改变按钮组件type的属性
             typeStyle: '',
             // 弹窗的标题提示
             prompt: '',
             // 传给子组件用于判断是失物还是招领模块
             sort: 0,
+            // 用于传给组件进行后台数据传递
+            sorts: '',
             dialogVisible: false,
             // 动态改变按钮的提示,多此一步是为了解决弹窗中出现title冒泡的问题
             buttonTitle: '',
-            page: 1,
-            // currentPage3: 5,
+            pageCount: 1,
+            // 当前页数
+            currentPage: 1,
             studentName: '',
             studentId: '',
-            account: '',
             password: '',
             // 当前是否已登录
             isLogin: false,
             // 登录窗口开关变量
             loginWindow: false,
             // 我的失物招领数据
-            goods: [
-                {
-                    id: 0,
-                    // 0代表进行,1代表完成
-                    status: 0,
-                    // 0丢失,1认领
-                    sort: 0,
-                    title: '蓝色小水杯',
-                    // 是否学院托管
-                    hoster: false,
-                    place: '中区主球场',
-                    time: '2019-02-23'
-                },
-                {
-                    id: 1,
-                    // 0代表进行,1代表完成
-                    status: 1,
-                    // 0丢失,1认领
-                    sort: 1,
-                    title: '卡西欧手表',
-                    // 是否学院托管
-                    hoster: true,
-                    place: '中区篮球场',
-                    time: '2019-06-04'
-                },
-                {
-                    id: 2,
-                    // 0代表进行,1代表完成
-                    status: 1,
-                    // 0丢失,1认领
-                    sort: 0,
-                    title: '小米手机',
-                    // 是否学院托管
-                    hoster: true,
-                    place: '南区食堂',
-                    time: '2018-12-16'
-                },
-                {
-                    id: 3,
-                    // 0代表进行,1代表完成
-                    status: 0,
-                    // 0丢失,1认领
-                    sort: 0,
-                    title: '一卡通171100220',
-                    // 是否学院托管
-                    hoster: false,
-                    place: '全校',
-                    time: '2019-06-11'
-                },
-                {
-                    id: 3,
-                    // 0代表进行,1代表完成
-                    status: 0,
-                    // 0丢失,1认领
-                    sort: 1,
-                    title: '一卡通171100220',
-                    // 是否学院托管
-                    hoster: false,
-                    place: '全校',
-                    time: '2019-06-11'
-                },
-                {
-                    id: 3,
-                    // 0代表进行,1代表完成
-                    status: 1,
-                    // 0丢失,1认领
-                    sort: 1,
-                    title: '一卡通171100220',
-                    // 是否学院托管
-                    hoster: false,
-                    place: '全校',
-                    time: '2019-06-11'
-                },
-                {
-                    id: 3,
-                    // 0代表进行,1代表完成
-                    status: 0,
-                    // 0丢失,1认领
-                    sort: 1,
-                    title: '一卡通171100220',
-                    // 是否学院托管
-                    hoster: false,
-                    place: '全校',
-                    time: '2019-06-11'
-                },
-                {
-                    id: 3,
-                    // 0代表进行,1代表完成
-                    status: 1,
-                    // 0丢失,1认领
-                    sort: 1,
-                    title: '一卡通171100220',
-                    // 是否学院托管
-                    hoster: false,
-                    place: '全校',
-                    time: '2019-06-11'
-                }
-            ]
+            goods: []
         }
+    },
+    // account为学号user_id
+    props: ['account'],
+    created () {
+        this.getGoods()
     },
     methods: {
         // 获取失物招领内容
         getGoods(){
-            this.$axios.get(prefix.api + goodsApi.getGoods).then((response)=>{
+            this.$axios.get(prefix.api + goodsApi.getGoods, {
+                user_id: this.account,
+                page: this.currentPage
+            }).then((response)=>{
                 // if(!responseHandler(response.data, this)){
                 //     // 提示出错
                 //     Message.error('您还未登录')
                 //     return
                 // }
-
-                // this.goods = response.data.data
-                // this.status = response.data.data.status
-                // this.sort = response.data.data.sort
-                // this.title = response.data.data.title
-                // this.hoster = response.data.data.hoster
-                // this.place = response.data.data.place
-                // this.time = response.data.data.time
-                // console.log(response.data.data)
+                this.goods = response.data.data.rs
+                this.pageCount = response.data.data.totalpage
             })
         },
         // 跳转至失物详情页
@@ -302,7 +209,7 @@ export default {
         },
         // 关闭element对话框
         handleClose(done) {
-            this.$confirm('确认关闭？')
+            MessageBox.$confirm('确认关闭？')
                 .then(() => {
                     done()
                 })
@@ -312,21 +219,23 @@ export default {
             // console.log(`每页 ${val} 条`);
         },
         // handleCurrentChange(val) {
-        //     // console.log(`当前页: ${val}`);
-        // }
-        getMyLostAndFoundList(page = 1){
+        //     console.log(`当前页: ${val}`)
+        // },
+        getMyLostAndFoundList(){
             this.$axios.get(prefix.api + goodsApi.getGoods, {
                 params: {
-                    page
+                    page: this.currentPage
                 }
+            }).then(response => {
+                console.log(response.data)
+                if(!responseHandler(response.data, this)) {
+                    Message.error('获取失败,请重新刷新页面')
+                    return false
+                }
+                this.goods = response.data.data.rs
+                this.pageCount = response.data.data.totalpage
             })
-                .then(response => {
-                    if(!responseHandler.handle(response.data, this)) { return }
-                    this.questionList = response.data.data.questions
-                    this.pageCount = response.data.data.pageCount
-                })
         }
-        
     }
 }
 </script>

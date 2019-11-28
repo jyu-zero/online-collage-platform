@@ -40,9 +40,9 @@
                 <span>遗失的时间
                     <el-date-picker
                     v-model="inputTime"
-                    type="date"
+                    type="datetime"
                     :editable="false"
-                    placeholder="选择日期">
+                    placeholder="选择时间">
                     </el-date-picker>
                 </span>
                 <!-- 遗失物品图片 -->
@@ -50,6 +50,8 @@
                     <el-upload
                     class="upload-demo"
                     action="https://jsonplaceholder.typicode.com/posts/"
+                    :auto-upload="false"
+                    :on-change="handleSelectFile"
                     :on-preview="handlePreview"
                     :on-remove="handleRemove"
                     :before-remove="beforeRemove"
@@ -57,7 +59,6 @@
                     :limit="3"
                     :on-exceed="handleExceed"
                     :file-list="fileList"
-                    :on-change="inputPictureChange"
                     >
                     <el-button size="small" type="primary">选择图片</el-button>
                     </el-upload>
@@ -72,7 +73,7 @@
                 </span>
                 <!-- 遗失者联系方式 -->
                 <span>您的联系方式
-                <el-input
+                    <el-input
                     placeholder="请输入内容"
                     v-model="inputTelephone"
                     clearable>
@@ -110,9 +111,9 @@
                 <span>拾到的时间
                     <el-date-picker
                     v-model="inputTime"
-                    type="date"
+                    type="datetime"
                     :editable="false"
-                    placeholder="选择日期">
+                    placeholder="选择时间">
                     </el-date-picker>
                 </span>
                 <!-- 拾到物品图片 -->
@@ -120,6 +121,8 @@
                     <el-upload
                     class="upload-demo"
                     action="https://jsonplaceholder.typicode.com/posts/"
+                    :auto-upload="false"
+                    :on-change="handleSelectFile"
                     :on-preview="handlePreview"
                     :on-remove="handleRemove"
                     :before-remove="beforeRemove"
@@ -127,7 +130,6 @@
                     :limit="3"
                     :on-exceed="handleExceed"
                     :file-list="fileList"
-                    :on-change="inputPictureChange"
                     >
                     <el-button size="small" type="primary">选择图片</el-button>
                     </el-upload>
@@ -154,7 +156,7 @@
                     <span>仅有回答全部正确的人才能取得您的联系方式</span>
                     <!-- question.goods_id这个东西怎么获取 -->
                     <ul class="check-questions">
-                        <li v-for="(question,index) of questionAndAnswers" :key="question.questionContent">
+                        <li v-for="(question,index) of questionAndAnswers" :key="index">
                             <span>问题{{index+1}}
                                 <el-input
                                 placeholder="请输入内容"
@@ -252,7 +254,7 @@ import { Button, Dialog, Input, Upload, MessageBox, Radio, Message, Select, Opti
 import { prefix, goodsApi, responseHandler } from '@/api'
 export default {
     components: {
-        name: 'LostAndFoundDialog',
+        // name: 'LostAndFoundDialog',
         [Button.name]: Button,
         [Dialog.name]: Dialog,
         [Input.name]: Input,
@@ -286,37 +288,35 @@ export default {
             // 问题及其答案
             questionAndAnswers: [
                 {
-                    questionContent: '1',
+                    questionContent: '',
                     questionAnswer: [
-                        { value: '选项1', answer: '11' },
-                        { value: '选项2', answer: '12' },
-                        { value: '选项3', answer: '13' },
-                        { value: '选项4', answer: '14' }
+                        { value: '选项A', answer: '' },
+                        { value: '选项B', answer: '' },
+                        { value: '选项C', answer: '' },
+                        { value: '选项D', answer: '' }
                     ]
                 },
                 {
-                    questionContent: '2',
+                    questionContent: '',
                     questionAnswer: [
-                        { value: '选项1', answer: '21' },
-                        { value: '选项2', answer: '22' },
-                        { value: '选项3', answer: '23' },
-                        { value: '选项4', answer: '24' }
+                        { value: '选项A', answer: '' },
+                        { value: '选项B', answer: '' },
+                        { value: '选项C', answer: '' },
+                        { value: '选项D', answer: '' }
                     ]
                 },
                 {
-                    questionContent: '3',
+                    questionContent: '',
                     questionAnswer: [
-                        { value: '选项1', answer: '31' },
-                        { value: '选项2', answer: '32' },
-                        { value: '选项3', answer: '33' },
-                        { value: '选项4', answer: '34' }
+                        { value: '选项A', answer: '' },
+                        { value: '选项B', answer: '' },
+                        { value: '选项C', answer: '' },
+                        { value: '选项D', answer: '' }
                     ]
                 }
             ],
-            // 图片的名字和url
-            fileList: [
-                // { name: '', url: '' }
-            ],
+            // 图片列表
+            fileList: [],
             // 招领人姓名
             foundUserName: '',
             // 招领人联系方式
@@ -354,15 +354,31 @@ export default {
             type: String,
             default: ''
         },
+        // 判断信息失物还是招领
         sort: {
             type: Number,
             default: 3
+        },
+        // 用于传给组件进行后台数据传递
+        sorts: {
+            type: Number,
+            default: 3
+        },
+        // 物品id,用于状态设置时向后台传递
+        good_id: {
+            type: Number,
+            default: 0
+        },
+        // 用户id,用于状态设置时向后台传递
+        user_id: {
+            type: String,
+            default: ''
         }
     },
     methods: {
-        handleClick(){
-            this.$emit('click')
-        },
+        // handleClick(){
+        //     this.$emit('click')
+        // },
         // 关闭element对话框
         handleClose(done) {
             MessageBox.confirm('确认关闭?')
@@ -373,23 +389,20 @@ export default {
         },
         // 删除上传图片 TODO:添加上传成功或失败的message
         handleRemove(file, fileList) {
-            // console.log(file, fileList)
+            this.fileList = fileList
+        },
+        handleSelectFile(file, fileList){
+            console.log(file)
+            console.log(fileList)
+            this.fileList = fileList
         },
         // 点击文件列表中已上传的文件时的钩子(还不知道有什么用,先留着)
         handlePreview(file) {
             // console.log(file)
         },
-        // 获取图片时对图片进行数据转换,便于之后的上传
-        inputPictureChange(file){
-            // console.log(file)
-            let pictureData = new FormData()
-            pictureData.append('file', file.raw)
-            // console.log(pictureData.get('file'))
-            return pictureData
-        },
         // 限制图上传数量
         handleExceed(files, fileList) {
-            this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`)
+            MessageBox.message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`)
         },
         // 确认删除图片
         beforeRemove(file, fileList) {
@@ -429,25 +442,26 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                this.$axios.post(prefix.api + goodsApi.addLost, {
-                    user_id: 1,
-                    title: this.inputTitle,
-                    name: this.inputName,
-                    place: this.inputPlace,
-                    time: this.inputTime,
-                    image: this.pictureData,
-                    contact_name: this.inputUserName,
-                    contact_num: this.inputTelephone
-                }).then(response => {
+                let lostData = new FormData()
+                lostData.append('title', this.inputTitle)
+                lostData.append('name', this.inputName)
+                lostData.append('place', this.inputPlace)
+                lostData.append('time', this.inputTime)
+                for(let file of this.fileList){
+                    lostData.append('image[]', file.raw)
+                }
+                lostData.append('contact_name', this.inputUserName)
+                lostData.append('contact_num', this.inputTelephone)
+                this.$axios.post(prefix.api + goodsApi.addLost, lostData).then(response => {
                     console.log(response.data)
+                    // 发布失败提示
                     if(!responseHandler(response.data, this)){
-                        // 提示出错
                         Message.error('发布失败,请重新发布一次')
                         return
                     }
                     Message({
                         type: 'success',
-                        message: '发布成功!'
+                        message: response.data.msg
                     })
                     this.dialogVisible = false
                 })
@@ -460,16 +474,71 @@ export default {
         },
         // 确定招领发布
         foundSubmit() {
-            MessageBox.confirm('', '确定发布吗?', {
+            if(this.inputTitle.trim() === ''){
+                Message.error('标题不能为空')
+                return
+            }
+            if(this.inputName.trim() === ''){
+                Message.error('物品名称不能为空')
+                return
+            }
+            if(this.inputPlace.trim() === ''){
+                Message.error('拾到地点不能为空')
+                return
+            }
+            if(this.inputTime === ''){
+                Message.error('拾到时间不能为空')
+                return
+            }
+            if(this.inputUserName.trim() === ''){
+                Message.error('姓名不能为空')
+                return
+            }
+            if(this.inputTelephone.trim() === ''){
+                Message.error('联系方式不能为空')
+                return
+            }else if(!(/^1[3456789]\d{9}$/.test(this.inputTelephone.trim()))){
+                Message.error('联系方式的格式不对,请输入正确的手机长号')
+                return
+            }
+            // 判断问题是否为空
+            // if(this.questionAndAnswers){
+
+            // }
+            MessageBox.confirm('确定发布吗?', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                Message({
-                    type: 'success',
-                    message: '发布成功!'
+                let foundData = new FormData()
+                foundData.append('title', this.inputTitle)
+                foundData.append('name', this.inputName)
+                foundData.append('place', this.inputPlace)
+                foundData.append('time', this.inputTime)
+                for(let file of this.fileList){
+                    foundData.append('image[]', file.raw)
+                }
+                foundData.append('contact_name', this.inputUserName)
+                foundData.append('contact_num', this.inputTelephone)
+                for(let question of this.questionAndAnswers){
+                    foundData.append('questionContent[]', question.questionContent)
+                    foundData.append('questionAnswer[]', question.questionAnswer)
+                    // 正确答案
+                    foundData.append('answer', this.value)
+                }
+                this.$axios.post(prefix.api + goodsApi.addFound, foundData).then(response => {
+                    console.log(response.data)
+                    // 发布失败提示
+                    if(!responseHandler(response.data, this)){
+                        Message.error('发布失败,请重新发布一次')
+                        return
+                    }
+                    Message({
+                        type: 'success',
+                        message: response.data.msg
+                    })
+                    this.dialogVisible = false
                 })
-                this.dialogVisible = false
             }).catch(() => {
                 Message({
                     type: 'info',
@@ -479,16 +548,63 @@ export default {
         },
         // 失物信息修改
         lostSubmitChange() {
+            if(this.inputTitle.trim() === ''){
+                Message.error('标题不能为空')
+                return
+            }
+            if(this.inputName.trim() === ''){
+                Message.error('物品名称不能为空')
+                return
+            }
+            if(this.inputPlace.trim() === ''){
+                Message.error('遗失地点不能为空')
+                return
+            }
+            if(this.inputTime === ''){
+                Message.error('遗失时间不能为空')
+                return
+            }
+            if(this.inputUserName.trim() === ''){
+                Message.error('姓名不能为空')
+                return
+            }
+            if(this.inputTelephone.trim() === ''){
+                Message.error('联系方式不能为空')
+                return
+            }else if(!(/^1[3456789]\d{9}$/.test(this.inputTelephone.trim()))){
+                Message.error('联系方式的格式不对,请输入正确的手机长号')
+                return
+            }
             MessageBox.confirm('', '确定修改吗?', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                Message({
-                    type: 'success',
-                    message: '修改成功!'
+                let lostData = new FormData()
+                lostData.append('good_id', this.good_id)
+                lostData.append('sort', this.sort)
+                lostData.append('title', this.inputTitle)
+                lostData.append('name', this.inputName)
+                lostData.append('place', this.inputPlace)
+                lostData.append('time', this.inputTime)
+                for(let file of this.fileList){
+                    lostData.append('image[]', file.raw)
+                }
+                lostData.append('contact_name', this.inputUserName)
+                lostData.append('contact_num', this.inputTelephone)
+                this.$axios.post(prefix.api + goodsApi.submitChange, lostData).then(response => {
+                    console.log(response.data)
+                    // 发布失败提示
+                    if(!responseHandler(response.data, this)){
+                        Message.error('修改失败,请重新修改')
+                        return
+                    }
+                    Message({
+                        type: 'success',
+                        message: response.data.msg
+                    })
+                    this.dialogVisible = false
                 })
-                this.dialogVisible = false
             }).catch(() => {
                 Message({
                     type: 'info',
@@ -498,16 +614,73 @@ export default {
         },
         // 招领信息修改
         foundSubmitChange() {
+            if(this.inputTitle.trim() === ''){
+                Message.error('标题不能为空')
+                return
+            }
+            if(this.inputName.trim() === ''){
+                Message.error('物品名称不能为空')
+                return
+            }
+            if(this.inputPlace.trim() === ''){
+                Message.error('拾到地点不能为空')
+                return
+            }
+            if(this.inputTime === ''){
+                Message.error('拾到时间不能为空')
+                return
+            }
+            if(this.inputUserName.trim() === ''){
+                Message.error('姓名不能为空')
+                return
+            }
+            if(this.inputTelephone.trim() === ''){
+                Message.error('联系方式不能为空')
+                return
+            }else if(!(/^1[3456789]\d{9}$/.test(this.inputTelephone.trim()))){
+                Message.error('联系方式的格式不对,请输入正确的手机长号')
+                return
+            }
+            // 判断问题是否为空
+            // if(this.questionAndAnswers){
+
+            // }
             MessageBox.confirm('', '确定修改吗?', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                Message({
-                    type: 'success',
-                    message: '修改成功!'
+                let foundData = new FormData()
+                foundData.append('good_id', this.good_id)
+                foundData.append('sort', this.sort)
+                foundData.append('title', this.inputTitle)
+                foundData.append('name', this.inputName)
+                foundData.append('place', this.inputPlace)
+                foundData.append('time', this.inputTime)
+                for(let file of this.fileList){
+                    foundData.append('image[]', file.raw)
+                }
+                foundData.append('contact_name', this.inputUserName)
+                foundData.append('contact_num', this.inputTelephone)
+                for(let question of this.questionAndAnswers){
+                    foundData.append('questionContent[]', question.questionContent)
+                    foundData.append('questionAnswer[]', question.questionAnswer)
+                    // 正确答案
+                    foundData.append('answer', this.value)
+                }
+                this.$axios.post(prefix.api + goodsApi.submitChange, foundData).then(response => {
+                    console.log(response.data)
+                    // 发布失败提示
+                    if(!responseHandler(response.data, this)){
+                        Message.error('发布失败,请重新发布一次')
+                        return
+                    }
+                    Message({
+                        type: 'success',
+                        message: response.data.msg
+                    })
+                    this.dialogVisible = false
                 })
-                this.dialogVisible = false
             }).catch(() => {
                 Message({
                     type: 'info',
@@ -522,11 +695,22 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                Message({
-                    type: 'success',
-                    message: '设置成功!'
+                this.$axios.post(prefix.api + goodsApi.setRecovered, {
+                    // 这里的good_id获取不到,为空
+                    good_id: this.good_id
+                }).then(response => {
+                    console.log(response.data)
+                    // 发布失败提示
+                    if(!responseHandler(response.data, this)){
+                        Message.error('设置失败,请重新发设置')
+                        return
+                    }
+                    Message({
+                        type: 'success',
+                        message: response.data.msg
+                    })
+                    this.dialogVisible = false
                 })
-                this.dialogVisible = false
             }).catch(() => {
                 Message({
                     type: 'info',
@@ -541,11 +725,24 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                Message({
-                    type: 'success',
-                    message: '设置成功!'
+                this.$axios.post(prefix.api + goodsApi.setAbandon, {
+                    // 这里要发送的数据还是获取不到,为空
+                    good_id: this.good_id,
+                    sort: this.sort,
+                    user_id: this.user_id
+                }).then(response => {
+                    console.log(response.data)
+                    // 设置失败提示
+                    if(!responseHandler(response.data, this)){
+                        Message.error('设置失败,请重新发设置')
+                        return
+                    }
+                    Message({
+                        type: 'success',
+                        message: response.data.msg
+                    })
+                    this.dialogVisible = false
                 })
-                this.dialogVisible = false
             }).catch(() => {
                 Message({
                     type: 'info',
@@ -560,11 +757,24 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                Message({
-                    type: 'success',
-                    message: '设置成功!'
+                this.$axios.post(prefix.api + goodsApi.setDelete, {
+                    // 这里要发送的数据还是获取不到,为空
+                    good_id: this.good_id,
+                    sort: this.sort,
+                    user_id: this.user_id
+                }).then(response => {
+                    console.log(response.data)
+                    // 设置失败提示
+                    if(!responseHandler(response.data, this)){
+                        Message.error('设置失败,请重新发设置')
+                        return
+                    }
+                    Message({
+                        type: 'success',
+                        message: response.data.msg
+                    })
+                    this.dialogVisible = false
                 })
-                this.dialogVisible = false
             }).catch(() => {
                 Message({
                     type: 'info',
@@ -574,16 +784,40 @@ export default {
         },
         // 确定认领
         setClaim() {
+            if(this.foundUserName.trim() === ''){
+                Message.error('姓名不能为空')
+                return
+            }
+            if(this.foundUserTelephone.trim() === ''){
+                Message.error('联系方式不能为空')
+                return
+            }
+            if(!(/^1[3456789]\d{9}$/.test(this.foundUserTelephone.trim()))){
+                Message.error('联系方式的格式不对,请输入正确的手机长号')
+                return
+            }
             MessageBox.confirm('此操作将永久设置该物品状态为确定认领, 是否继续?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                Message({
-                    type: 'success',
-                    message: '设置成功!'
+                this.$axios.post(prefix.api + goodsApi.setClaim, {
+                    good_id: this.good_id,
+                    found_name: this.foundUserName,
+                    found_num: this.foundUserTelephone
+                }).then(response => {
+                    console.log(response.data)
+                    // 设置失败提示
+                    if(!responseHandler(response.data, this)){
+                        Message.error('设置失败,请重新发设置')
+                        return
+                    }
+                    Message({
+                        type: 'success',
+                        message: response.data.msg
+                    })
+                    this.dialogVisible = false
                 })
-                this.dialogVisible = false
             }).catch(() => {
                 Message({
                     type: 'info',
@@ -650,7 +884,7 @@ ul,li {
                         height: 35px;
                     }
                     .el-input__suffix{
-                        margin-right: 10px;
+                        margin-right: 26px;
                     }
                 }
                 :nth-child(5){
