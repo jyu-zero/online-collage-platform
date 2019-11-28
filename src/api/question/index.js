@@ -24,7 +24,9 @@ export default {
     // 获取回答问题的列表
     'getSolutions': '/admin/get-solutions',
     // 给回答点赞
-    'likes': '/admin/likes',
+    'likes': '/likes',
     // 给回答点踩
-    'dislikes': '/admin/dislikes'
+    'dislikes': '/dislikes',
+    // 发布答案
+    'publishAnswer': '/publish-answers'
 }

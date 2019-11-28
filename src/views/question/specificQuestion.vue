@@ -3,7 +3,7 @@
             <el-breadcrumb separator = "/">
             <el-card>
                 <el-row class = "question-description" :gutter = "10">
-                    <el-col :span = "16">
+                    <el-col :span = "12">
                         <div class = "grid-content bg-purple-dark">
                             <h1 class = "question-title">{{questionTitle}}</h1>
                         </div>
@@ -14,16 +14,14 @@
                             <i class = "el-icon-s-order"></i><span>{{questionType}}</span>
                         </div>
                     </el-col>
-                    <el-col :span = "8" class="question-title" style="
-                    padding-left: 5px;
-                    padding-right: 34px;
+                    <el-col :span = "12" class="question-title" style="
                     display: flex;
                     flex-direction: row-reverse;">
-                        <el-button type="danger" @click='delectQuestion(questionId)' style="margin: 6px 8px;">删除问题<i class="el-icon-delete-solid"></i></el-button>
-                        <el-button type="primary" @click="open" style="margin: 6px 8px;">添加回答<i class="el-icon-edit"></i></el-button>
+                        <el-checkbox v-model="anonymous" label="是否匿名" border style="margin: 6px 8px;">是否匿名</el-checkbox>
+                        <el-button type="danger" v-if="isQuestioner" @click='delectQuestion(questionId)' style="margin: 6px 8px;">删除问题<i class="el-icon-delete-solid"></i></el-button>
+                        <el-button type="primary" @click="publishAnswer" style="margin: 6px 8px;">添加回答<i class="el-icon-edit"></i></el-button>
                     </el-col>
                 </el-row>
-            </el-card>
                 <el-row>
                     <el-col :span = "24">
                         <div class = "grid-content bg-purple-dark description">
@@ -31,6 +29,7 @@
                         </div>
                     </el-col>
                 </el-row>
+            </el-card>
             </el-breadcrumb>
             <el-row>
                 <el-col :span = "24">
@@ -50,7 +49,7 @@
                     </el-row>
                 </el-col>
                 <el-row class = "answer-contant">
-                    <el-col :span = "24" class = "description">{{item.content}}</el-col>
+                    <el-col :span = "24" class = "description" v-html="item.content">{{item.content}}</el-col>
                 </el-row>
                 <el-row class = "answer-buttom" :gutter = "20">
                     <el-col :span = "3">
@@ -78,7 +77,7 @@
                         background
                         layout = " prev, pager, next"
                         :current-page = "currentpage"
-                        :total = "100"
+                        :total = allPage
                         :page-size = 3>
                         </el-pagination>
                     </div>
@@ -100,7 +99,7 @@ import E from 'wangeditor'
 import Vue from 'vue'
 import Editor from '@/components/question/Editor.vue'
 import { prefix, responseHandler, questionApi } from '@/api'
-import { Breadcrumb, Card, Button, Message, MessageBox, Pagination, Avatar, Badge, Col, Row } from 'element-ui'
+import { Breadcrumb, checkbox, Card, Button, Message, MessageBox, Pagination, Avatar, Badge, Col, Row } from 'element-ui'
 Vue.prototype.$msgbox = MessageBox
 Vue.prototype.$alert = MessageBox.alert
 Vue.prototype.$confirm = MessageBox.confirm
@@ -110,6 +109,7 @@ export default {
     name: 'QuestionSpecific',
     components: {
         [Breadcrumb.name]: Breadcrumb,
+        [checkbox.name]: checkbox,
         [Card.name]: Card,
         [Button.name]: Button,
         [Message.name]: Message,
@@ -123,11 +123,12 @@ export default {
     },
     data(){
         return {
-            allPage: '100', // 总页数
+            isQuestioner: false,
+            allPage: 100, // 总页数
             currentpage: 1, // 当前页数
             submitanswer: '',
             illegalKeyword: [],
-            anonymous: true,
+            anonymous: false, // 是否匿名
             questionId: this.$route.params.id,
             questionTitle: '如何进行？',
             questionOwer: 'XXXX',
@@ -140,26 +141,40 @@ export default {
     },
     mounted(){
         this.getQuestion(this.questionId)// 进入页面时预设我们页面的问题资料
-        this.getAnswer()// 进入页面时预设我们问题相关回答的资料
+        this.getAnswer(this.questionId)// 进入页面时预设我们问题相关回答的资料
     },
     methods: {
+        // 封装的处理放回数据提示的方法
+        responsemesg(response){
+            if (response.data.code === '0000') {
+                this.$message({
+                    type: 'success',
+                    message: response.data.msg
+                })
+            }else {
+                this.$message({
+                    type: 'error',
+                    message: response.data.msg
+                })
+            }
+        },
         // 处理点踩的逻辑
         dislike(solutionId, index){
-            this.answers[index].pointTimes--
             this.$axios.post(prefix.api + questionApi.dislikes, {
                 solutionId }).then(response =>{
-                if (response.data.code === '0000') {
-                    alert(response.data.msg)
+                this.responsemesg(response)// 返回值处理
+                if(response.data.code === '0000'){
+                    this.answers[index].pointTimes--
                 }
             })
         },
         // 处理点赞的逻辑
         like(solutionId, index){
-            this.answers[index].pointTimes++
             this.$axios.post(prefix.api + questionApi.likes, {
                 solutionId }).then(response => {
-                if (response.data.code === '0000') {
-                    alert(response.data.msg)
+                this.responsemesg(response)// 返回值处理
+                if(response.data.code === '0000'){
+                    this.answers[index].pointTimes++
                 }
             })
         },
@@ -167,18 +182,31 @@ export default {
         adoptAsBest(solutionId){
             this.$axios.post(prefix.api + questionApi.adoptAsBest, {
                 solutionId }).then(response => {
-                if (response.data.code === '0000') {
-                    alert(response.data.msg)
-                }
+                this.responsemesg(response)// 返回值处理
             })
         },
         //  处理删除问题的逻辑
         delectQuestion(id){
-            this.$axios.post(prefix.api + questionApi.deleteQuestion, {
-                questionId: id }).then(response => {
-                if (response.data.code === '0000') {
-                    alert(response.data.msg)
-                }
+            this.$confirm('此操作将永久删除该问题, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                // 删除问题的具体逻辑
+                let questionId = [id] // 后台要接收一个存放需要删除的问题的id
+                this.$axios.post(prefix.api + questionApi.deleteQuestion, {
+                    questionId }).then(response => {
+                    this.responsemesg(response)// 返回值处理
+                    if(response.data.code === '0000'){
+                        this.$router.push({ path: `/question` })
+                    }
+                })
+                // 删除问题完
+            }).catch(() => {
+                this.$message({
+                    type: 'error',
+                    message: '已取消删除该问题'
+                })
             })
         },
         catchData(value){
@@ -196,48 +224,62 @@ export default {
             this.getAnswer(this.currentpage, this.questionId)
         },
         // 获取问题的逻辑
-        getQuestion(questionId = 1){
+        getQuestion(questionsId = 1){
             this.$axios.get(prefix.api + questionApi.getCheckQuestions, {
-                questionId: this.$route.params.id }).then(response => {
+                params: {
+                    questionsId
+                } }).then(response => {
+                this.responsemesg(response)// 返回值处理
                 if (response.data.code === '0000') {
-                    this.questionId = response.data.data.questionId
-                    this.questionTitle = response.data.data.title
-                    this.questionOwer = response.data.data.name
-                    this.questionTime = response.data.data.time
-                    this.browseTimes = response.data.data.watch
-                    this.questionType = response.data.data.typeName
-                    this.questionDescription = response.data.data.description
+                    this.questionId = response.data.data.information[0].questionId
+                    this.questionTitle = response.data.data.information[0].title
+                    this.questionOwer = response.data.data.information[0].name
+                    this.questionTime = response.data.data.information[0].time
+                    this.browseTimes = response.data.data.information[0].watch
+                    this.questionType = response.data.data.information[0].typeName
+                    this.questionDescription = response.data.data.information[0].description
+                    this.isQuestioner = response.data.data.information[0].isSelf
                 }
             })
         },
         // 获取回答的逻辑
-        getAnswer(page = 1, questionsId = 1){
+        getAnswer(questionsId = 1, page = 1){
+            let that = this // 以防后面获取不到this
             this.$axios.get(prefix.api + questionApi.getSolutions, {
-                page, questionsId }).then(response => {
+                params: {
+                    page,
+                    questionsId
+                } }).then(response => {
                 if (response.data.code === '0000') {
                     response.data.data.information.forEach((item) => {
-                        var obj = {}
-                        obj.solutionId = item.solutionId
-                        obj.content = item.contentPath
-                        obj.pointTimes = item.likeNum
-                        obj.phone = item.userContact
-                        obj.answer = item.userName
-                        this.answers.push(obj)
+                        this.answers.push(this.addAnswer(item))
                     })
-                    this.allpage = response.data.data.pageCount
+                    that.allPage = response.data.data.pageCount
                 }
             })
+        },
+        // 封装将后端数据整合添加回答的数据
+        addAnswer(item){
+            let obj = {}
+            obj.solutionId = item.solutionId
+            obj.content = item.contentPath
+            obj.pointTimes = item.likeNum
+            obj.phone = item.userContact
+            obj.answer = item.userName
+            return obj
         },
         // 获取回答框里的内容
         getEditor(html){
             this.submitanswer = html
         },
-        open(){
+        publishAnswer(){
             const h = this.$createElement
             this.$msgbox({
-                title: '问题提交框',
+                title: '回答提交框',
                 message: h('p', null, [
-                    h('span', null, '请输入您的回答 '),
+                    h('div', null, [
+                        h('span', null, '请输入你的回答')
+                    ]),
                     h('Editor', {
                         props: {
                             catchData: this.submitanswer
@@ -251,32 +293,31 @@ export default {
                         refInFor: true
                     }, this.submitanswer)
                 ]),
+                showClose: true,
                 showCancelButton: true,
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
+                distinguishCancelAndClose: true,
                 beforeClose: (action, instance, done) => {
                     if (action === 'confirm') {
-                        // console.log(JSON.stringify(this.$refs.myeditors[0].$refs))
-                        // this.$refs.myeditors.clearEditor()
                         instance.confirmButtonLoading = true
                         instance.confirmButtonText = '执行中...'
                         this.illegalKeyword.forEach((e) => {
                             let param = e
-                            let reg = new RegExp(param, 'gim') // re为/^\d+bl$/gim
+                            let reg = new RegExp(param, 'gim') // reg为/^\d+bl$/gim
                             this.submitanswer = this.submitanswer.replace(reg, '*')
                         })
-                        this.$refs.myEditor[0].clear()
                         let content = this.submitanswer // 问题内容
-                        let questionsId = this.questionId // 问题id
+                        console.log(content)
+                        let questionId = this.questionId // 问题id
                         let anonymous = this.anonymous // 是否匿名
                         this.$axios.post(prefix.api + questionApi.publishAnswer, {
-                            content, questionsId, anonymous }).then(response => {
-                            if (response.data.code === '0000') {
-                                this.$message({
-                                    message: response.data.msg,
-                                    type: 'success'
+                            content, questionId, anonymous }).then(response => {
+                            this.responsemesg(response)// 返回值处理
+                            if(response.data.code === '0000'){
+                                response.data.data.information.forEach((item) => {
+                                    this.$set(this.answers, 0, this.addAnswer(item))// vue的set函数可以解决添加数据不能及时渲染的问题
                                 })
-                                this.submitanswer = ''
                             }
                         })
                         setTimeout(() => {
@@ -284,17 +325,13 @@ export default {
                                 instance.confirmButtonLoading = false
                                 done()
                             }, 300)
-                        }, 3000)
+                        }, 1000)
                     } else {
                         done()
                     }
+                    this.$refs.myEditor[0].clear()
+                    this.submitanswer = ''
                 }
-            }).then(action => {
-                this.$message({
-                    type: 'info',
-                    message: 'action: ' + action
-                })
-                this.submitanswer = ''
             })
         }
     }
@@ -366,20 +403,18 @@ export default {
     margin: 10px 0;
     padding: 10px;
 }
-
+.wrapper-body >div{
+    width: 100%;
+    padding: 20px 10%;
+}
 </style>
 
 <style lang="less">
 #app{
     height: auto;
 }
-.wrapper-body >div{
-    width: 100%;
-    padding: 20px 10%;
-}
 .el-message-box  {
     width: 50% !important;
-    height: 67%;
     .w-e-text-container{
         height: 359px;
     }

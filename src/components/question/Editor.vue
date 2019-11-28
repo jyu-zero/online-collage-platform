@@ -17,6 +17,7 @@ export default {
     },
     methods: {
         getContent: function () {
+            console.log(this.editor.txt.html())
             alert(this.editorContent)// 该方法可以获取富文本的内容
         },
         clear: function(){
