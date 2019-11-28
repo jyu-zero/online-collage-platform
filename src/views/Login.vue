@@ -32,8 +32,8 @@ export default {
     data(){
         return{
             labelPosition: 'right',
-            account: '',
-            password: ''
+            account: 0,
+            password: 0
         }
     },
     methods: {

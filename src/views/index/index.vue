@@ -5,9 +5,9 @@
         <h1>在线学院平台</h1>
         <!--下拉菜单-->
         <div class="header-right" v-if="isLogin" >
-          <div class="new-msg">
+          <div class="new-msg" @click="goToUserCenter">
             <i class="el-icon-message"></i>
-            <span class="msg-num">996</span>
+            <span class="msg-num" >{{unReadNum}}</span>
           </div>
           <el-dropdown trigger="click"  >
                   <span class="el-dropdown-link " id='dropdown-btn'>
@@ -38,8 +38,8 @@
                       <h2>新闻中心</h2>
                       <span @click="goToNewsPage">查看更多</span>
                   </div>
-                  <ul class="news-list" @click="goToNewsPage">
-                      <li class="news-item"
+                  <dl class="news-list" @click="goToNewsPage">
+                      <dt class="news-item"
                         v-for="item of news"
                         :key="item.news_id"
                         :data-id='item.news_id'>
@@ -50,14 +50,14 @@
                               <font-awesome-icon icon="eye" />
                               {{item.views}}
                           </span>
-                      </li>
-                  </ul>
+                      </dt>
+                  </dl>
                 </div>
                 <!--在线问答-->
                 <div class="online-question">
                   <div class="container-header">
                       <h2>在线问答</h2>
-                      <span @click="goToQuestionPage()">查看更多</span>
+                      <span @click="goToQuestionPage">查看更多</span>
                   </div>
                   <dl class="question-list"
                   @click="goToQuestionPage">
@@ -100,12 +100,12 @@
                 <div class="user-info">
                   <div id="num-msg">
                     <ul>
-                      <li><p id="article-count">24</p>我的问题</li>
-                      <li><p id="member-count">30</p>我的回答</li>
-                      <li><p id="reply-count">41</p>我的失物</li>
+                      <li @click="goToUserCenterQuestion('MyQuestion')"><p id="article-count">24</p>我的问题</li>
+                      <li @click="goToUserCenterQuestion('MyAnswer')"><p id="member-count">30</p>我的回答</li>
+                      <li @click="goToUserCenterLostAndFound"><p id="reply-count" >41</p>我的失物</li>
                     </ul>
                   </div>
-                  <div id="user-center" @click="goToUserCenter()">个人中心</div>
+                  <div id="user-center" @click="goToUserCenter">个人中心</div>
                 </div>
                 <!--失物招领-->
                 <div class="lost-and-found">
@@ -170,7 +170,7 @@
 
 <script>
 import { Dropdown, DropdownMenu, DropdownItem, Button, Input, Message, Dialog } from 'element-ui'
-import { prefix, responseHandler, userApi, goodsApi, newsApi, questionApi } from '@/api'
+import { prefix, responseHandler, userApi, goodsApi, newsApi, questionApi, notificationApi } from '@/api'
 export default {
     name: 'HomePage',
     components: {
@@ -190,25 +190,11 @@ export default {
             // 当前是否已登录
             isLogin: false,
             // 新闻数据
-            news: [
-                {
-                    'news_title': '啊哈哈哈',
-                    'views': 66,
-                    'created_at': '2019-06-08'
-                },
-                {
-                    'news_title': '啊哈哈哈',
-                    'views': 66,
-                    'created_at': '2019-06-08'
-                },
-                {
-                    'news_title': '啊哈哈哈',
-                    'views': 66,
-                    'created_at': '2019-06-08'
-                }
-            ],
+            news: [],
             questions: [],
             goods: [],
+            readArray: [],
+            unReadNum: 0,
             documents: [
                 {
                     id: 0,
@@ -306,6 +292,38 @@ export default {
             })
         },
 
+        // 获取未读通知条数
+        getNotificationNum(){
+            // 先判断本地存储是否有alreadyReadList
+            if(!localStorage.getItem('alreadyReadList')){
+                // 没有则创建一个
+                localStorage.setItem('alreadyReadList', '')
+            }
+            // 将alreadyReadList存储到本地的已读列表中
+            this.readArray = localStorage.getItem('alreadyReadList').split(',')
+            let numberic = []
+            this.readArray.forEach(element => {
+                numberic.push(Number(element))
+            })
+            this.readArray = numberic
+
+            this.$axios.get(prefix.api + notificationApi.getIdList).then((response)=>{
+                if(!responseHandler(response.data, this)){
+                    // 提示出错
+                    Message.error('通知模块发生了未知的问题')
+                    return
+                }
+                let unReadCount = 0
+                response.data.data.idList.forEach(item => {
+                    if (this.readArray.indexOf(item) === -1){
+                        unReadCount++
+                    }
+                })
+                // 大于99条则显示为99
+                this.unReadNum = unReadCount > 99 ? 99 : unReadCount
+            })
+        },
+
         // TODO : 接口没给
         // 获取分享资料
         // getSources(){
@@ -398,6 +416,14 @@ export default {
                     break
             }
         },
+
+        // 跳转至个人中心的失误招领
+        goToUserCenterLostAndFound(){
+            this.$router.push({ name: 'UserCenterLostAndFound' })
+        },
+        goToUserCenterQuestion(where){
+            this.$router.push({ name: where })
+        },
         // 资源共享跳转
         goToSourceShare(){
             this.$router.push({ name: 'SourceShare' })
@@ -409,6 +435,7 @@ export default {
         this.getGoods()
         this.getNewsList()
         this.getQuestion()
+        this.getNotificationNum()
     }
 }
 </script>
