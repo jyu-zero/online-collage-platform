@@ -4,16 +4,16 @@
       <header v-cloak>
         <h1>在线学院平台</h1>
         <!--下拉菜单-->
-        <div class="header-right"  v-if="isLogin" >
-          <div class="new-msg">
+        <div class="header-right" v-if="isLogin" >
+          <div class="new-msg" @click="goToUserCenter">
             <i class="el-icon-message"></i>
-            <span class="msg-num">996</span>
+            <span class="msg-num" >{{unReadNum}}</span>
           </div>
           <el-dropdown trigger="click"  >
                   <span class="el-dropdown-link " id='dropdown-btn'>
                       <div>
-                          <div class="user-name" >{{this.studentName}}</div>
-                          <div class="user-id" >{{this.studentId}}</div>
+                          <div class="user-name" >{{this.name}}</div>
+                          <div class="user-id" >{{this.account}}</div>
                       </div>
                       <i class="el-icon-arrow-down el-icon--right"></i>
                   </span>
@@ -23,9 +23,9 @@
             </el-dropdown-menu>
           </el-dropdown>
         </div>
-        <!--下拉菜单.结束-->
         <!--登录按钮-->
-        <el-button  id="go-to-login" type="info"  plain v-if="!isLogin" @click="showLoginWindow" >登录</el-button>
+        <el-button  id="go-to-login" type="info"  plain v-if="!isLogin" @click="goToLogin" >登录</el-button>
+        <!--下拉菜单.结束-->
       </header>
 
       <!--主体部分-->
@@ -38,8 +38,8 @@
                       <h2>新闻中心</h2>
                       <span @click="goToNewsPage">查看更多</span>
                   </div>
-                  <ul class="news-list" @click="goToNewsPage">
-                      <li class="news-item"
+                  <dl class="news-list" @click="goToNewsPage">
+                      <dt class="news-item"
                         v-for="item of news"
                         :key="item.news_id"
                         :data-id='item.news_id'>
@@ -50,14 +50,14 @@
                               <font-awesome-icon icon="eye" />
                               {{item.views}}
                           </span>
-                      </li>
-                  </ul>
+                      </dt>
+                  </dl>
                 </div>
                 <!--在线问答-->
                 <div class="online-question">
                   <div class="container-header">
                       <h2>在线问答</h2>
-                      <span @click="goToQuestionPage()">查看更多</span>
+                      <span @click="goToQuestionPage">查看更多</span>
                   </div>
                   <dl class="question-list"
                   @click="goToQuestionPage">
@@ -97,15 +97,15 @@
             <!--主体右侧-->
             <div class="main-right">
                 <!--用户中心-->
-                <div class="user-info"  v-if="isLogin">
+                <div class="user-info">
                   <div id="num-msg">
                     <ul>
-                      <li><p id="article-count">24</p>我的问题</li>
-                      <li><p id="member-count">30</p>我的回答</li>
-                      <li><p id="reply-count">41</p>我的失物</li>
+                      <li @click="goToUserCenterQuestion('MyQuestion')"><p id="article-count">24</p>我的问题</li>
+                      <li @click="goToUserCenterQuestion('MyAnswer')"><p id="member-count">30</p>我的回答</li>
+                      <li @click="goToUserCenterLostAndFound"><p id="reply-count" >41</p>我的失物</li>
                     </ul>
                   </div>
-                  <div id="user-center" @click="goToUserCenter()">个人中心</div>
+                  <div id="user-center" @click="goToUserCenter">个人中心</div>
                 </div>
                 <!--失物招领-->
                 <div class="lost-and-found">
@@ -165,36 +165,12 @@
             </div>
 
         </main>
-        <!--登录窗口-->
-        <div id="login-container" v-if="loginWindow" >
-          <span id="cancel-btn"  @click="showLoginWindow">×</span>
-          <h2>登录窗口</h2>
-          <p>学号</p>
-          <el-input  v-model="account" placeholder="请输入学号" ></el-input>
-          <p>密码</p>
-          <el-input  type="password" v-model="password" placeholder="请输入密码"></el-input>
-          <p><el-button type="text" @click="dialogVisible = true">忘记密码？</el-button></p>
-          <div class="btn-container">
-          <el-button  id="login-btn" type="info" @click="login"  plain >登录</el-button>
-          </div>
-        </div>
-        <!--忘记密码的弹窗提示-->
-        <el-dialog
-        title="提示"
-        :visible.sync="dialogVisible"
-        width="30%"
-       >
-        <span>请带上学生证,并写一份保证书前往锡昌科技大楼116重置密码</span>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="dialogVisible = false" type="info" plain class="understand-btn">了解</el-button>
-        </span>
-      </el-dialog>
     </div>
 </template>
 
 <script>
 import { Dropdown, DropdownMenu, DropdownItem, Button, Input, Message, Dialog } from 'element-ui'
-import { prefix, responseHandler, userApi, goodsApi, newsApi, questionApi } from '@/api'
+import { prefix, responseHandler, userApi, goodsApi, newsApi, questionApi, notificationApi } from '@/api'
 export default {
     name: 'HomePage',
     components: {
@@ -209,36 +185,16 @@ export default {
     data() {
         return {
             // 页眉处的姓名学号
-            studentName: '',
-            studentId: '',
-            // 临时登录的帐号密码
+            name: '',
             account: '',
-            password: '',
             // 当前是否已登录
             isLogin: false,
-            // 登录窗口开关变量
-            loginWindow: false,
-            dialogVisible: false,
             // 新闻数据
-            news: [
-                {
-                    'news_title': '啊哈哈哈',
-                    'views': 66,
-                    'created_at': '2019-06-08'
-                },
-                {
-                    'news_title': '啊哈哈哈',
-                    'views': 66,
-                    'created_at': '2019-06-08'
-                },
-                {
-                    'news_title': '啊哈哈哈',
-                    'views': 66,
-                    'created_at': '2019-06-08'
-                }
-            ],
+            news: [],
             questions: [],
             goods: [],
+            readArray: [],
+            unReadNum: 0,
             documents: [
                 {
                     id: 0,
@@ -277,40 +233,14 @@ export default {
             this.$axios.get(prefix.api + userApi.getStudentName).then((response)=>{
                 if(!responseHandler(response.data, this)){
                     // 提示出错
-                    Message.error('您还未登录')
-                    return
+                    Message.error('对不起，您还未登录')
+                    return false
                 }
                 this.isLogin = true
                 // 更新姓名以及一卡通id
-                this.studentName = response.data.data.name
-                this.studentId = response.data.data.account
+                this.name = response.data.data.name
+                this.account = response.data.data.account
             })
-        },
-        // 弹出登录框
-        showLoginWindow() {
-            this.loginWindow = !this.loginWindow
-            this.account = ''
-            this.password = ''
-        },
-        // 登录
-        login(){
-            if(!this.account || !this.password){
-                Message.error('帐号密码不能为空')
-                return
-            }
-            this.$axios
-                .post(prefix.api + userApi.login, { account: this.account, password: this.password })
-                .then((response)=>{
-                    if(!responseHandler(response.data, this)){
-                        // 提示出错
-                        Message.error(response.data.msg)
-                    }
-                    this.getUserName()
-                    this.showLoginWindow()
-                    this.account = ''
-                    this.password = ''
-                    Message.success(response.data.msg)
-                })
         },
         // 注销
         logout(){
@@ -319,12 +249,14 @@ export default {
                     // 提示出错
                     Message.error(response.data.msg)
                 }
-                this.isLogin = false
+                this.$router.push({ name: 'Login' })
                 Message.success(response.data.msg)
             })
         },
-
-        // TODO : 没给观看次数
+        // 跳转登录界面
+        goToLogin(){
+            this.$router.push({ name: 'Login' })
+        },
         // 获取新闻列表
         getNewsList(){
             this.$axios.get(prefix.api + newsApi.getNews).then((response)=>{
@@ -336,8 +268,6 @@ export default {
                 this.news = response.data.data
             })
         },
-
-        // TODO : 接口没给
         // 获取问题列表
         getQuestion(){
             this.$axios.get(prefix.api + questionApi.getQuestions).then((response)=>{
@@ -355,10 +285,42 @@ export default {
             this.$axios.get(prefix.api + goodsApi.getGoods).then((response)=>{
                 if(!responseHandler(response.data, this)){
                     // 提示出错
-                    Message.error('您还未登录')
+                    Message.error(response.data.msg)
                     return
                 }
                 this.goods = response.data.data.rs
+            })
+        },
+
+        // 获取未读通知条数
+        getNotificationNum(){
+            // 先判断本地存储是否有alreadyReadList
+            if(!localStorage.getItem('alreadyReadList')){
+                // 没有则创建一个
+                localStorage.setItem('alreadyReadList', '')
+            }
+            // 将alreadyReadList存储到本地的已读列表中
+            this.readArray = localStorage.getItem('alreadyReadList').split(',')
+            let numberic = []
+            this.readArray.forEach(element => {
+                numberic.push(Number(element))
+            })
+            this.readArray = numberic
+
+            this.$axios.get(prefix.api + notificationApi.getIdList).then((response)=>{
+                if(!responseHandler(response.data, this)){
+                    // 提示出错
+                    Message.error('通知模块发生了未知的问题')
+                    return
+                }
+                let unReadCount = 0
+                response.data.data.idList.forEach(item => {
+                    if (this.readArray.indexOf(item) === -1){
+                        unReadCount++
+                    }
+                })
+                // 大于99条则显示为99
+                this.unReadNum = unReadCount > 99 ? 99 : unReadCount
             })
         },
 
@@ -378,6 +340,11 @@ export default {
         // 跳转部分
         // 个人中心跳转
         goToUserCenter(){
+            // auth
+            if (!this.isLogin){
+                Message.error('对不起，请先登录再进行操作')
+                return
+            }
             this.$router.push({ path: '/user-center/' })
         },
         // 递归寻找dt元素
@@ -449,6 +416,14 @@ export default {
                     break
             }
         },
+
+        // 跳转至个人中心的失误招领
+        goToUserCenterLostAndFound(){
+            this.$router.push({ name: 'UserCenterLostAndFound' })
+        },
+        goToUserCenterQuestion(where){
+            this.$router.push({ name: where })
+        },
         // 资源共享跳转
         goToSourceShare(){
             this.$router.push({ name: 'SourceShare' })
@@ -460,6 +435,7 @@ export default {
         this.getGoods()
         this.getNewsList()
         this.getQuestion()
+        this.getNotificationNum()
     }
 }
 </script>

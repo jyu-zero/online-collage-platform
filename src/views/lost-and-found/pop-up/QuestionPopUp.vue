@@ -2,17 +2,17 @@
     <div class="question-pop-up">
         <el-row class="question-contain" v-for="(questionsItem,index) of questions " :key="index" >
             <el-row class="question">问题{{index+1}}. {{questionsItem.question}}</el-row>
-            <el-row class="select"><el-radio v-model="answer[index]" label="A">A. {{questionsItem.a}}</el-radio></el-row>
-            <el-row class="select"><el-radio v-model="answer[index]" label="B">B. {{questionsItem.b}}</el-radio></el-row>
-            <el-row class="select"><el-radio v-model="answer[index]" label="C">C. {{questionsItem.c}}</el-radio></el-row>
-            <el-row class="select"><el-radio v-model="answer[index]" label="D">D. {{questionsItem.d}}</el-radio></el-row>
+            <el-row class="select"><el-radio v-model="answer[index]" label="a">A. {{questionsItem.a}}</el-radio></el-row>
+            <el-row class="select"><el-radio v-model="answer[index]" label="b">B. {{questionsItem.b}}</el-radio></el-row>
+            <el-row class="select"><el-radio v-model="answer[index]" label="c">C. {{questionsItem.c}}</el-radio></el-row>
+            <el-row class="select"><el-radio v-model="answer[index]" label="d">D. {{questionsItem.d}}</el-radio></el-row>
         </el-row>
         <el-divider></el-divider>
 
         <el-row type="flex" justify="space-between">
-            <el-row>
-                <el-col>{{name}}</el-col>
-                <el-col>{{num}}</el-col>
+            <el-row >
+                <el-col :offset="8">{{name}}</el-col>
+                <el-col :offset="8">{{num}}</el-col>
             </el-row>
             <el-row><el-button type="success" @click="getInfomation">提交</el-button></el-row>
         </el-row>
@@ -64,12 +64,20 @@ export default {
             this.good_id = this.$route.params.sort
         },
         getInfomation() {
+            var answer = this.answer
+            for(var i = 0; i < 3; i++){
+                if(answer[i] === ''){
+                    this.name = '还有选项没有选择'
+                    return
+                }
+            }
             axios
                 .post(prefix.api + goodsApi.giveLostQuestion, {
                     good_id: 1,
-                    anwserOne: this.answer[0],
-                    anwserTwo: this.answer[1],
-                    anwserThree: this.answer[2]
+                    sort: 1,
+                    answerOne: this.answer[0],
+                    answerTwo: this.answer[1],
+                    answerThree: this.answer[2]
                 })
                 .then(response => {
                     this.name = response.data.data.rs[0].found_name
