@@ -14,7 +14,7 @@
                     <div class="">
                         <el-divider></el-divider>
                     </div>
-                    <span v-html="newsvalue.news_content"> {{newsvalue.news_content}} </span>
+                    <div class="" v-html="newsvalue.news_content"> {{newsvalue.news_content}} </div>
                     <div class="">
                         <el-divider></el-divider>
                     </div>
@@ -220,10 +220,17 @@ export default {
         // height: 100px;
         // border: 1px solid rgb(0, 0, 0);
         text-align:center;
-        img{
-            text-align: center;
+        /deep/ table{
+            border:1px solid gray
+        }
+        /deep/ th{
+            border:1px solid gray
+        }
+        /deep/ td{
+            border:1px solid gray
         }
     }
+
     // 附件样式
     .appendix{
         margin-top: 20px;
