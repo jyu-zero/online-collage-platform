@@ -80,11 +80,11 @@ export default {
             let newsThatIViewed = JSON.parse(localStorage.getItem('newsThatIViewed'))
             // this.$route.params.newsId) == -1 时newsThatIViewed为null
             if(newsThatIViewed !== null && newsThatIViewed.indexOf(this.$route.params.newsId) >= 0){
-                return false
+                return 0
             }else{
                 localStorage.setItem('newsThatIViewed', JSON.stringify([this.$route.params.newsId]))
             }
-            return true
+            return 1
         },
         // 跳转至主页
         toHomePage(){
