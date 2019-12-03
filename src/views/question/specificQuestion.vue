@@ -308,7 +308,7 @@ export default {
                             this.submitanswer = this.submitanswer.replace(reg, '*')
                         })
                         let content = this.submitanswer // 问题内容
-                        console.log(content)
+                        // console.log(content)
                         let questionId = this.questionId // 问题id
                         let anonymous = this.anonymous // 是否匿名
                         this.$axios.post(prefix.api + questionApi.publishAnswer, {
@@ -316,7 +316,8 @@ export default {
                             this.responsemesg(response)// 返回值处理
                             if(response.data.code === '0000'){
                                 response.data.data.information.forEach((item) => {
-                                    this.$set(this.answers, 0, this.addAnswer(item))// vue的set函数可以解决添加数据不能及时渲染的问题
+                                    // this.$set(this.answers, 0, this.addAnswer(item))// vue的set函数可以解决添加数据不能及时渲染的问题
+                                    this.answers.unshift(this.addAnswer(item))
                                 })
                             }
                         })
