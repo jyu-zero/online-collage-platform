@@ -21,6 +21,4 @@ export const responseHandler = _responseHandler
 
 export const prefix = apiPrefix
 
-export const newsApi = news
-
 export const fileApi = file
