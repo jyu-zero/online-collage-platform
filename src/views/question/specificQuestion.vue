@@ -221,7 +221,7 @@ export default {
                 message: '请求成功!'
             })
             this.answers = [] // 清空页面的回答数据
-            this.getAnswer(this.currentpage, this.questionId)
+            this.getAnswer(this.questionId, this.currentpage)
         },
         // 获取问题的逻辑
         getQuestion(questionsId = 1){
@@ -254,7 +254,7 @@ export default {
                     response.data.data.information.forEach((item) => {
                         this.answers.push(this.addAnswer(item))
                     })
-                    that.allPage = response.data.data.pageCount
+                    that.allPage = (response.data.data.pageCount - 1) * 4
                 }
             })
         },
